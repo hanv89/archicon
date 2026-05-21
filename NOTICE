@@ -1,0 +1,37 @@
+archicon
+Copyright (c) 2026 hanv89
+
+This repository hosts architecture-diagram icons redistributed from multiple
+upstream sources. Per-source attribution, license terms, and trademark
+notices are completed during license verification before each vendor's icons
+are added to the repository.
+
+Planned upstream sources and their licenses:
+
+  - Microsoft Azure architecture icons (via the plantuml-stdlib/Azure-PlantUML
+    upstream redistribution, MIT).
+  - Microsoft Fabric icons (via the @fabric-msft/svg-icons npm package,
+    published by Microsoft Corporation under MIT).
+  - Kubernetes icons (via kubernetes/community, CNCF / Linux Foundation,
+    Apache-2.0 OR CC-BY-4.0 dual grant).
+  - Microsoft FluentUI System Icons (via microsoft/fluentui-system-icons,
+    published by Microsoft Corporation under MIT).
+  - Devicon dev-tool icons (via devicons/devicon, community-maintained, MIT,
+    Copyright (c) 2015 konpa).
+  - AWS architecture icons (via awslabs/aws-icons-for-plantuml,
+    CC-BY-ND 2.0 — redistributed verbatim, no modification).
+  - Google Cloud icons (via the Google Cloud Icon Library, used for reference
+    in architecture diagrams under Google's brand guidelines).
+
+This project is not affiliated with or endorsed by Microsoft Corporation, the
+Cloud Native Computing Foundation, the Linux Foundation, Amazon Web Services,
+Google LLC, the Devicon project, or any of the third-party brands whose
+products are depicted. All product names and icons are trademarks of their
+respective owners.
+
+================================================================================
+THIRD-PARTY NOTICES
+================================================================================
+
+Per-source notices (source URL, captured commit/version, verbatim license
+text, and trademark policy) are completed before each vendor's icons ship.

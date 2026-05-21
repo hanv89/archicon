@@ -1,0 +1,16 @@
+# Leak detection regex patterns.
+# Single source of truth — sourced by `scripts/check-leaks.sh` (local CLI wrapper)
+# and `.github/workflows/leak-check.yml` (CI).
+# Format: KEY=regex, one per line. Lines starting with `#` and blank lines are
+# ignored. Values are NOT shell-quoted (treated as literal regex strings).
+#
+# Two patterns:
+#   - CONTENT_PATTERN: applied to tracked-file content. Narrow on
+#       \bR[0-9]{2,3}\b so that region labels like `R1` in deployment .puml
+#       files do not false-positive.
+#   - SURFACE_PATTERN: applied to commit messages + branch names only.
+#       Broader \bR[0-9]+\b (single-digit OK) because surface text never
+#       contains region labels.
+
+CONTENT_PATTERN=Phase[ -]?[0-9]+\.|D-[0-9]{3}|\bR[0-9]{2,3}\b|sun group|sungroup|phú quốc|head of tech
+SURFACE_PATTERN=Phase[ -]?[0-9]+\.|D-[0-9]{3}|\bR[0-9]+\b|sun group|sungroup|phú quốc|head of tech

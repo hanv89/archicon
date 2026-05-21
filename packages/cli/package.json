@@ -1,0 +1,47 @@
+{
+  "name": "@hanv89/arch-skill",
+  "version": "0.0.0",
+  "description": "Install the architecture-diagram skill into your AI coding agent (Claude Code, Codex CLI, Cursor).",
+  "bin": {
+    "arch-skill": "dist/index.js"
+  },
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "!dist/**/*.test.*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "tsc && node --test dist/**/*.test.js dist/*.test.js",
+    "test:coverage": "tsc && node --test --experimental-test-coverage dist/**/*.test.js dist/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hanv89/archicon.git",
+    "directory": "packages/cli"
+  },
+  "bugs": {
+    "url": "https://github.com/hanv89/archicon/issues"
+  },
+  "homepage": "https://github.com/hanv89/archicon#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "commander": "14.0.3",
+    "js-yaml": "4.1.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "4.0.9",
+    "@types/node": "22.18.0",
+    "typescript": "5.9.3"
+  }
+}
