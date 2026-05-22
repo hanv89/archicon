@@ -1,0 +1,42 @@
+name: lockfile-check
+
+# Asserts every "resolved" URL in package-lock.json (root + packages/cli)
+# starts with https://registry.npmjs.org/. Catches a malicious or
+# accidental switch to a private/mirror registry. Runs on every PR
+# that touches a lockfile.
+
+on:
+  pull_request:
+    paths:
+      - 'package-lock.json'
+      - 'packages/cli/package-lock.json'
+
+permissions:
+  contents: read
+
+jobs:
+  registry-pin:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Assert lockfile URLs are npmjs.org only
+        run: |
+          set -uo pipefail
+          FAILED=0
+          for f in package-lock.json packages/cli/package-lock.json; do
+            if [ ! -f "$f" ]; then
+              echo "SKIP $f (not present)"
+              continue
+            fi
+            BAD=$(jq -r '.. | objects | select(has("resolved")) | .resolved' "$f" \
+                  | grep -vE '^https://registry\.npmjs\.org/' || true)
+            if [ -n "$BAD" ]; then
+              echo "FAIL non-npmjs.org URLs in $f:"
+              echo "$BAD"
+              FAILED=1
+            else
+              echo "PASS $f registry-pin"
+            fi
+          done
+          exit "$FAILED"

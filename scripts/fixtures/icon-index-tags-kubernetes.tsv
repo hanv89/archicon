@@ -1,0 +1,40 @@
+key	name	description	tags
+api	API Server	Kubernetes API server — control-plane entry point	`control-plane`, `api`
+c-c-m	Cloud Controller Manager	Cloud-provider integration controller	`control-plane`, `cloud`
+c-m	Controller Manager	Built-in controller loops (Node, Replication, Endpoints, ...)	`control-plane`, `controller`
+k-proxy	kube-proxy	Per-node network proxy for Service routing	`control-plane`, `network`, `node`
+kubelet	kubelet	Per-node Pod-lifecycle agent	`control-plane`, `node`
+sched	Scheduler	Pod placement decisions across Nodes	`control-plane`, `scheduling`
+etcd	etcd	Consistent + highly-available key-value store	`infrastructure`, `storage`, `cluster-state`
+master	Master	Control-plane master node	`infrastructure`, `control-plane`
+node	Node	Worker node	`infrastructure`, `node`, `compute`
+pod	Pod	Smallest deployable unit of computing	`workload`, `compute`
+deploy	Deployment	Declarative updates for Pods + ReplicaSets	`workload`, `rollout`, `scaling`
+sts	StatefulSet	Stateful workload with stable identity	`workload`, `stateful`
+ds	DaemonSet	One Pod per (matching) Node	`workload`, `daemon`
+rs	ReplicaSet	Maintains a stable set of Pod replicas	`workload`, `replicaset`
+job	Job	Run-to-completion batch task	`workload`, `batch`
+cronjob	CronJob	Scheduled Job	`workload`, `batch`, `scheduled`
+hpa	HorizontalPodAutoscaler	Scale Pods by metric thresholds	`scaling`, `autoscale`
+svc	Service	Stable network endpoint for a set of Pods	`network`, `service-discovery`
+ing	Ingress	External HTTP(S) routing into Services	`network`, `ingress`
+ep	Endpoints	The IPs backing a Service	`network`, `endpoints`
+netpol	NetworkPolicy	Pod-to-Pod and Pod-to-external traffic rules	`network`, `security`, `policy`
+cm	ConfigMap	Non-confidential configuration key-value pairs	`config`
+secret	Secret	Sensitive data (passwords, tokens, keys)	`config`, `security`, `secret`
+ns	Namespace	Virtual cluster division	`cluster`, `isolation`
+pv	PersistentVolume	Cluster-provisioned storage resource	`storage`, `persistent`
+pvc	PersistentVolumeClaim	Storage request from a user	`storage`, `claim`
+sc	StorageClass	Storage-provisioning profile	`storage`, `profile`
+vol	Volume	Pod-scoped storage	`storage`, `volume`
+quota	ResourceQuota	Namespace resource limits	`cluster`, `policy`, `quota`
+limits	LimitRange	Per-container default + max limits	`cluster`, `policy`, `limits`
+sa	ServiceAccount	Pod identity for API access	`security`, `identity`
+user	User	RBAC user subject	`security`, `rbac`, `identity`
+group	Group	RBAC group subject	`security`, `rbac`, `identity`
+role	Role	Namespaced RBAC permissions	`security`, `rbac`
+c-role	ClusterRole	Cluster-wide RBAC permissions	`security`, `rbac`
+rb	RoleBinding	Bind Role to subject(s)	`security`, `rbac`
+crb	ClusterRoleBinding	Bind ClusterRole to subject(s)	`security`, `rbac`
+crd	CustomResourceDefinition	Extend the Kubernetes API with custom kinds	`api-extension`
+psp	PodSecurityPolicy	Pod security constraints (deprecated since v1.21, removed v1.25)	`security`, `policy`, `deprecated`

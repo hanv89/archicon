@@ -1,0 +1,38 @@
+cat:AIMachineLearning	-	-	`ai`, `ml`, `machine-learning`, `cognitive`
+cat:Analytics	-	-	`analytics`, `data`, `bi`
+cat:Blockchain	-	-	`blockchain`, `distributed-ledger`
+cat:Compute	-	-	`compute`, `vm`, `iaas`, `paas`
+cat:Containers	-	-	`containers`, `kubernetes`, `aks`
+cat:Databases	-	-	`database`, `data`, `sql`, `nosql`
+cat:DevOps	-	-	`devops`, `ci-cd`, `pipelines`
+cat:General	-	-	`general`, `core`
+cat:Health	-	-	`health`, `healthcare`
+cat:Identity	-	-	`identity`, `entra`, `aad`, `auth`
+cat:Integration	-	-	`integration`, `messaging`, `events`
+cat:InternetOfThings	-	-	`iot`, `devices`, `edge`
+cat:Intune	-	-	`intune`, `endpoint-management`, `mdm`
+cat:Management	-	-	`management`, `monitoring`, `governance`
+cat:Media	-	-	`media`, `streaming`, `cdn`
+cat:Migrate	-	-	`migrate`, `migration`
+cat:Mobile	-	-	`mobile`, `apps`
+cat:Networking	-	-	`networking`, `network`, `vnet`, `firewall`, `dns`
+cat:Security	-	-	`security`, `defender`, `key-vault`
+cat:Stack	-	-	`stack`, `hybrid`, `on-prem`
+cat:Storage	-	-	`storage`, `blob`, `disk`
+cat:Web	-	-	`web`, `app-service`, `static-web-apps`
+AzureKubernetesService	-	Microsoft Azure Kubernetes Service (AKS) — managed Kubernetes cluster	`compute`, `containers`, `kubernetes`, `aks`
+AzureContainerRegistry	-	Microsoft Azure Container Registry (ACR) — managed Docker registry	`containers`, `acr`, `registry`
+AzureSqlDatabase	-	Microsoft Azure SQL Database — managed relational database (PaaS)	`database`, `sql`, `relational`, `paas`
+AzureRedisCache	Azure Cache for Redis	Microsoft Azure Cache for Redis — managed Redis cache	`database`, `cache`, `redis`
+AzureCosmosDb	-	Microsoft Azure Cosmos DB — globally distributed multi-model NoSQL database	`database`, `nosql`, `cosmos`, `globally-distributed`
+AzureFunction	Azure Functions	Microsoft Azure Functions — serverless compute (events + HTTP triggers)	`compute`, `serverless`, `functions`
+AzureAppService	-	Microsoft Azure App Service — managed web/API host (PaaS)	`web`, `app-service`, `paas`
+AzureFrontDoor	-	Microsoft Azure Front Door — global L7 load balancer with WAF	`networking`, `cdn`, `waf`, `entry-point`
+AzureServiceBus	-	Microsoft Azure Service Bus — enterprise messaging broker (queues + topics)	`integration`, `messaging`, `queue`, `pubsub`
+AzureKeyVault	-	Microsoft Azure Key Vault — managed secrets / keys / certificates	`security`, `secrets`, `keys`, `certificates`
+AzureMonitor	-	Microsoft Azure Monitor — logs + metrics + traces (observability)	`management`, `monitoring`, `logs`, `metrics`
+AzureActiveDirectory	Microsoft Entra ID	Microsoft Entra ID (formerly Azure Active Directory) — identity + workload identity	`identity`, `entra`, `aad`, `auth`
+AzureVirtualMachine	-	Microsoft Azure Virtual Machine — managed VM (IaaS)	`compute`, `vm`, `iaas`
+AzureBlobStorage	-	Microsoft Azure Blob Storage — object storage	`storage`, `blob`, `object-store`
+AzureMachineLearning	-	Microsoft Azure Machine Learning — managed ML platform (workspaces, training, deployment)	`ai`, `ml`, `machine-learning`, `aml`
+AzureAzureDDoSProtection	Azure DDoS Protection	Microsoft Azure DDoS Protection — managed L3/L4 mitigation	`networking`, `ddos`, `security`

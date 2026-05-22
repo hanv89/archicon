@@ -1,0 +1,26 @@
+# AWS humanize acronym whitelist — PROVISIONAL stub (not yet shipped).
+# Same format/semantics as acronyms-azure.tsv: <pattern><TAB><replacement>,
+# applied after PascalCase splitting, single-token fixes before multi-token re-joins.
+# These rows are a best-effort seed for the common AWS acronyms; the authoritative
+# list is finalised against the actual awslabs/aws-icons-for-plantuml
+# filename set. DO NOT rely on this for a shipped AWS build yet.
+Ec2	EC2
+S3	S3
+Rds	RDS
+Vpc	VPC
+Iam	IAM
+Eks	EKS
+Ecs	ECS
+Sns	SNS
+Sqs	SQS
+Ebs	EBS
+Efs	EFS
+Elb	ELB
+Cdn	CDN
+Dns	DNS
+Api	API
+Db	DB
+Cloud Front	CloudFront
+Cloud Watch	CloudWatch
+Cloud Formation	CloudFormation
+Dynamo DB	DynamoDB

@@ -1,0 +1,91 @@
+name: leak-check
+
+# Scans tracked text files for tokens that should never appear in the public
+# repository: internal phase identifiers, decision-log IDs, internal review
+# tags, and organization-internal terms. Runs on every PR + push to main +
+# every tag push (skill-v* / icons-v* — closes the tag-event blind spot
+# documented in the 2026-05-18 deep review).
+#
+# Regex source: `scripts/leak-patterns.txt` (single source of truth shared
+# with `scripts/check-leaks.sh`). The CONTENT_PATTERN narrow form is used
+# here. A self-test runs first against `tests/leak-fixtures.txt` to ensure
+# the regex still catches each pattern category.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+    tags:
+      - 'skill-v*'
+      - 'icons-v*'
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Load CONTENT_PATTERN from scripts/leak-patterns.txt
+        id: load
+        run: |
+          set -uo pipefail
+          PATTERN="$(grep -E '^CONTENT_PATTERN=' scripts/leak-patterns.txt | head -1 | cut -d= -f2-)"
+          if [ -z "$PATTERN" ]; then
+            echo "FAIL — CONTENT_PATTERN missing in scripts/leak-patterns.txt"
+            exit 1
+          fi
+          # Write to GITHUB_ENV for subsequent steps. Use the heredoc form so
+          # special regex characters (`|`, `\b`) survive without shell interpretation.
+          {
+            echo "PATTERN<<EOF"
+            echo "$PATTERN"
+            echo "EOF"
+          } >> "$GITHUB_ENV"
+          echo "Loaded CONTENT_PATTERN: $PATTERN"
+
+      - name: Self-test — regex must match every known-bad pattern fixture
+        run: |
+          set -uo pipefail
+          # Each non-comment line in the fixture is a string the regex MUST flag.
+          MISSED=$(grep -vE '^\s*(#|$)' tests/leak-fixtures.txt | grep -vE "$PATTERN" || true)
+          if [ -n "$MISSED" ]; then
+            echo "FAIL — leak regex no longer catches these fixture lines:"
+            echo "$MISSED"
+            exit 1
+          fi
+          echo "PASS — leak regex catches every fixture line."
+
+      - name: Grep for internal-only tokens
+        run: |
+          set -uo pipefail
+          # Patterns flagged:
+          #   Phase 1.2 / Phase-1.7 — internal phase identifiers
+          #   D-021 / D-013b — decision-log entries
+          #   R30            — review-finding shorthand
+          #   sun group / phú quốc / head of tech — organization-internal terms
+          #
+          # -I excludes binary files (PNG icon filenames like
+          # "AzureMachineLearningStudioWebServicePlan(m).png" otherwise trigger
+          # the \bR[0-9]+\b alternative via binary fingerprint matches).
+          # leak-patterns.txt is the regex source — excluded since it carries
+          # the patterns as literals; same for the workflow file + fixture.
+          MATCHES=$(git grep -InE "$PATTERN" \
+                    -- ':!.github/workflows/leak-check.yml' \
+                    ':!scripts/leak-patterns.txt' \
+                    ':!tests/leak-fixtures.txt' \
+                    || true)
+
+          if [ -n "$MATCHES" ]; then
+            echo "FAIL — internal tokens found in tracked files:"
+            echo "$MATCHES"
+            echo ""
+            echo "If a match is a legitimate public reference (e.g. an upstream"
+            echo "library version, a CVE number), narrow the regex in"
+            echo "scripts/leak-patterns.txt or add a ':!path' exclusion above."
+            exit 1
+          fi
+
+          echo "PASS — no internal tokens detected."

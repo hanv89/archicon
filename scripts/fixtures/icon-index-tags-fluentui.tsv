@@ -1,0 +1,26 @@
+key	name	description	tags
+cloud	Cloud	Generic cloud / cloud-service affordance	`cloud`, `generic`
+cloud_dismiss	Cloud Dismiss	Cloud-offline / cloud-disabled state	`cloud`, `offline`, `state`
+database	Database	Generic database / data store	`data`, `database`, `storage`
+data_trending	Data Trending	Analytics / metrics trend chart	`data`, `analytics`, `metrics`
+shield	Shield	Security / protection affordance	`security`, `protection`
+person	Person	Single user / actor	`identity`, `user`
+people	People	Group of users / team	`identity`, `team`, `group`
+person_add	Person Add	Add user / onboarding / invite	`identity`, `auth`, `onboarding`
+apps	Apps	Application catalog / app grid	`apps`, `catalog`
+clock	Clock	Time / scheduling / latency affordance	`time`, `clock`
+calendar	Calendar	Date / schedule / cron / recurring	`time`, `calendar`, `schedule`
+building	Building	Organisation / enterprise / datacenter	`organisation`, `enterprise`
+briefcase	Briefcase	Business unit / work context	`organisation`, `work`
+code_block	Code Block	Source code / programming affordance	`code`, `source`
+send	Send	Transmission / outbound API / dispatch	`messaging`, `transmission`
+chat	Chat	Conversation / notification / messaging	`messaging`, `notification`
+settings	Settings	Configuration / preferences / admin	`config`, `admin`
+clipboard	Clipboard	Record / list / inventory / paste	`data`, `record`, `list`
+checkmark_circle	Checkmark Circle	Success / healthy / OK state	`status`, `success`, `healthy`
+warning	Warning	Warning / degraded / attention state	`status`, `warning`, `attention`
+alert	Alert	Notification / new event / incident	`status`, `notification`, `alert`
+book	Book	Documentation / runbook / knowledge base	`docs`, `documentation`
+puzzle_piece	Puzzle Piece	Modular component / plugin / extension	`component`, `plugin`, `module`
+pin	Pin	Anchor / sticky / favorite resource	`affordance`, `anchor`
+question_circle	Question Circle	Help / unknown / FAQ	`help`, `unknown`, `question`

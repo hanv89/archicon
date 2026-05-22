@@ -1,0 +1,20 @@
+# GCP humanize acronym whitelist — PROVISIONAL stub (not yet shipped).
+# Same format/semantics as acronyms-azure.tsv: <pattern><TAB><replacement>,
+# applied after PascalCase splitting, single-token fixes before multi-token re-joins.
+# Best-effort seed for common GCP acronyms; authoritative list finalised in
+# the actual Google Cloud Icon Library filename set, when the cloud-icon work lands.
+# DO NOT rely on this for a shipped GCP build yet.
+Gke	GKE
+Gcs	GCS
+Gcp	GCP
+Vpc	VPC
+Iam	IAM
+Api	API
+Dns	DNS
+Cdn	CDN
+Sql	SQL
+Big Query	BigQuery
+Big Table	Bigtable
+Pub Sub	Pub/Sub
+Cloud Sql	Cloud SQL
+g RPC	gRPC

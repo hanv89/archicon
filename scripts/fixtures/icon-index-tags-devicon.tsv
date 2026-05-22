@@ -1,0 +1,150 @@
+key	name	category	description	tags
+python	Python	language	Python programming language	`devicon`, `language`, `python`
+javascript	JavaScript	language	JavaScript programming language	`devicon`, `language`, `javascript`, `web`
+typescript	TypeScript	language	TypeScript (typed JavaScript)	`devicon`, `language`, `typescript`, `web`
+go	Go	language	Go programming language	`devicon`, `language`, `go`
+java	Java	language	Java programming language	`devicon`, `language`, `java`, `jvm`
+rust	Rust	language	Rust systems programming language	`devicon`, `language`, `rust`, `systems`
+c	C	language	C programming language	`devicon`, `language`, `c`, `systems`
+cplusplus	C++	language	C++ programming language	`devicon`, `language`, `cpp`, `systems`
+csharp	C#	language	C# / .NET programming language	`devicon`, `language`, `csharp`, `dotnet`
+ruby	Ruby	language	Ruby programming language	`devicon`, `language`, `ruby`
+php	PHP	language	PHP programming language	`devicon`, `language`, `php`, `web`
+kotlin	Kotlin	language	Kotlin language (JVM/Android)	`devicon`, `language`, `kotlin`, `jvm`
+swift	Swift	language	Swift language (Apple platforms)	`devicon`, `language`, `swift`, `apple`
+scala	Scala	language	Scala language (JVM)	`devicon`, `language`, `scala`, `jvm`
+r	R	language	R statistical language	`devicon`, `language`, `r`, `data`
+haskell	Haskell	language	Haskell functional language	`devicon`, `language`, `haskell`, `functional`
+lua	Lua	language	Lua embedded scripting language	`devicon`, `language`, `lua`
+clojure	Clojure	language	Clojure (Lisp on the JVM)	`devicon`, `language`, `clojure`, `jvm`
+elixir	Elixir	language	Elixir language (BEAM VM)	`devicon`, `language`, `elixir`, `beam`
+erlang	Erlang	language	Erlang language (BEAM VM)	`devicon`, `language`, `erlang`, `beam`
+dart	Dart	language	Dart language (Flutter)	`devicon`, `language`, `dart`
+ocaml	OCaml	language	OCaml functional language	`devicon`, `language`, `ocaml`, `functional`
+fsharp	F#	language	F# functional .NET language	`devicon`, `language`, `fsharp`, `dotnet`
+julia	Julia	language	Julia scientific language	`devicon`, `language`, `julia`, `data`
+bash	Bash	language	Bash shell scripting	`devicon`, `language`, `shell`, `bash`
+react	React	web-framework	React frontend library	`devicon`, `web`, `frontend`, `react`
+vuejs	Vue.js	web-framework	Vue.js progressive framework	`devicon`, `web`, `frontend`, `vue`
+angular	Angular	web-framework	Angular SPA framework	`devicon`, `web`, `frontend`, `angular`
+nextjs	Next.js	web-framework	Next.js React meta-framework	`devicon`, `web`, `frontend`, `nextjs`
+svelte	Svelte	web-framework	Svelte reactive compiler	`devicon`, `web`, `frontend`, `svelte`
+spring	Spring	web-framework	Spring Java framework	`devicon`, `web`, `backend`, `spring`, `jvm`
+flask	Flask	web-framework	Flask Python micro-framework	`devicon`, `web`, `backend`, `flask`, `python`
+express	Express	web-framework	Express Node.js web framework	`devicon`, `web`, `backend`, `express`, `node`
+fastapi	FastAPI	web-framework	FastAPI Python async framework	`devicon`, `web`, `backend`, `fastapi`, `python`
+nestjs	NestJS	web-framework	NestJS Node.js TS framework	`devicon`, `web`, `backend`, `nestjs`, `node`
+laravel	Laravel	web-framework	Laravel PHP framework	`devicon`, `web`, `backend`, `laravel`, `php`
+dotnetcore	.NET Core	web-framework	.NET / ASP.NET Core	`devicon`, `web`, `backend`, `dotnet`
+dot-net	.NET	web-framework	.NET (classic) framework	`devicon`, `web`, `backend`, `dotnet`
+quarkus	Quarkus	web-framework	Quarkus Kubernetes-native Java	`devicon`, `web`, `backend`, `quarkus`, `jvm`
+symfony	Symfony	web-framework	Symfony PHP framework	`devicon`, `web`, `backend`, `symfony`, `php`
+phoenix	Phoenix	web-framework	Phoenix Elixir web framework	`devicon`, `web`, `backend`, `phoenix`, `elixir`
+gatsby	Gatsby	web-framework	Gatsby React static-site generator	`devicon`, `web`, `frontend`, `gatsby`, `react`
+nuxtjs	Nuxt.js	web-framework	Nuxt.js Vue meta-framework	`devicon`, `web`, `frontend`, `nuxt`, `vue`
+remix	Remix	web-framework	Remix React full-stack framework	`devicon`, `web`, `frontend`, `remix`, `react`
+astro	Astro	web-framework	Astro content-first web framework	`devicon`, `web`, `frontend`, `astro`
+tailwindcss	Tailwind CSS	frontend	Tailwind utility-first CSS	`devicon`, `frontend`, `css`, `tailwind`
+bootstrap	Bootstrap	frontend	Bootstrap UI framework	`devicon`, `frontend`, `css`, `bootstrap`
+jquery	jQuery	frontend	jQuery JS library	`devicon`, `frontend`, `js`, `jquery`
+redux	Redux	frontend	Redux state container	`devicon`, `frontend`, `state`, `redux`
+alpinejs	Alpine.js	frontend	Alpine.js minimal reactive library	`devicon`, `frontend`, `js`, `alpine`
+webpack	Webpack	build-tool	Webpack module bundler	`devicon`, `build`, `bundler`, `webpack`
+vite	Vite	build-tool	Vite dev server + bundler	`devicon`, `build`, `bundler`, `vite`
+babel	Babel	build-tool	Babel JS compiler	`devicon`, `build`, `compiler`, `babel`
+rollup	Rollup	build-tool	Rollup module bundler	`devicon`, `build`, `bundler`, `rollup`
+sass	Sass	build-tool	Sass CSS preprocessor	`devicon`, `build`, `css`, `sass`
+postcss	PostCSS	build-tool	PostCSS CSS transformer	`devicon`, `build`, `css`, `postcss`
+npm	npm	build-tool	Node Package Manager (npm)	`devicon`, `build`, `package-manager`, `node`
+yarn	Yarn	build-tool	Yarn JS package manager	`devicon`, `build`, `package-manager`, `node`
+pnpm	pnpm	build-tool	pnpm fast disk-efficient package manager	`devicon`, `build`, `package-manager`, `node`
+bun	Bun	build-tool	Bun JS runtime + package manager	`devicon`, `build`, `package-manager`, `runtime`, `bun`
+docker	Docker	container	Docker container engine	`devicon`, `container`, `docker`
+kubernetes	Kubernetes	container	Kubernetes orchestrator	`devicon`, `container`, `kubernetes`, `orchestration`
+podman	Podman	container	Podman daemonless containers	`devicon`, `container`, `podman`
+helm	Helm	container	Helm Kubernetes package manager	`devicon`, `container`, `kubernetes`, `helm`
+rancher	Rancher	container	Rancher Kubernetes management	`devicon`, `container`, `kubernetes`, `rancher`
+azure	Azure	cloud	Microsoft Azure cloud	`devicon`, `cloud`, `azure`, `microsoft`
+googlecloud	Google Cloud	cloud	Google Cloud Platform	`devicon`, `cloud`, `gcp`, `google`
+digitalocean	DigitalOcean	cloud	DigitalOcean cloud platform	`devicon`, `cloud`, `digitalocean`
+heroku	Heroku	cloud	Heroku PaaS	`devicon`, `cloud`, `paas`, `heroku`
+vercel	Vercel	cloud	Vercel hosting / edge platform	`devicon`, `cloud`, `vercel`, `edge`
+netlify	Netlify	cloud	Netlify JAMstack hosting	`devicon`, `cloud`, `netlify`, `jamstack`
+cloudflare	Cloudflare	cloud	Cloudflare edge / CDN	`devicon`, `cloud`, `cdn`, `cloudflare`
+firebase	Firebase	cloud	Firebase Google BaaS	`devicon`, `cloud`, `baas`, `firebase`, `google`
+supabase	Supabase	cloud	Supabase open-source BaaS	`devicon`, `cloud`, `baas`, `supabase`
+terraform	Terraform	iac	Terraform IaC	`devicon`, `iac`, `terraform`
+pulumi	Pulumi	iac	Pulumi multi-language IaC	`devicon`, `iac`, `pulumi`
+ansible	Ansible	iac	Ansible configuration management	`devicon`, `iac`, `ansible`, `automation`
+postgresql	PostgreSQL	database	PostgreSQL relational DB	`devicon`, `database`, `sql`, `postgresql`
+mysql	MySQL	database	MySQL relational DB	`devicon`, `database`, `sql`, `mysql`
+mariadb	MariaDB	database	MariaDB MySQL-compatible DB	`devicon`, `database`, `sql`, `mariadb`
+mongodb	MongoDB	database	MongoDB document DB	`devicon`, `database`, `nosql`, `document`, `mongodb`
+redis	Redis	database	Redis in-memory data store	`devicon`, `database`, `cache`, `kv`, `redis`
+sqlite	SQLite	database	SQLite embedded SQL DB	`devicon`, `database`, `sql`, `sqlite`, `embedded`
+cassandra	Cassandra	database	Apache Cassandra distributed DB	`devicon`, `database`, `nosql`, `wide-column`, `cassandra`
+dynamodb	DynamoDB	database	AWS DynamoDB NoSQL service	`devicon`, `database`, `nosql`, `aws`, `dynamodb`
+couchbase	Couchbase	database	Couchbase document DB	`devicon`, `database`, `nosql`, `document`, `couchbase`
+couchdb	CouchDB	database	Apache CouchDB document DB	`devicon`, `database`, `nosql`, `document`, `couchdb`
+neo4j	Neo4j	database	Neo4j graph DB	`devicon`, `database`, `graph`, `neo4j`
+influxdb	InfluxDB	database	InfluxDB time-series DB	`devicon`, `database`, `timeseries`, `influxdb`
+microsoftsqlserver	SQL Server	database	Microsoft SQL Server	`devicon`, `database`, `sql`, `mssql`, `microsoft`
+oracle	Oracle DB	database	Oracle Database	`devicon`, `database`, `sql`, `oracle`
+clickhouse	ClickHouse	database	ClickHouse OLAP DB	`devicon`, `database`, `olap`, `clickhouse`
+elasticsearch	Elasticsearch	observability	Elasticsearch search + analytics	`devicon`, `search`, `analytics`, `elasticsearch`
+prometheus	Prometheus	observability	Prometheus metrics + monitoring	`devicon`, `observability`, `metrics`, `prometheus`
+grafana	Grafana	observability	Grafana dashboards	`devicon`, `observability`, `dashboard`, `grafana`
+kibana	Kibana	observability	Kibana Elastic dashboards	`devicon`, `observability`, `dashboard`, `kibana`, `elastic`
+logstash	Logstash	observability	Logstash log pipeline	`devicon`, `observability`, `logs`, `logstash`, `elastic`
+nginx	NGINX	web-server	NGINX web server / reverse proxy	`devicon`, `web-server`, `proxy`, `nginx`
+apache	Apache HTTP	web-server	Apache HTTP server	`devicon`, `web-server`, `apache`
+envoy	Envoy	web-server	Envoy service proxy	`devicon`, `web-server`, `proxy`, `envoy`, `mesh`
+argocd	Argo CD	ci-cd	Argo CD GitOps continuous delivery	`devicon`, `ci-cd`, `gitops`, `argocd`
+jenkins	Jenkins	ci-cd	Jenkins CI server	`devicon`, `ci-cd`, `jenkins`
+githubactions	GitHub Actions	ci-cd	GitHub Actions CI/CD	`devicon`, `ci-cd`, `github`
+gitlab	GitLab	ci-cd	GitLab DevOps platform	`devicon`, `ci-cd`, `scm`, `gitlab`
+travis	Travis CI	ci-cd	Travis CI continuous integration	`devicon`, `ci-cd`, `travis`
+github	GitHub	collab	GitHub source-control / collab	`devicon`, `scm`, `github`, `collab`
+bitbucket	Bitbucket	collab	Bitbucket Atlassian SCM	`devicon`, `scm`, `bitbucket`, `atlassian`
+jira	Jira	collab	Jira issue tracker	`devicon`, `collab`, `jira`, `atlassian`
+slack	Slack	collab	Slack team messaging	`devicon`, `collab`, `chat`, `slack`
+notion	Notion	collab	Notion docs / knowledge base	`devicon`, `collab`, `docs`, `notion`
+maven	Maven	build-tool	Apache Maven build tool (JVM)	`devicon`, `build`, `jvm`, `maven`
+gradle	Gradle	build-tool	Gradle build automation	`devicon`, `build`, `jvm`, `gradle`
+bazel	Bazel	build-tool	Bazel polyglot build system	`devicon`, `build`, `bazel`, `polyglot`
+figma	Figma	ide	Figma design tool	`devicon`, `design`, `figma`
+vscode	VS Code	ide	Visual Studio Code editor	`devicon`, `ide`, `vscode`, `microsoft`
+intellij	IntelliJ IDEA	ide	IntelliJ IDEA JVM IDE	`devicon`, `ide`, `intellij`, `jetbrains`
+visualstudio	Visual Studio	ide	Microsoft Visual Studio IDE	`devicon`, `ide`, `visualstudio`, `microsoft`
+pycharm	PyCharm	ide	JetBrains PyCharm Python IDE	`devicon`, `ide`, `pycharm`, `jetbrains`, `python`
+webstorm	WebStorm	ide	JetBrains WebStorm JS IDE	`devicon`, `ide`, `webstorm`, `jetbrains`, `web`
+androidstudio	Android Studio	ide	Android Studio IDE	`devicon`, `ide`, `android`, `google`
+eclipse	Eclipse	ide	Eclipse JVM IDE	`devicon`, `ide`, `eclipse`, `jvm`
+vim	Vim	editor	Vim text editor	`devicon`, `editor`, `vim`
+neovim	Neovim	editor	Neovim modernized Vim	`devicon`, `editor`, `neovim`
+emacs	Emacs	editor	GNU Emacs editor	`devicon`, `editor`, `emacs`, `gnu`
+tmux	tmux	editor	tmux terminal multiplexer	`devicon`, `editor`, `tmux`, `terminal`
+pytorch	PyTorch	data-ai	PyTorch deep learning framework	`devicon`, `ai`, `ml`, `pytorch`, `python`
+tensorflow	TensorFlow	data-ai	TensorFlow ML framework	`devicon`, `ai`, `ml`, `tensorflow`, `google`
+pandas	pandas	data-ai	pandas data analysis library	`devicon`, `data`, `pandas`, `python`
+numpy	NumPy	data-ai	NumPy numerical computing	`devicon`, `data`, `numpy`, `python`
+jupyter	Jupyter	data-ai	Jupyter notebooks	`devicon`, `data`, `notebook`, `jupyter`
+flutter	Flutter	mobile	Flutter cross-platform UI framework	`devicon`, `mobile`, `flutter`, `dart`
+ionic	Ionic	mobile	Ionic hybrid mobile framework	`devicon`, `mobile`, `ionic`, `hybrid`
+android	Android	mobile	Android OS / platform	`devicon`, `mobile`, `android`, `google`
+mocha	Mocha	testing	Mocha JS test framework	`devicon`, `testing`, `mocha`, `js`
+playwright	Playwright	testing	Playwright browser automation	`devicon`, `testing`, `e2e`, `playwright`
+selenium	Selenium	testing	Selenium browser automation	`devicon`, `testing`, `e2e`, `selenium`
+hadoop	Hadoop	dev-platform	Apache Hadoop distributed compute	`devicon`, `data`, `bigdata`, `hadoop`
+materialui	Material UI	dev-platform	Material UI React component library	`devicon`, `frontend`, `ui`, `material`, `react`
+storybook	Storybook	dev-platform	Storybook UI component workshop	`devicon`, `frontend`, `ui`, `storybook`
+rabbitmq	RabbitMQ	dev-platform	RabbitMQ message broker	`devicon`, `messaging`, `queue`, `rabbitmq`
+sentry	Sentry	dev-platform	Sentry error monitoring	`devicon`, `observability`, `errors`, `sentry`
+anaconda	Anaconda	dev-platform	Anaconda Python distribution	`devicon`, `data`, `anaconda`, `python`
+linux	Linux	os	Linux operating system	`devicon`, `os`, `linux`
+ubuntu	Ubuntu	os	Ubuntu Linux distribution	`devicon`, `os`, `linux`, `ubuntu`
+debian	Debian	os	Debian Linux distribution	`devicon`, `os`, `linux`, `debian`
+vagrant	Vagrant	os	Vagrant dev environments	`devicon`, `devops`, `vagrant`, `vm`
+chrome	Chrome	browser	Google Chrome browser	`devicon`, `browser`, `chrome`, `google`
+firefox	Firefox	browser	Mozilla Firefox browser	`devicon`, `browser`, `firefox`, `mozilla`
+nodejs	Node.js	runtime	Node.js JavaScript runtime	`devicon`, `runtime`, `node`, `js`

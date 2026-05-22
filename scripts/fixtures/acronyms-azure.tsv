@@ -1,0 +1,21 @@
+# Azure humanize acronym whitelist — applied by build_icon_index.sh azure_humanize()
+# AFTER PascalCase word-splitting, as ordered `sed -E 's/\b<pattern>\b/<replacement>/g'`.
+# Format: <pattern><TAB><replacement>. Tab-separated; patterns may contain spaces.
+# ORDER MATTERS: single-token acronym fixes first, then multi-token re-joins
+# (a re-join may depend on a prior single-token fix, e.g. "Maria DB" needs "Db"->"DB").
+# Extend as upstream introduces new mixed-case acronyms.
+Db	DB
+Ai	AI
+Ml	ML
+Vm	VM
+Iot	IoT
+Api	API
+Dns	DNS
+Cdn	CDN
+Waf	WAF
+Io T	IoT
+My SQL	MySQL
+Postgre SQL	PostgreSQL
+Maria DB	MariaDB
+Signal R	SignalR
+HD Insight	HDInsight

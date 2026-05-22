@@ -1,0 +1,16 @@
+# Self-test fixtures for .github/workflows/leak-check.yml
+# Each non-comment line below is a string the leak regex MUST flag.
+# If any line below stops matching the regex, the self-test fails before
+# the main scan runs — preventing silent regex regressions.
+#
+# This file is excluded from the main leak-check scan via a ':!tests/' filter.
+# Comments are lines starting with '#'; the self-test ignores them.
+this file mentions Phase 1.2 explicitly
+this file mentions Phase-1.7 with a hyphen
+this file mentions decision D-021
+this file mentions decision D-013b
+this file mentions review finding R30
+this file mentions sun group internal
+this file mentions sungroup variant
+this file mentions phú quốc operations
+this file mentions head of tech

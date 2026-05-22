@@ -1,0 +1,14 @@
+# Minimum expected PNG count per full-copy vendor (no curation list drives these).
+# Format: <vendor><TAB><min_count>
+# Semantics: test_icon_sync_completeness.sh asserts the actual dist/<vendor>
+# PNG count is >= min_count. A legitimate upstream addition (via the weekly
+# update-icons.yml cron PR) raises the real count above the floor and does
+# NOT fail the gate; a partial-sync regression (fewer files than the floor)
+# DOES. Bump a floor here only when an intentional curation/scope change
+# permanently lowers a vendor's count.
+#
+# Curation-driven vendors (Devicon, FluentUI) are NOT listed here — their
+# completeness is checked against the curation fixture directly.
+Azure	528
+Fabric	312
+Kubernetes	148

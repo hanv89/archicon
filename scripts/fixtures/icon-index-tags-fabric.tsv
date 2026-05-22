@@ -1,0 +1,28 @@
+suffix:item	-	-	`fabric`, `item`, `artifact`
+suffix:non-item	-	-	`fabric`, `non-item`, `workspace-or-action`
+suffix:color	-	-	`fabric`, `color`, `workload-brand`
+suffix:plain	-	-	`fabric`, `plain`
+lakehouse	-	Microsoft Fabric Lakehouse — bronze/silver/gold Delta storage layer (OneLake-backed)	`fabric`, `lakehouse`, `delta`, `storage`
+notebook	-	Microsoft Fabric Notebook — Spark-based interactive transform / orchestration	`fabric`, `notebook`, `spark`, `transform`
+one_lake	OneLake	Microsoft Fabric OneLake — unified Delta foundation for the whole tenant	`fabric`, `onelake`, `delta`, `foundation`
+data_warehouse	Data Warehouse	Microsoft Fabric Data Warehouse — T-SQL curated gold layer	`fabric`, `warehouse`, `sql`, `gold`
+semantic_model	Semantic Model	Microsoft Fabric Semantic Model — dimensional layer feeding Power BI	`fabric`, `semantic-model`, `bi`, `dimensional`
+power_bi	Power BI	Microsoft Power BI — reporting + dashboards on the Fabric semantic layer	`fabric`, `power-bi`, `bi`, `reporting`
+report	-	Microsoft Fabric Report — published Power BI report artifact	`fabric`, `report`, `bi`
+eventstream	-	Microsoft Fabric Eventstream — real-time event ingest into the Lakehouse / Event House	`fabric`, `eventstream`, `streaming`, `real-time`
+mirrored_catalog	Mirrored Catalog	Microsoft Fabric Mirrored Catalog — zero-ETL Delta mirror of an external database	`fabric`, `mirroring`, `delta`, `zero-etl`
+data_pipeline	Data Pipeline	Microsoft Fabric Data Pipeline — orchestrated multi-activity data flow (ADF-style)	`fabric`, `pipeline`, `orchestration`, `etl`
+dataflow	-	Microsoft Fabric Dataflow — Power Query–based transformation pipeline	`fabric`, `dataflow`, `power-query`, `transform`
+kql_database	KQL Database	Microsoft Fabric KQL Database — Kusto-style real-time analytics store	`fabric`, `kql`, `kusto`, `real-time`, `database`
+sql_database	SQL Database	Microsoft Fabric SQL Database — Fabric-native OLTP SQL store	`fabric`, `sql`, `database`, `oltp`
+real_time_intelligence	Real-Time Intelligence	Microsoft Fabric Real-Time Intelligence — Eventstream + KQL combined workload	`fabric`, `real-time`, `streaming`, `intelligence`
+fabric	-	Microsoft Fabric — the unified analytics platform brand mark	`fabric`, `brand`, `platform`
+apps	-	Microsoft Fabric Apps — packaged Fabric solution artifact	`fabric`, `apps`, `packaged`
+workspace	-	Microsoft Fabric Workspace — top-level collaboration container	`fabric`, `workspace`, `collaboration`
+my_workspace	My Workspace	Microsoft Fabric My Workspace — personal workspace	`fabric`, `workspace`, `personal`
+healthcare	-	Microsoft Fabric Healthcare data solution	`fabric`, `healthcare`, `vertical`
+cohort	-	Microsoft Fabric Cohort — healthcare cohort definition artifact	`fabric`, `cohort`, `healthcare`
+import_notebook	Import Notebook	Microsoft Fabric Import Notebook (action) — bring an existing notebook into a workspace	`fabric`, `action`, `notebook`, `import`
+add_pipeline	Add Pipeline	Microsoft Fabric Add Pipeline (action) — create a new data pipeline	`fabric`, `action`, `pipeline`, `create`
+graph_model	Graph Model	Microsoft Fabric Graph Model — relationship/graph data model	`fabric`, `graph`, `model`
+runtime_lineage	Runtime Lineage	Microsoft Fabric Runtime Lineage — lineage view of executions	`fabric`, `lineage`, `runtime`, `observability`
