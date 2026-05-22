@@ -1,0 +1,59 @@
+name: release-icons
+
+# Triggered by 'icons-v*' tag pushes. Creates a GitHub Release with one
+# zip per dist/<Vendor>/ directory (auto-discovered). No npm publish —
+# icons are a content release, not a package. No OIDC (assets only).
+
+on:
+  push:
+    tags:
+      - 'icons-v*'
+
+permissions:
+  contents: write   # gh release create
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Build asset zips
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#icons-v}"
+          # One zip per dist/<Vendor>/ directory. Auto-discover so future
+          # vendor adds don't need a workflow edit. Exclude non-vendor dirs.
+          EXCLUDE_NAMES="skill Custom baselines notes"
+          for VENDOR_DIR in dist/*/; do
+            [ -d "${VENDOR_DIR}" ] || continue
+            VENDOR_BASENAME="$(basename "${VENDOR_DIR}")"
+            skip=0
+            for excl in ${EXCLUDE_NAMES}; do
+              [ "${VENDOR_BASENAME}" = "${excl}" ] && skip=1 && break
+            done
+            [ "${skip}" = "1" ] && { echo "Skipping non-vendor: ${VENDOR_DIR}"; continue; }
+            # Skip vendor dirs that have no PNGs yet (only a .gitkeep/USAGE-RULES).
+            if [ -z "$(find "${VENDOR_DIR}" -name '*.png' -print -quit)" ]; then
+              echo "Skipping empty vendor: ${VENDOR_DIR}"; continue
+            fi
+            VENDOR_NAME="$(echo "${VENDOR_BASENAME}" | tr '[:upper:]' '[:lower:]')"
+            zip -r "dist-${VENDOR_NAME}-icons-v${VERSION}.zip" "${VENDOR_DIR}"
+          done
+          ls -la dist-*.zip
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          VERSION="${GITHUB_REF_NAME#icons-v}"
+          notes=$(printf '%s\n' \
+            "Icon set release v${VERSION}. One asset zip per dist/<Vendor>/ directory, each preserving its source layout. Unzip at the consumer's repo root to mirror the structure." \
+            "" \
+            "Built automatically by release-icons.yml.")
+          gh release create "${GITHUB_REF_NAME}" \
+            dist-*-icons-v${VERSION}.zip \
+            --title "Icons v${VERSION}" \
+            --notes "${notes}"

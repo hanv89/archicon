@@ -1,0 +1,75 @@
+name: release-skill
+
+# Triggered by 'skill-v*' tag pushes. rc tags (skill-v*-rc.*) publish under
+# the npm 'next' dist-tag; non-rc tags publish under 'latest'. Each publish
+# uses 'npm publish --provenance' so the tarball ships a Sigstore-signed
+# attestation tracing back to this commit + workflow run.
+#
+# Authority comes from the npm Trusted Publisher entry linking
+# @hanv89/arch-skill to this exact workflow path. No NPM_TOKEN is stored;
+# 'id-token: write' lets GitHub mint a short-lived OIDC token npm verifies.
+
+on:
+  push:
+    tags:
+      - 'skill-v*'
+
+permissions:
+  contents: write   # gh release create
+  id-token: write   # OIDC for npm Trusted Publishing
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/cli
+    steps:
+      - name: Checkout tag
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Setup Node 20
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: '20'
+        # NOTE: do NOT set 'registry-url' — it injects a .npmrc _authToken
+        # that conflicts with the Trusted Publisher OIDC flow.
+
+      - name: Upgrade npm to latest (trusted publishing needs >= 11.5.1)
+        run: npm install -g npm@latest
+
+      - name: Install + build + pack
+        run: |
+          npm ci
+          npm run build
+          npm pack
+
+      - name: Run tests before publish
+        run: npm test
+
+      - name: npm audit gate (block publish on high-severity advisories)
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Detect npm dist-tag from git tag
+        id: dist
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          if [[ "$TAG" == *-rc.* ]]; then
+            echo "tag=next" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: npm publish --provenance
+        run: npm publish --provenance --access public --tag "${{ steps.dist.outputs.tag }}"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TARBALL=$(ls hanv89-arch-skill-*.tgz | head -1)
+          VERSION="${GITHUB_REF_NAME#skill-v}"
+          NOTES="Release v${VERSION} of @hanv89/arch-skill. Published with Sigstore provenance attestation via Trusted Publisher OIDC."
+          gh release create "${GITHUB_REF_NAME}" "$TARBALL" \
+            --title "arch-skill v${VERSION}" \
+            --notes "$NOTES"

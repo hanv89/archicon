@@ -1,8 +1,9 @@
 name: ci
 
 # Runs npm test on every PR + push to main so a broken state never lands.
-# Pairs with release-skill.yml which runs npm test again before npm publish
-# so a tagged broken state never publishes either.
+# Pairs with release-skill.yml which runs npm test again before npm publish.
+# Jobs grow as vendors / CLI adapters / skill features land (smoke, more
+# bash-tests, sync-completeness, bundle-repro are added in later releases).
 
 on:
   pull_request:
@@ -18,9 +19,6 @@ permissions:
 
 jobs:
   test:
-    # Two-LTS rolling window: the engines.node floor is >=20, so CI must
-    # validate both currently-active LTS lines (Node 20 + 22), not just the
-    # floor.
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
@@ -32,91 +30,36 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
       - name: Setup Node ${{ matrix.node-version }}
         uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
         with:
           node-version: ${{ matrix.node-version }}
-
       - name: Install dependencies
         run: npm ci
-
       - name: Run tests
         run: npm test
-
-  smoke:
-    # The CLI build + exit-code-contract + install-to-disk smoke (smoke_cli)
-    # and the engines-floor + icons-unreachable smoke (smoke_e2e). These were
-    # manual-only before; gating them stops a broken install path from landing.
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Setup Node 20
-        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
-        with:
-          node-version: '20'
-
-      - name: scripts/smoke_cli.sh
-        run: bash scripts/smoke_cli.sh
-
-      - name: scripts/smoke_e2e.sh
-        run: bash scripts/smoke_e2e.sh
 
   bash-tests:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: Install librsvg2-bin (rsvg-convert) for build-script unit tests
-        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
-
       - name: scripts/_lib_icon_build.test.sh
         run: bash scripts/_lib_icon_build.test.sh
-
-      - name: scripts/test_monitor_ms_tou.sh (fixture-based)
-        run: bash scripts/test_monitor_ms_tou.sh
-
       - name: scripts/build_icon_index.test.sh
         run: bash scripts/build_icon_index.test.sh
 
-      - name: scripts/build_devicon.test.sh
-        run: bash scripts/build_devicon.test.sh
-
-      - name: scripts/build_fluentui_system.test.sh
-        run: bash scripts/build_fluentui_system.test.sh
-
-      - name: scripts/build_kubernetes.test.sh
-        run: bash scripts/build_kubernetes.test.sh
-
-      - name: scripts/build_azure.test.sh
-        run: bash scripts/build_azure.test.sh
-
-      - name: scripts/build_fabric.test.sh
-        run: bash scripts/build_fabric.test.sh
-
-      - name: scripts/iac_to_diagram.test.sh
-        run: bash scripts/iac_to_diagram.test.sh
-
   contract:
     # Offline contract gates: the shipped dist/ + skill bundle must be
-    # internally consistent. No network. See each script's header.
+    # internally consistent. No network.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
       - name: scripts/validate_manifest.sh
         run: bash scripts/validate_manifest.sh
-
       - name: scripts/test_skill_refs.sh
         run: bash scripts/test_skill_refs.sh
-
       - name: scripts/test_index_integrity.sh
         run: bash scripts/test_index_integrity.sh
-
-      - name: scripts/test_icon_sync_completeness.sh
-        run: bash scripts/test_icon_sync_completeness.sh
-
       - name: scripts/lint_examples.sh
         run: bash scripts/lint_examples.sh
 
@@ -124,16 +67,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
       - name: Download actionlint v1.7.12 binary (pinned release URL)
         run: |
           set -euo pipefail
-          # Fetch via HTTPS from the pinned GitHub release; rhysd publishes
-          # SHA256 checksums alongside the release artifacts. We fetch the
-          # checksums file from the same release and verify the binary
-          # archive against it, so the tag-pin alone is not the security
-          # boundary. Filenames must match what the checksums file references
-          # so `sha256sum -c -` can find the archive.
           mkdir -p /tmp/actionlint-dl
           cd /tmp/actionlint-dl
           curl -fsSL -O \
@@ -145,14 +81,7 @@ jobs:
           chmod +x actionlint
           mv actionlint /tmp/actionlint
           /tmp/actionlint -version
-
       - name: actionlint — lint all GitHub Actions workflow YAML
-        # -shellcheck "-S warning" silences shellcheck info-level findings
-        # (SC2012 ls-vs-find, SC2086 intentional word-splitting in our
-        # release-icons.yml zip-glob and EXCLUDE_NAMES iteration), while
-        # still catching warning + error level issues that indicate real
-        # bugs. actionlint's own YAML/workflow-structure checks run at
-        # full strictness regardless.
         run: /tmp/actionlint -color -shellcheck "shellcheck -S warning"
 
   fixture-drift:
@@ -160,25 +89,12 @@ jobs:
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
         with:
-          fetch-depth: 0   # full history so fixture/skill-md-only fetch can compare against main
-
+          fetch-depth: 0
       - name: Fetch fixture/skill-md-only
         run: |
           git fetch origin fixture/skill-md-only:fixture/skill-md-only || {
-            echo "fixture/skill-md-only does not exist on origin — skipping drift check (will be re-created next time SKILL.md ships)"
+            echo "fixture/skill-md-only does not exist on origin — skipping drift check"
             exit 0
           }
-
       - name: scripts/test_fixture_drift.sh
         run: bash scripts/test_fixture_drift.sh
-
-  bundle-repro:
-    # Verifies dist/chat-ui-bundle.zip is byte-reproducible across two
-    # build runs on the same source tree. Guards against host-clock leakage,
-    # non-sorted file order, or archive-metadata drift in build_chat_ui_bundle.sh.
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
-
-      - name: scripts/test_chat_ui_bundle_repro.sh
-        run: bash scripts/test_chat_ui_bundle_repro.sh
