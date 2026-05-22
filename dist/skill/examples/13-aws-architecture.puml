@@ -1,0 +1,59 @@
+@startuml
+' AWS serverless web architecture (C4 level 2). Demonstrates the AWS vendor
+' icon set: CloudFront edge -> API Gateway -> Lambda compute -> DynamoDB +
+' RDS data tier, with S3 for static assets and SNS/SQS for async fan-out.
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   AWS Architecture Icons via awslabs/aws-icons-for-plantuml, licensed
+'     CC-BY-ND 2.0 (Creative Commons Attribution-NoDerivatives). The icons are
+'     redistributed VERBATIM (byte-identical to upstream) — they are NOT
+'     resized, recolored, cropped, or re-encoded, because the NoDerivatives
+'     clause forbids derivative works (a resize IS a derivative). See repo
+'     NOTICE + dist/AWS/USAGE-RULES.txt. "AWS Architecture Icons" (c) Amazon
+'     Web Services, Inc. or its affiliates; this project is not affiliated
+'     with, sponsored by, or endorsed by AWS.
+'
+' Filenames are copied verbatim from dist/AWS/INDEX.md (e.g. S3 is
+' `SimpleStorageService.png`, NOT `S3.png`) — guessing a name is a 404.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time from this
+' repository's public raw URLs.
+
+left to right direction
+skinparam linetype ortho
+
+title AWS serverless web architecture
+
+actor "User" as user
+
+' ----- Edge -----
+rectangle "**CloudFront**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/NetworkingContentDelivery/CloudFront.png>\nCDN + edge cache" as cf
+
+rectangle "**API Gateway**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/NetworkingContentDelivery/APIGateway.png>\nREST entry" as apigw
+
+' ----- Compute -----
+rectangle "**Lambda**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Compute/Lambda.png>\norder handler" as fn
+
+' ----- Async fan-out -----
+rectangle "**SNS**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/ApplicationIntegration/SimpleNotificationService.png>\nevent topic" as sns
+rectangle "**SQS**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/ApplicationIntegration/SimpleQueueService.png>\nwork queue" as sqs
+
+' ----- Data tier -----
+rectangle "**S3**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Storage/SimpleStorageService.png>\nstatic assets" as s3
+rectangle "**DynamoDB**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Database/DynamoDB.png>\nsession + cart" as ddb
+rectangle "**RDS**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Database/RDS.png>\nproduct catalog" as rds
+
+' ----- Flow -----
+user -right-> cf : HTTPS
+cf -right-> s3 : static GET
+cf -right-> apigw : API GET/POST
+apigw -right-> fn : invoke
+fn -right-> ddb : read/write
+fn -right-> rds : T-SQL
+fn -down-> sns : publish OrderPlaced
+sns -down-> sqs : fan-out
+@enduml

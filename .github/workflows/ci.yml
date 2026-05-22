@@ -76,6 +76,10 @@ jobs:
         run: bash scripts/build_devicon.test.sh
       - name: scripts/iac_to_diagram.test.sh
         run: bash scripts/iac_to_diagram.test.sh
+      # >>> AWS-CI-BEGIN (verbatim-copy build unit test; no rsvg needed)
+      - name: scripts/build_aws.test.sh
+        run: bash scripts/build_aws.test.sh
+      # <<< AWS-CI-END
 
   bundle-repro:
     # Assert the chat-UI distribution bundle builds byte-reproducibly.
@@ -101,6 +105,12 @@ jobs:
         run: bash scripts/test_icon_sync_completeness.sh
       - name: scripts/lint_examples.sh
         run: bash scripts/lint_examples.sh
+      # >>> AWS-CI-BEGIN (CC-BY-ND verbatim contract gate: build has no rsvg +
+      #     shipped dist/AWS PNGs are sha256-identical to upstream; offline via
+      #     the cached scripts/fixtures/aws-upstream-sha256.tsv)
+      - name: scripts/test_aws_verbatim.sh
+        run: bash scripts/test_aws_verbatim.sh
+      # <<< AWS-CI-END
 
   actionlint:
     runs-on: ubuntu-latest

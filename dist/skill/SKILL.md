@@ -124,6 +124,9 @@ Every icon ships with a flat markdown catalog you can grep. Each row carries the
 - Kubernetes: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/INDEX.md>
 - FluentUI: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/INDEX.md>
 - Devicon: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/INDEX.md>
+<!-- AWS-SKILL-BEGIN -->
+- AWS: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/INDEX.md>
+<!-- AWS-SKILL-END -->
 
 When the user names a service, **fetch the relevant INDEX.md once at the start of a session, search it (case-insensitive substring or tag match across name + description + tags), and use the `path` column from the matching row** verbatim in your `<img:URL>` token.
 
@@ -190,6 +193,14 @@ Each vendor uses a different canonical filename convention. The pattern is fixed
 - Pattern: `dist/Devicon/png/<stem>-original_48.png` where `<stem>` is the lowercase upstream key.
 - Quirk: `-original` variant + `_48` size only. Some stems use hyphens (`dot-net`, not `dotnet`); some use full words (`googlecloud`, not `gcp`); some keep abbreviations (`vuejs`, `nextjs`, `nodejs`). Always look up the canonical stem in INDEX.md — guessing `gcp.png` instead of `googlecloud-original_48.png` is a 404.
 - Worked example: `<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/python-original_48.png>`
+
+<!-- AWS-SKILL-BEGIN -->
+**AWS** (`dist/AWS/INDEX.md` · `https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/INDEX.md`)
+- Pattern: `dist/AWS/<Category>/<PascalCaseStem>.png` (flat per-category, every icon 64×64).
+- Quirk: all-caps acronyms stay as-is (`EC2`, `S3`-as-`SimpleStorageService`, `RDS`, `VPC`, `IAM`, `EKS`, `ECS`); but S3's file is `SimpleStorageService.png`, SNS is `SimpleNotificationService.png`, SQS is `SimpleQueueService.png`. Brand words are one word (`CloudFront`, `DynamoDB`, `CloudWatch`). Look up the canonical filename in INDEX.md.
+- **Verbatim / no-resize**: AWS icons are CC-BY-ND 2.0 (NoDerivatives). They are redistributed byte-identical to upstream — do NOT resize, recolor, crop, or re-encode them; a resize is a derivative and is forbidden. Use the PNG as-is.
+- Worked example: `<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Compute/Lambda.png>`
+<!-- AWS-SKILL-END -->
 
 ### Filenames with parentheses (URL encoding required)
 
@@ -488,6 +499,34 @@ Typical patterns:
 - **Tech-stack reference**: enumerate frontend (`react-original_48.png` + `tailwindcss-original_48.png`), backend (`fastapi-original_48.png` + `python-original_48.png`), data (`postgresql-original_48.png` + `redis-original_48.png` + `elasticsearch-original_48.png`), and infrastructure (`docker-original_48.png` + `kubernetes-original_48.png` + `terraform-original_48.png`) in a single legend-style diagram.
 
 **Trademark note**: Devicon icons depict third-party brands (Python language, Docker container engine, etc.). Use these icons only to identify the tool / language / platform they depict — do not use a Devicon icon to represent **your** product or service. The MIT grant from Devicon does not transfer any trademark rights to depicted brands; see `NOTICE` § Devicon for the per-tool-trademark disclaim.
+
+<!-- AWS-SKILL-BEGIN -->
+## AWS icons
+
+The skill also covers **AWS** — sourced from the upstream `awslabs/aws-icons-for-plantuml` set (AWS Architecture Icons). The aesthetic is the AWS square/rounded filled-glyph; it composes naturally alongside the other vendors for multicloud diagrams.
+
+AWS icons live under:
+
+```
+https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/
+```
+
+Layout: flat, one PNG per service under a category directory — `dist/AWS/<Category>/<ServiceName>.png` (e.g. `Compute/EC2.png`, `Serverless`/`Compute/Lambda.png`, `Storage/SimpleStorageService.png`). Every icon is 64×64. Fetch the full name + tag lookup table at `dist/AWS/INDEX.md`.
+
+> **License — verbatim / NO resize (read before using).** AWS Architecture Icons are licensed **CC-BY-ND 2.0** (Creative Commons Attribution-**NoDerivatives**). The "NoDerivatives" clause means modifying an icon — including **resizing**, recoloring, cropping, flipping, rotating, or re-encoding it — creates a derivative work, which the license **forbids**. This repo therefore ships the AWS PNGs **byte-identical** to upstream, and a CI gate (`scripts/test_aws_verbatim.sh`) asserts it. When you place an AWS icon in a diagram, use the PNG **as-is**: do not set a width/height that rescales it, and do not run it through any image converter. Attribution: "AWS Architecture Icons" (c) Amazon Web Services, Inc. or its affiliates. This project is not affiliated with, sponsored by, or endorsed by AWS. See `dist/AWS/USAGE-RULES.txt` and `NOTICE` § AWS.
+
+Common AWS references (filenames copied verbatim from `dist/AWS/INDEX.md`):
+
+```plantuml
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Compute/EC2.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Compute/Lambda.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Storage/SimpleStorageService.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Database/DynamoDB.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/NetworkingContentDelivery/CloudFront.png>
+```
+
+See `examples/13-aws-architecture.puml` for a worked serverless AWS example.
+<!-- AWS-SKILL-END -->
 
 ## Pattern 1: System Architecture Diagram
 
@@ -822,5 +861,8 @@ Renderable example diagrams live in `examples/` (file list mirrors `manifest.jso
 - [`10-edit-existing.puml`](examples/10-edit-existing.puml) — worked before/after **edit** of an existing 3-tier diagram (adds a Redis cache node + re-wires it) demonstrating the § "Editing an existing diagram" minimal-diff workflow.
 - [`11-mermaid-architecture.mmd`](examples/11-mermaid-architecture.mmd) — **Mermaid** (`.mmd`, not PlantUML) text-labelled topology demonstrating § "Mermaid mode" (icon-light, renders natively on GitHub).
 - [`12-mermaid-icons.mmd`](examples/12-mermaid-icons.mmd) — **Mermaid** icon-mode example (ELK layout + inline `<img>` vendor icons + styled clusters) demonstrating § "Mermaid mode" sub-mode (b); render with `examples/assets/render-mermaid.sh`.
+<!-- AWS-SKILL-BEGIN -->
+- [`13-aws-architecture.puml`](examples/13-aws-architecture.puml) — AWS serverless web architecture (CloudFront → API Gateway → Lambda → DynamoDB + RDS, with S3 + SNS/SQS). Canonical AWS-vendor example; AWS icons are CC-BY-ND verbatim (no resize).
+<!-- AWS-SKILL-END -->
 </content>
 </invoke>
