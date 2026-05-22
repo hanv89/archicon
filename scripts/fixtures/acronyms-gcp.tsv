@@ -1,20 +1,40 @@
-# GCP humanize acronym whitelist — PROVISIONAL stub (not yet shipped).
-# Same format/semantics as acronyms-azure.tsv: <pattern><TAB><replacement>,
-# applied after PascalCase splitting, single-token fixes before multi-token re-joins.
-# Best-effort seed for common GCP acronyms; authoritative list finalised in
-# the actual Google Cloud Icon Library filename set, when the cloud-icon work lands.
-# DO NOT rely on this for a shipped GCP build yet.
+# GCP humanize acronym whitelist — applied by build_icon_index.sh gcp_humanize()
+# AFTER PascalCase word-splitting, as ordered `sed -E 's/\b<pattern>\b/<replacement>/g'`.
+# Format: <pattern><TAB><replacement>. Tab-separated; patterns may contain spaces.
+# ORDER MATTERS: single-token acronym fixes first, then multi-token re-joins
+# (a re-join may depend on a prior single-token fix). Extend as upstream
+# introduces new mixed-case acronyms / products.
+#
+# Coverage: the shipped Google Cloud "core products" stems plus common GCP
+# acronyms an author may type into a diagram label (GKE, GCS, VPC, IAM, GCE,
+# gRPC, Pub/Sub, Bigtable, BigQuery, Cloud SQL, Cloud Run, ...).
+#
+# --- single-token acronym fixes ---
 Gke	GKE
 Gcs	GCS
 Gcp	GCP
+Gce	GCE
 Vpc	VPC
 Iam	IAM
 Api	API
 Dns	DNS
 Cdn	CDN
 Sql	SQL
+Db	DB
+Ai	AI
+Ml	ML
+Vm	VM
+Tpu	TPU
+Gpu	GPU
+Cdc	CDC
+Secops	SecOps
+Sec Ops	SecOps
+# --- multi-token re-joins (depend on prior single-token fixes) ---
 Big Query	BigQuery
 Big Table	Bigtable
-Pub Sub	Pub/Sub
+Pub Sub	PubSub
 Cloud Sql	Cloud SQL
+Cloud SQL	Cloud SQL
+Alloy DB	AlloyDB
 g RPC	gRPC
+G RPC	gRPC

@@ -124,6 +124,7 @@ Every icon ships with a flat markdown catalog you can grep. Each row carries the
 - Kubernetes: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/INDEX.md>
 - FluentUI: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/INDEX.md>
 - Devicon: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/INDEX.md>
+- GCP: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/INDEX.md>
 
 When the user names a service, **fetch the relevant INDEX.md once at the start of a session, search it (case-insensitive substring or tag match across name + description + tags), and use the `path` column from the matching row** verbatim in your `<img:URL>` token.
 
@@ -190,6 +191,11 @@ Each vendor uses a different canonical filename convention. The pattern is fixed
 - Pattern: `dist/Devicon/png/<stem>-original_48.png` where `<stem>` is the lowercase upstream key.
 - Quirk: `-original` variant + `_48` size only. Some stems use hyphens (`dot-net`, not `dotnet`); some use full words (`googlecloud`, not `gcp`); some keep abbreviations (`vuejs`, `nextjs`, `nodejs`). Always look up the canonical stem in INDEX.md — guessing `gcp.png` instead of `googlecloud-original_48.png` is a 404.
 - Worked example: `<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/python-original_48.png>`
+
+**GCP** (`dist/GCP/INDEX.md` · `https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/INDEX.md`)
+- Pattern: `dist/GCP/png/<Stem>.png` (flat, one PNG per product). `<Stem>` is a sanitized PascalCase product key (e.g. `GKE`, `BigQuery`, `CloudStorage`, `CloudSQL`, `VertexAI`) — no size or variant suffix.
+- Quirk: a single uniform 64x64 raster per product (no size variants). Brand guidelines permit proportional scaling only — no distortion / recolor / crop. Stems keep product capitalization (`GKE.png`, not `gke.png`); always copy the exact `path` column from INDEX.md.
+- Worked example: `<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/BigQuery.png>`
 
 ### Filenames with parentheses (URL encoding required)
 
@@ -488,6 +494,38 @@ Typical patterns:
 - **Tech-stack reference**: enumerate frontend (`react-original_48.png` + `tailwindcss-original_48.png`), backend (`fastapi-original_48.png` + `python-original_48.png`), data (`postgresql-original_48.png` + `redis-original_48.png` + `elasticsearch-original_48.png`), and infrastructure (`docker-original_48.png` + `kubernetes-original_48.png` + `terraform-original_48.png`) in a single legend-style diagram.
 
 **Trademark note**: Devicon icons depict third-party brands (Python language, Docker container engine, etc.). Use these icons only to identify the tool / language / platform they depict — do not use a Devicon icon to represent **your** product or service. The MIT grant from Devicon does not transfer any trademark rights to depicted brands; see `NOTICE` § Devicon for the per-tool-trademark disclaim.
+
+## Google Cloud icons (reference scope)
+
+The skill also covers **Google Cloud** — the official "core products" icon pack from the Google Cloud Icon Library. The set is full-color product glyphs (one per Google Cloud product) and composes naturally alongside Azure / Kubernetes nodes in a multi-cloud diagram.
+
+Google Cloud icons live under:
+
+```
+https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/
+```
+
+**Layout**: flat, one file per product. Filename pattern: `<Stem>.png` where `<Stem>` is a sanitized PascalCase product key (e.g. `GKE`, `BigQuery`, `CloudStorage`, `CloudSQL`, `ComputeEngine`, `VertexAI`).
+
+**Sizes available**: a single **uniform 64x64** raster per product. There are no size variants. PlantUML scales the icon inside an `<img:>` token automatically; because the source glyph is square, any PlantUML scaling stays proportional.
+
+**Index**: fetch `dist/GCP/INDEX.md` (`https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/INDEX.md`) and copy the `path` column verbatim. Guessing a filename from the product name (e.g. `bigquery.png` instead of `BigQuery.png`) is a 404.
+
+**Brand / trademark note (uniform-scale rule)**: Google permits these product icons to accurately reference Google Cloud products in architecture diagrams, governed by Google's brand and trademark guidelines (reference use). The guidelines permit **uniform / proportional scaling only** — do **not** distort, recolor, or crop the icons, and do not imply Google affiliation, sponsorship, or endorsement, or represent a Google Cloud service as your own product. This project is not affiliated with, sponsored by, or endorsed by Google LLC. See `dist/GCP/USAGE-RULES.txt` and `NOTICE` § Google Cloud Icons.
+
+### Common Google Cloud references
+
+```plantuml
+' Google Cloud product icons (64x64 uniform, one PNG per product)
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/GKE.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudRun.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/BigQuery.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudStorage.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudSQL.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/VertexAI.png>
+```
+
+PascalCase stems = no URL encoding needed (no parentheses, no spaces). See `examples/14-gcp-architecture.puml` for a worked Google Cloud data + ML platform diagram.
 
 ## Pattern 1: System Architecture Diagram
 
@@ -822,5 +860,6 @@ Renderable example diagrams live in `examples/` (file list mirrors `manifest.jso
 - [`10-edit-existing.puml`](examples/10-edit-existing.puml) — worked before/after **edit** of an existing 3-tier diagram (adds a Redis cache node + re-wires it) demonstrating the § "Editing an existing diagram" minimal-diff workflow.
 - [`11-mermaid-architecture.mmd`](examples/11-mermaid-architecture.mmd) — **Mermaid** (`.mmd`, not PlantUML) text-labelled topology demonstrating § "Mermaid mode" (icon-light, renders natively on GitHub).
 - [`12-mermaid-icons.mmd`](examples/12-mermaid-icons.mmd) — **Mermaid** icon-mode example (ELK layout + inline `<img>` vendor icons + styled clusters) demonstrating § "Mermaid mode" sub-mode (b); render with `examples/assets/render-mermaid.sh`.
+- [`14-gcp-architecture.puml`](examples/14-gcp-architecture.puml) — Google Cloud data + ML platform (Cloud Run → GKE → Cloud SQL + Cloud Storage → BigQuery → Vertex AI). Canonical Google Cloud example; icons rastered at a uniform 64x64 per the brand-guidelines proportional-scaling rule.
 </content>
 </invoke>

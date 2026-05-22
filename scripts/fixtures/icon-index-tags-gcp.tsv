@@ -1,0 +1,20 @@
+key	name	description	tags
+AIHypercomputer	AI Hypercomputer	Google Cloud AI Hypercomputer supercomputing system for AI workloads	`gcp`, `ai`, `compute`
+AlloyDB	AlloyDB	Google Cloud AlloyDB for PostgreSQL (managed relational database)	`gcp`, `database`, `postgresql`
+Anthos	Anthos	Google Cloud Anthos hybrid + multi-cloud application platform	`gcp`, `hybrid`, `kubernetes`
+Apigee	Apigee	Google Cloud Apigee API management platform	`gcp`, `api`, `integration`
+BigQuery	BigQuery	Google Cloud BigQuery serverless data warehouse + analytics	`gcp`, `analytics`, `data`, `warehouse`
+CloudRun	Cloud Run	Google Cloud Run serverless container runtime	`gcp`, `compute`, `serverless`, `containers`
+CloudSpanner	Cloud Spanner	Google Cloud Spanner globally-distributed relational database	`gcp`, `database`, `distributed`
+CloudSQL	Cloud SQL	Google Cloud SQL managed relational database (MySQL / PostgreSQL / SQL Server)	`gcp`, `database`, `sql`
+CloudStorage	Cloud Storage	Google Cloud Storage object storage (GCS)	`gcp`, `storage`, `object`
+ComputeEngine	Compute Engine	Google Compute Engine virtual machines (GCE)	`gcp`, `compute`, `vm`
+DistributedCloud	Distributed Cloud	Google Distributed Cloud (edge + on-prem extension of Google Cloud)	`gcp`, `edge`, `hybrid`
+GKE	GKE	Google Kubernetes Engine (managed Kubernetes)	`gcp`, `compute`, `kubernetes`, `containers`
+Hyperdisk	Hyperdisk	Google Cloud Hyperdisk high-performance block storage	`gcp`, `storage`, `block`
+Looker	Looker	Google Cloud Looker business-intelligence + data platform	`gcp`, `analytics`, `bi`
+Mandiant	Mandiant	Google Cloud Mandiant threat intelligence + incident response	`gcp`, `security`, `threat-intelligence`
+SecurityCommandCenter	Security Command Center	Google Cloud Security Command Center (security + risk management)	`gcp`, `security`, `posture`
+SecurityOperations	Security Operations	Google Cloud Security Operations (SecOps / Chronicle SIEM)	`gcp`, `security`, `siem`
+ThreatIntelligence	Threat Intelligence	Google Cloud Threat Intelligence	`gcp`, `security`, `threat-intelligence`
+VertexAI	Vertex AI	Google Cloud Vertex AI unified ML + generative-AI platform	`gcp`, `ai`, `ml`

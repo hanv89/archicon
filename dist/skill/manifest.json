@@ -9,7 +9,7 @@
       "src": "dist/skill/SKILL.md",
       "dest": "SKILL.md",
       "role": "skill",
-      "sha256": "c87a1fb264aea4e5f55a548933c95804796cddf783c03f817a1e7ed4f33d585e"
+      "sha256": "5a5eb2c673cbc4f8741f2a4c1b63a679a1575e2c0da2d9fb1c776693e42b0bbe"
     },
     {
       "src": "dist/skill/examples/01-context.puml",
@@ -82,6 +82,12 @@
       "dest": "examples/12-mermaid-icons.mmd",
       "role": "example",
       "sha256": "d7651cb07c60a7ade4190a24308edd544567e344e8882567ce8eeb3eedf7e893"
+    },
+    {
+      "src": "dist/skill/examples/14-gcp-architecture.puml",
+      "dest": "examples/14-gcp-architecture.puml",
+      "role": "example",
+      "sha256": "64af09d9a2af87be0ec6e672739067112e3fbc4a85be8174df13d3defc3ba2d2"
     },
     {
       "src": "dist/skill/examples/assets/icon.css",
