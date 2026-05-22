@@ -1,24 +1,99 @@
 {
   "$schema": "./manifest.schema.json",
   "name": "architecture-diagram",
-  "version": "0.4.0",
-  "requires_icons": ">=0.2.0",
-  "icons_version": "0.2.0",
+  "version": "1.0.0",
+  "requires_icons": ">=1.0.0",
+  "icons_version": "1.0.0",
   "files": [
-    { "src": "dist/skill/SKILL.md",                              "dest": "SKILL.md",                              "role": "skill",   "sha256": "7ec1a56fa43e61188e63921f5c0844fe5a723f0852360b839078ada3a4805f82" },
-    { "src": "dist/skill/examples/01-context.puml",              "dest": "examples/01-context.puml",              "role": "example", "sha256": "496c283541713bbf8bb34774bc0a8836ad152333750be6acfd0954b11a40edc9" },
-    { "src": "dist/skill/examples/02-fabric-data-pipeline.puml", "dest": "examples/02-fabric-data-pipeline.puml", "role": "example", "sha256": "4ff40fe36add21d6cd8a2bda4a7fc5c1b728989c3c23ba8bf463cffb29efc9d2" },
-    { "src": "dist/skill/examples/03-system-architecture.puml",  "dest": "examples/03-system-architecture.puml",  "role": "example", "sha256": "5492412449bc56c6ddc4099941691e15aba503eb0dbf64bde48dcf158f37d20e" },
-    { "src": "dist/skill/examples/04-sequence-flow.puml",        "dest": "examples/04-sequence-flow.puml",        "role": "example", "sha256": "83d494d10a5ddf9cee19f1a559b855f31eb67381db9ff29d0c1180a30ee8da52" },
-    { "src": "dist/skill/examples/05-component.puml",            "dest": "examples/05-component.puml",            "role": "example", "sha256": "4704186f7844da2b1e0eb35985d34e1a6dccef4ef93c30ed576590cf0fcc989c" },
-    { "src": "dist/skill/examples/06-deployment.puml",           "dest": "examples/06-deployment.puml",           "role": "example", "sha256": "fb1f905c64c1134bd4b4f999e1acf038ecd869ee2f6792204daab5f7205442cd" },
-    { "src": "dist/skill/examples/07-azure-aks-mixed.puml",      "dest": "examples/07-azure-aks-mixed.puml",      "role": "example", "sha256": "2a97a4f667d8c5de81d125bac7cacadcc29d65d47b6cf64548600a22fd69ae1d" },
-    { "src": "dist/skill/examples/08-azure-fluentui-mixed.puml", "dest": "examples/08-azure-fluentui-mixed.puml", "role": "example", "sha256": "57ffec02ba2713701fc0ea03793e6e5100d8b2c81cd5425e98c5a613962962ad" },
-    { "src": "dist/skill/examples/09-devops-pipeline.puml",      "dest": "examples/09-devops-pipeline.puml",      "role": "example", "sha256": "471711f200a26c80f12824dabb50ae5719c2b1fb68031f73beb68ebe5c0c1f0c" },
-    { "src": "dist/skill/examples/10-edit-existing.puml",        "dest": "examples/10-edit-existing.puml",        "role": "example", "sha256": "2db3832e8fc623c495446dc45c2aa383891d2135e3e760bf3d46d7fa01c98b76" },
-    { "src": "dist/skill/examples/11-mermaid-architecture.mmd",  "dest": "examples/11-mermaid-architecture.mmd",  "role": "example", "sha256": "570dfec27d1ea4bf60231d03467f932d65aefa9424876567151cb698e86b316b" },
-    { "src": "dist/skill/examples/12-mermaid-icons.mmd",         "dest": "examples/12-mermaid-icons.mmd",         "role": "example", "sha256": "d7651cb07c60a7ade4190a24308edd544567e344e8882567ce8eeb3eedf7e893" },
-    { "src": "dist/skill/examples/assets/icon.css",              "dest": "examples/assets/icon.css",              "role": "asset",   "sha256": "230bece2bc2423a05dfcac14ee1fa4818460817846e9d5152ef678b64db504e6" },
-    { "src": "dist/skill/examples/assets/render-mermaid.sh",     "dest": "examples/assets/render-mermaid.sh",     "role": "asset",   "sha256": "8e6ee717914c6fd91cd2af6f45054c293285ec624eb83d1bc10920855d5b17fc" }
+    {
+      "src": "dist/skill/SKILL.md",
+      "dest": "SKILL.md",
+      "role": "skill",
+      "sha256": "dd05d0c41dea413f4e99b51cc30dd1809e19f82a06f67230c52b4f5a12f4d1b8"
+    },
+    {
+      "src": "dist/skill/examples/01-context.puml",
+      "dest": "examples/01-context.puml",
+      "role": "example",
+      "sha256": "496c283541713bbf8bb34774bc0a8836ad152333750be6acfd0954b11a40edc9"
+    },
+    {
+      "src": "dist/skill/examples/02-fabric-data-pipeline.puml",
+      "dest": "examples/02-fabric-data-pipeline.puml",
+      "role": "example",
+      "sha256": "4ff40fe36add21d6cd8a2bda4a7fc5c1b728989c3c23ba8bf463cffb29efc9d2"
+    },
+    {
+      "src": "dist/skill/examples/03-system-architecture.puml",
+      "dest": "examples/03-system-architecture.puml",
+      "role": "example",
+      "sha256": "5492412449bc56c6ddc4099941691e15aba503eb0dbf64bde48dcf158f37d20e"
+    },
+    {
+      "src": "dist/skill/examples/04-sequence-flow.puml",
+      "dest": "examples/04-sequence-flow.puml",
+      "role": "example",
+      "sha256": "83d494d10a5ddf9cee19f1a559b855f31eb67381db9ff29d0c1180a30ee8da52"
+    },
+    {
+      "src": "dist/skill/examples/05-component.puml",
+      "dest": "examples/05-component.puml",
+      "role": "example",
+      "sha256": "4704186f7844da2b1e0eb35985d34e1a6dccef4ef93c30ed576590cf0fcc989c"
+    },
+    {
+      "src": "dist/skill/examples/06-deployment.puml",
+      "dest": "examples/06-deployment.puml",
+      "role": "example",
+      "sha256": "fb1f905c64c1134bd4b4f999e1acf038ecd869ee2f6792204daab5f7205442cd"
+    },
+    {
+      "src": "dist/skill/examples/07-azure-aks-mixed.puml",
+      "dest": "examples/07-azure-aks-mixed.puml",
+      "role": "example",
+      "sha256": "2a97a4f667d8c5de81d125bac7cacadcc29d65d47b6cf64548600a22fd69ae1d"
+    },
+    {
+      "src": "dist/skill/examples/08-azure-fluentui-mixed.puml",
+      "dest": "examples/08-azure-fluentui-mixed.puml",
+      "role": "example",
+      "sha256": "57ffec02ba2713701fc0ea03793e6e5100d8b2c81cd5425e98c5a613962962ad"
+    },
+    {
+      "src": "dist/skill/examples/09-devops-pipeline.puml",
+      "dest": "examples/09-devops-pipeline.puml",
+      "role": "example",
+      "sha256": "471711f200a26c80f12824dabb50ae5719c2b1fb68031f73beb68ebe5c0c1f0c"
+    },
+    {
+      "src": "dist/skill/examples/10-edit-existing.puml",
+      "dest": "examples/10-edit-existing.puml",
+      "role": "example",
+      "sha256": "2db3832e8fc623c495446dc45c2aa383891d2135e3e760bf3d46d7fa01c98b76"
+    },
+    {
+      "src": "dist/skill/examples/11-mermaid-architecture.mmd",
+      "dest": "examples/11-mermaid-architecture.mmd",
+      "role": "example",
+      "sha256": "570dfec27d1ea4bf60231d03467f932d65aefa9424876567151cb698e86b316b"
+    },
+    {
+      "src": "dist/skill/examples/12-mermaid-icons.mmd",
+      "dest": "examples/12-mermaid-icons.mmd",
+      "role": "example",
+      "sha256": "d7651cb07c60a7ade4190a24308edd544567e344e8882567ce8eeb3eedf7e893"
+    },
+    {
+      "src": "dist/skill/examples/assets/icon.css",
+      "dest": "examples/assets/icon.css",
+      "role": "asset",
+      "sha256": "230bece2bc2423a05dfcac14ee1fa4818460817846e9d5152ef678b64db504e6"
+    },
+    {
+      "src": "dist/skill/examples/assets/render-mermaid.sh",
+      "dest": "examples/assets/render-mermaid.sh",
+      "role": "asset",
+      "sha256": "8e6ee717914c6fd91cd2af6f45054c293285ec624eb83d1bc10920855d5b17fc"
+    }
   ]
 }
