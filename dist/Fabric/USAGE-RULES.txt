@@ -1,0 +1,35 @@
+USAGE RULES — Microsoft Fabric icons in this directory
+======================================================
+
+These icons are Microsoft trademarks. Their use is governed by:
+
+  - Microsoft Fabric icon Terms of Use (Microsoft's public Fabric branding
+    guidance — verify the latest authoritative URL via Microsoft Learn at
+    next icon refresh).
+  - Microsoft Trademark and Brand Guidelines:
+    https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general
+
+The wrapper package shipping these icons (@fabric-msft/svg-icons on npm)
+is MIT-licensed by Microsoft Corporation, which permits redistribution of
+the SVG/PNG assets in this repository. The trademark + ToU layer applies
+to the iconography itself and persists through the MIT wrapper.
+
+By using any icon in this directory, you agree to the Microsoft Fabric
+icon Terms of Use AND the Microsoft Trademark and Brand Guidelines.
+
+Microsoft permits the use of these icons in architectural diagrams,
+training materials, or documentation. The following are prohibited
+(mirror of the Microsoft Azure architecture icons rules; verify against
+Microsoft's published Fabric ToU at next refresh):
+
+  - Don't crop, flip, or rotate icons.
+  - Don't distort or change icon shape in any way.
+  - Don't use Microsoft product icons to represent your product or
+    service.
+
+Source pin: see dist/Fabric/UPSTREAM-VERSION.txt for the exact
+@fabric-msft/svg-icons semver this redistribution was built from.
+
+For full third-party attribution, the MIT license text for the
+@fabric-msft/svg-icons package, and the per-release rationale, see
+the NOTICE file at the repository root.

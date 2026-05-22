@@ -1,0 +1,22 @@
+USAGE RULES — Microsoft Azure architecture icons in this directory
+===================================================================
+
+These icons are Microsoft trademarks. Their use is governed by the
+Microsoft Azure Architecture Icons Terms of Use:
+
+  https://learn.microsoft.com/en-us/azure/architecture/icons/
+
+By using any icon in this directory, you agree to those Terms.
+
+Microsoft permits the use of these icons in architectural diagrams,
+training materials, or documentation. The following are prohibited
+(verbatim from Microsoft):
+
+  - Don't crop, flip, or rotate icons.
+  - Don't distort or change icon shape in any way.
+  - Don't use Microsoft product icons to represent your product or
+    service.
+
+For full third-party attribution, redistribution license details,
+and the Microsoft Trademark and Brand Guidelines link, see the
+NOTICE file at the repository root.

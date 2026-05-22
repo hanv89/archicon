@@ -1,0 +1,16 @@
+Google Cloud Icons — usage rules (brand guidelines, reference use)
+
+Source: Official Google Cloud Icon Library (https://cloud.google.com/icons)
+
+Google permits the product icons to be used freely and without permission to
+accurately reference Google's technology and tools (for instance in books or
+architecture diagrams). Use is governed by Google's brand/trademark guidelines:
+  - Permitted: reference Google Cloud products in architecture diagrams, docs,
+    and training materials.
+  - Uniform scaling only (width = height). Do NOT distort, recolor, or crop the
+    icons — the brand guidelines forbid distortion (proportional scaling is OK).
+  - Do not imply Google affiliation, sponsorship, or endorsement.
+  - Do not represent a Google Cloud service as your own product or service.
+
+This project is not affiliated with, sponsored by, or endorsed by Google LLC.
+Google Cloud and the Google Cloud logo are trademarks of Google LLC.

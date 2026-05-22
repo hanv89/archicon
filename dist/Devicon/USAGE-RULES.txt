@@ -1,0 +1,47 @@
+Devicon — usage rules
+=====================
+
+Source: https://github.com/devicons/devicon
+License: MIT (Copyright (c) 2015 konpa)
+Per-tool trademarks: each Devicon icon depicts a third-party brand whose
+                     trademark policy applies SEPARATELY to USE. The Devicon
+                     MIT grant covers redistribution of the icon files only.
+
+Use Devicon icons to IDENTIFY the depicted tool, language, framework, or
+platform — alongside Azure / Fabric / Kubernetes / FluentUI icons in
+architecture diagrams, DevOps pipeline diagrams, tech-stack legends, and
+similar use cases.
+
+What you MUST NOT do:
+  - Don't use a Devicon icon to represent YOUR product or service. The icon
+    of a third-party tool is a brand identifier for THAT tool, not for
+    anything you build on top of it. Using the Python icon to label a service
+    you wrote in Python is fine ("backend (Python)"); using the Python icon
+    AS YOUR PRODUCT LOGO is not.
+  - Don't recolor, crop, flip, rotate, or otherwise modify the icon shape —
+    each depicted brand's trademark policy is likely to require unmodified
+    presentation, and recoloring may infringe the trademark even if the MIT
+    license technically permits derivative works.
+  - Don't claim affiliation with, sponsorship by, or endorsement from the
+    depicted brand owner solely on the basis of using their icon in a diagram.
+
+What you SHOULD do:
+  - Pair the icon with the brand's word mark as a label (e.g. icon next to
+    "Python", "Docker", "PostgreSQL") — same convention Microsoft mandates
+    for Azure / Fabric icons, and a per-brand trademark courtesy.
+  - Consult the depicted brand's trademark policy if you have any use case
+    beyond plain identification in an architecture diagram (e.g. marketing
+    materials, commercial products, conference signage).
+  - For commercial-grade clarity, link to https://github.com/devicons/devicon
+    in your project README so reviewers can verify the redistribution chain.
+
+This project is not affiliated with, sponsored by, or endorsed by Devicon,
+konpa, or any of the brands depicted in the icons. The icons are redistributed
+in unmodified form for use in software architecture diagrams under the MIT
+license grant.
+
+This file is the per-vendor USAGE-RULES counterpart to dist/Azure/USAGE-RULES.txt
+and dist/Fabric/USAGE-RULES.txt.
+
+For full license text and per-source attribution, see NOTICE at the repository
+root.

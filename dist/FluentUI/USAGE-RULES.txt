@@ -1,0 +1,35 @@
+Microsoft Fluent UI System Icons — usage rules
+==============================================
+
+Source: https://github.com/microsoft/fluentui-system-icons
+License: MIT (© Microsoft Corporation 2020)
+Trademark: Microsoft Trademark and Brand Guidelines
+           https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general
+
+While the FluentUI System Icons files themselves are MIT-licensed,
+Microsoft brand and product trademarks remain Microsoft's intellectual
+property. The MIT license covers redistribution of the icon files; the
+trademark layer governs HOW the icons may be used.
+
+Verbatim Don'ts (mirror of Azure / Fabric Microsoft icon rules):
+  - Don't crop, flip, or rotate icons.
+  - Don't distort or change icon shape in any way.
+  - Don't use Microsoft product icons to represent your product or service.
+
+What you SHOULD do:
+  - Use FluentUI icons as decorators in architecture diagrams (Cloud,
+    Database, Shield, Person, status indicators, etc.) to label users,
+    data flow, authentication, and system status alongside Azure / Fabric
+    service icons.
+  - Always show the concept name as a label adjacent to the icon (this is
+    a Microsoft Do — same convention as the Azure Architecture Icons).
+
+This project is not affiliated with, sponsored by, or endorsed by Microsoft
+Corporation. The icons are redistributed in unmodified form for use in
+software architecture diagrams under the MIT license grant.
+
+This file is the per-vendor USAGE-RULES counterpart to dist/Azure/USAGE-RULES.txt
+and dist/Fabric/USAGE-RULES.txt.
+
+For full license text and per-source attribution, see NOTICE at the repository
+root.

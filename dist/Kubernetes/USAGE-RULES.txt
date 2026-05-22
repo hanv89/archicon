@@ -1,0 +1,35 @@
+Kubernetes Icons Set — usage rules
+==================================
+
+Source: https://github.com/kubernetes/community/tree/main/icons
+License: Apache-2.0 OR CC-BY-4.0 (dual grant, user's choice at redistribution)
+Trademark: Kubernetes(R) is a registered trademark of The Linux Foundation
+           in the United States and other countries. Use of the Kubernetes
+           name and logo is governed by the Linux Foundation Trademark Usage
+           Guidelines: https://www.linuxfoundation.org/trademark-usage/
+
+Use these icons in architecture diagrams, documentation, training materials,
+and slide decks. The Apache-2.0 / CC-BY-4.0 dual grant imposes NO USE
+RESTRICTIONS beyond standard license obligations:
+  - Apache-2.0: preserve the NOTICE file + license header.
+  - CC-BY-4.0: provide attribution to the Kubernetes project (CNCF / Linux
+    Foundation) when distributing or displaying derivative works.
+
+The Microsoft "Don't crop, flip, or rotate" + "Don't represent your product"
+restrictions that govern Azure / Fabric / FluentUI icons DO NOT APPLY to
+Kubernetes icons — those are Microsoft-specific Terms of Use, not a feature
+of OSS licenses.
+
+What you SHOULD do (trademark courtesy, not a license obligation):
+  - Use the Kubernetes icon to identify Kubernetes-related concepts only
+    (resources, control-plane components, infrastructure). Don't use a
+    Kubernetes icon to label "your custom orchestrator that's compatible
+    with Kubernetes" — that's a trademark concern, not a license one.
+  - Preserve the Kubernetes word mark as "Kubernetes" or "K8s" (do not
+    coin variants like "K8 Pro", "Kubernetes++", etc.).
+
+This file is the per-vendor USAGE-RULES counterpart to dist/Azure/USAGE-RULES.txt
+and dist/Fabric/USAGE-RULES.txt.
+
+For full license text and per-source attribution, see NOTICE at the repository
+root.

@@ -2,11 +2,8 @@ archicon
 Copyright (c) 2026 hanv89
 
 This repository hosts architecture-diagram icons redistributed from multiple
-upstream sources. Per-source attribution, license terms, and trademark
-notices are completed during license verification before each vendor's icons
-are added to the repository.
-
-Planned upstream sources and their licenses:
+upstream sources, used in architecture diagrams, training materials, and
+documentation:
 
   - Microsoft Azure architecture icons (via the plantuml-stdlib/Azure-PlantUML
     upstream redistribution, MIT).
@@ -18,10 +15,10 @@ Planned upstream sources and their licenses:
     published by Microsoft Corporation under MIT).
   - Devicon dev-tool icons (via devicons/devicon, community-maintained, MIT,
     Copyright (c) 2015 konpa).
-  - AWS architecture icons (via awslabs/aws-icons-for-plantuml,
-    CC-BY-ND 2.0 — redistributed verbatim, no modification).
-  - Google Cloud icons (via the Google Cloud Icon Library, used for reference
-    in architecture diagrams under Google's brand guidelines).
+  - AWS architecture icons (via awslabs/aws-icons-for-plantuml, CC-BY-ND 2.0 —
+    redistributed verbatim, no modification or resize).
+  - Google Cloud icons (via the official Google Cloud Icon Library, used for
+    reference in architecture diagrams under Google's brand guidelines).
 
 This project is not affiliated with or endorsed by Microsoft Corporation, the
 Cloud Native Computing Foundation, the Linux Foundation, Amazon Web Services,
@@ -33,5 +30,245 @@ respective owners.
 THIRD-PARTY NOTICES
 ================================================================================
 
-Per-source notices (source URL, captured commit/version, verbatim license
-text, and trademark policy) are completed before each vendor's icons ship.
+Azure-PlantUML (intermediate redistribution source for the Azure icons):
+  Source:    https://github.com/plantuml-stdlib/Azure-PlantUML
+  License:   MIT
+  Copyright: Copyright (c) 2018-2019 Ricardo Niepel,
+             2021-2022 Ricardo Niepel and contributors
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+
+Microsoft Azure Architecture Icons (original icon source):
+  Source: https://learn.microsoft.com/en-us/azure/architecture/icons/
+  Terms:  "Microsoft permits the use of these icons in architectural
+          diagrams, training materials, or documentation. You can copy,
+          distribute, and display the icons only for the permitted use
+          unless granted explicit permission by Microsoft. Microsoft
+          reserves all other rights."
+
+  Restrictions on icon use (verbatim from Microsoft):
+    - Don't crop, flip, or rotate icons.
+    - Don't distort or change icon shape in any way.
+    - Don't use Microsoft product icons to represent your product or service.
+
+Microsoft Trademark and Brand Guidelines (governs trademark rights to the
+Microsoft logos and product icons redistributed here):
+  Source: https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general
+
+================================================================================
+
+Microsoft Fabric icons (source for the dist/Fabric/ icon set):
+  Source:   @fabric-msft/svg-icons npm package, published by Microsoft Corporation
+            https://www.npmjs.com/package/@fabric-msft/svg-icons
+  License:  MIT (verified at every build via `npm view @fabric-msft/svg-icons license`;
+            build fails if upstream license string is anything other than MIT)
+  Copyright: Copyright (c) Microsoft Corporation
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in
+  all copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+  THE SOFTWARE.
+
+  Note: while the @fabric-msft/svg-icons package itself is MIT-licensed,
+  the Microsoft Fabric icons it contains are also Microsoft trademarks and
+  subject to the Microsoft Trademark and Brand Guidelines (linked above) AND
+  Microsoft's Fabric icon Terms of Use. The MIT license covers redistribution
+  of the wrapper package; trademark + ToU layer is preserved unchanged.
+
+  Restrictions on icon use (mirror of Azure rules):
+    - Don't crop, flip, or rotate icons.
+    - Don't distort or change icon shape in any way.
+    - Don't use Microsoft product icons to represent your product or service.
+
+================================================================================
+
+Kubernetes Icons (source for the dist/Kubernetes/ icon set):
+
+  https://github.com/kubernetes/community/tree/main/icons
+
+  The Kubernetes Icons Set is licensed by the Kubernetes project (CNCF /
+  Linux Foundation) under a choice of either the Apache License 2.0
+  (https://www.apache.org/licenses/LICENSE-2.0) or the Creative Commons
+  Attribution 4.0 International License (CC-BY-4.0,
+  https://creativecommons.org/licenses/by/4.0/). The dual grant is
+  documented in icons/README.md § License in the upstream repository.
+
+  This project (dist/Kubernetes/) redistributes a subset of the upstream
+  PNGs (labeled + unlabeled variants at 128px and 256px sizes). The upstream
+  commit SHA is recorded in dist/Kubernetes/UPSTREAM-SHA.txt.
+
+  Kubernetes(R) is a registered trademark of The Linux Foundation in
+  the United States and other countries. Use of the Kubernetes name
+  and logo is governed by The Linux Foundation Trademark Usage
+  Guidelines at https://www.linuxfoundation.org/trademark-usage/.
+
+  This project is not affiliated with, sponsored by, or endorsed by
+  the Kubernetes project, the Cloud Native Computing Foundation, or
+  the Linux Foundation. The Kubernetes Icons Set is redistributed
+  here in unmodified form for use in architecture diagrams under
+  the Apache-2.0 / CC-BY-4.0 grant.
+
+================================================================================
+
+Microsoft Fluent UI System Icons (source for the dist/FluentUI/ icon set):
+
+  https://github.com/microsoft/fluentui-system-icons
+
+  The Fluent UI System Icons repository is published by Microsoft Corporation
+  under the MIT License. License terms reproduced below (verbatim from the
+  upstream LICENSE file):
+
+      MIT License
+
+      Copyright (c) 2020 Microsoft Corporation
+
+      Permission is hereby granted, free of charge, to any person obtaining a
+      copy of this software and associated documentation files (the "Software"),
+      to deal in the Software without restriction, including without limitation
+      the rights to use, copy, modify, merge, publish, distribute, sublicense,
+      and/or sell copies of the Software, and to permit persons to whom the
+      Software is furnished to do so, subject to the following conditions:
+
+      The above copyright notice and this permission notice shall be included
+      in all copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+      OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+      MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+      IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+      CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+      TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+      SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  This project (dist/FluentUI/) redistributes a curated subset: 25
+  architecture-diagram concepts × 3 sizes (24/32/48) × the `_color` variant.
+  The curation list is scripts/fixtures/fluentui-curation.txt; the upstream
+  commit SHA is recorded in dist/FluentUI/UPSTREAM-SHA.txt.
+
+  The Fluent UI System Icons file licensing (MIT) covers redistribution
+  of the icon files themselves. Microsoft brand and product trademarks
+  remain Microsoft's intellectual property and are subject to the
+  Microsoft Trademark and Brand Guidelines:
+
+    https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general
+
+  This project is not affiliated with, sponsored by, or endorsed by
+  Microsoft Corporation. The icons are redistributed in unmodified form
+  for use in software architecture diagrams under the MIT license grant.
+
+================================================================================
+
+Devicon (source for the dist/Devicon/ icon set):
+
+  https://github.com/devicons/devicon
+
+  Devicon is a community-maintained icon collection depicting popular
+  programming languages, frameworks, tools, and platforms. The repository
+  is published under the MIT License. License terms reproduced below
+  (verbatim from the upstream LICENSE file):
+
+      The MIT License (MIT)
+
+      Copyright (c) 2015 konpa
+
+      Permission is hereby granted, free of charge, to any person obtaining
+      a copy of this software and associated documentation files (the
+      "Software"), to deal in the Software without restriction, including
+      without limitation the rights to use, copy, modify, merge, publish,
+      distribute, sublicense, and/or sell copies of the Software, and to
+      permit persons to whom the Software is furnished to do so, subject to
+      the following conditions:
+
+      The above copyright notice and this permission notice shall be
+      included in all copies or substantial portions of the Software.
+
+      THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+      EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+      MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+      IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY
+      CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+      TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
+      SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+  This project (dist/Devicon/) redistributes a curated subset: ~150 popular
+  dev-tool concepts × the `-original` variant at 48px. The curation list is
+  scripts/fixtures/devicon-curation.txt; the upstream commit SHA is recorded
+  in dist/Devicon/UPSTREAM-SHA.txt.
+
+  The Devicon file licensing (MIT) covers redistribution of the icon files
+  themselves. Each icon depicts a third-party brand whose trademark is owned
+  by its respective owner. The MIT grant from Devicon is the redistribution
+  legal basis; trademark policies of the depicted brands apply separately.
+
+  This project is not affiliated with, sponsored by, or endorsed by
+  Devicon, konpa, or any of the brands depicted in the icons.
+
+================================================================================
+
+AWS Architecture Icons (source for the dist/AWS/ icon set):
+
+  Upstream: https://github.com/awslabs/aws-icons-for-plantuml
+  Original: AWS Architecture Icons — https://aws.amazon.com/architecture/icons/
+  License:  CC-BY-ND 2.0 (Creative Commons Attribution-NoDerivatives 2.0)
+            https://creativecommons.org/licenses/by-nd/2.0/
+
+  The "NoDerivatives" clause permits use + verbatim redistribution with
+  attribution but FORBIDS distributing modified or derivative versions.
+  Accordingly, this project redistributes the upstream PNGs **byte-identically**
+  (dist/AWS/) — NO resize, no re-encode, no recolor, no crop. A CI gate asserts
+  each shipped AWS PNG is sha256-identical to its upstream source and that the
+  AWS build path never invokes an image converter.
+
+  Attribution: "AWS Architecture Icons" © Amazon Web Services, Inc. or its
+  affiliates. This project is not affiliated with, sponsored by, or endorsed
+  by Amazon Web Services. AWS and the AWS logo are trademarks of Amazon.com,
+  Inc. or its affiliates.
+
+================================================================================
+
+Google Cloud Icons (source for the dist/GCP/ icon set):
+
+  Source: Official Google Cloud Icon Library — https://cloud.google.com/icons
+
+  Google permits the product icons to be used freely and without permission to
+  accurately reference Google's technology and tools — for instance in books or
+  architecture diagrams. Use is governed by Google's brand and trademark
+  guidelines (a trademark layer, not a no-derivatives copyright restriction).
+
+  This project (dist/GCP/) redistributes the icons for architecture-diagram
+  reference use. Icons are scaled uniformly only (width = height); they are not
+  distorted, recolored, or cropped, per the brand guidelines. The upstream ZIP
+  content hash is recorded in dist/GCP/UPSTREAM-SHA.txt.
+
+  This project is not affiliated with, sponsored by, or endorsed by Google LLC,
+  and does not represent any Google Cloud product as its own. Google Cloud and
+  the Google Cloud logo are trademarks of Google LLC.

@@ -1,0 +1,18 @@
+AWS Architecture Icons — usage rules (CC-BY-ND 2.0)
+
+Source:   awslabs/aws-icons-for-plantuml (https://github.com/awslabs/aws-icons-for-plantuml)
+Original: AWS Architecture Icons (https://aws.amazon.com/architecture/icons/)
+License:  Creative Commons Attribution-NoDerivatives 2.0 (CC-BY-ND 2.0)
+
+The "NoDerivatives" clause means the icons are redistributed VERBATIM only:
+  - Do NOT resize, re-encode, recolor, crop, flip, or rotate the icons.
+  - Modifying an icon (including resizing) creates a derivative work, which
+    CC-BY-ND forbids. This repo ships AWS PNGs byte-identical to upstream; a
+    CI gate enforces it.
+  - Attribution required: "AWS Architecture Icons" (c) Amazon Web Services, Inc.
+    or its affiliates.
+  - Do not use an AWS icon to represent your own product or service.
+
+This project is not affiliated with, sponsored by, or endorsed by Amazon Web
+Services. AWS and the AWS logo are trademarks of Amazon.com, Inc. or its
+affiliates.
