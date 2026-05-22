@@ -2,9 +2,8 @@
 
 import { Command } from "commander";
 import pkg from "../package.json";
-import { ADAPTERS, AgentName, SUPPORTED_AGENTS, SUPPORTED_TARGETS } from "./adapters/registry";
-
-type Subcommand = keyof (typeof ADAPTERS)[AgentName];
+import { ADAPTERS, AgentName, ALL_TARGET, SUPPORTED_AGENTS, SUPPORTED_TARGETS } from "./adapters/registry";
+import { runOverAll, Subcommand } from "./all";
 
 const program = new Command()
   .name("arch-skill")
@@ -36,6 +35,10 @@ function defineSubcommand(name: Subcommand, description: string): void {
         throw new Error(`--version must match X.Y.Z (got: ${opts.version})`);
       }
       const optsForAdapter = { target: opts.target, version: opts.version };
+      if (opts.agent === ALL_TARGET) {
+        process.exitCode = await runOverAll(name, optsForAdapter);
+        return;
+      }
       if (!SUPPORTED_AGENTS.includes(opts.agent)) {
         throw new Error(`unknown agent: ${opts.agent} (supported: ${SUPPORTED_AGENTS.join(", ")})`);
       }

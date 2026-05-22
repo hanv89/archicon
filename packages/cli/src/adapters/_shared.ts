@@ -746,7 +746,7 @@ export function makeFolderInstallAdapter(cfg: FolderAdapterConfig): Adapter {
  * Lives in _shared.ts so every adapter built on makeFolderInstallAdapter (and
  * future adapters reusing these helpers) inherits the check for free.
  */
-function verifyBundleFile(file: ManifestFile, body: string | Buffer): void {
+export function verifyBundleFile(file: ManifestFile, body: string | Buffer): void {
   if (file.sha256) {
     verifyFileHash(body, file.sha256);
   } else {
