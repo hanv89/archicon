@@ -11,6 +11,7 @@ name: update-icons
 #   - monitor_devicon_health.sh          (devicons/devicon)
 #   - monitor_aws_health.sh              (awslabs/aws-icons-for-plantuml —
 #                                         CC-BY-ND LICENSE fingerprint + health)
+#   - monitor_gcp_health.sh              (Google Cloud Icon Library ZIP)
 # If any monitor fires red, the cron short-circuits and opens a watchdog
 # issue instead of pulling possibly-newly-restricted icons.
 
@@ -88,15 +89,17 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: bash scripts/monitor_devicon_health.sh
 
-      # >>> AWS-UPDATE-BEGIN (CC-BY-ND verbatim regime: LICENSE-fingerprint +
-      #     archived/disabled health gate before any AWS icon refresh)
       - name: AWS upstream-health monitor
         id: aws_health_monitor
         continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: bash scripts/monitor_aws_health.sh
-      # <<< AWS-UPDATE-END
+
+      - name: GCP icon-pack drift monitor
+        id: gcp_health_monitor
+        continue-on-error: true
+        run: bash scripts/monitor_gcp_health.sh
 
       - name: Watchdog issue on any monitor failure
         if: >-
@@ -106,14 +109,15 @@ jobs:
           steps.kubernetes_health_monitor.outcome == 'failure' ||
           steps.fluentui_health_monitor.outcome == 'failure' ||
           steps.devicon_health_monitor.outcome == 'failure' ||
-          steps.aws_health_monitor.outcome == 'failure'
+          steps.aws_health_monitor.outcome == 'failure' ||
+          steps.gcp_health_monitor.outcome == 'failure'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           gh issue create \
             --title "watchdog: upstream monitor failed ($(date -u +%Y-%m-%d))" \
-            --body "$(printf 'monitor_ms_tou.sh:                  %s\nmonitor_fabric_tou.sh:              %s\nmonitor_azure_plantuml_health.sh:   %s\nmonitor_kubernetes_health.sh:       %s\nmonitor_fluentui_health.sh:         %s\nmonitor_devicon_health.sh:          %s\nmonitor_aws_health.sh:              %s\n\nManual triage required before the next icon refresh.' "${{ steps.tou_monitor.outcome }}" "${{ steps.fabric_tou_monitor.outcome }}" "${{ steps.health_monitor.outcome }}" "${{ steps.kubernetes_health_monitor.outcome }}" "${{ steps.fluentui_health_monitor.outcome }}" "${{ steps.devicon_health_monitor.outcome }}" "${{ steps.aws_health_monitor.outcome }}")"
+            --body "$(printf 'monitor_ms_tou.sh:                  %s\nmonitor_fabric_tou.sh:              %s\nmonitor_azure_plantuml_health.sh:   %s\nmonitor_kubernetes_health.sh:       %s\nmonitor_fluentui_health.sh:         %s\nmonitor_devicon_health.sh:          %s\nmonitor_aws_health.sh:              %s\nmonitor_gcp_health.sh:              %s\n\nManual triage required before the next icon refresh.' "${{ steps.tou_monitor.outcome }}" "${{ steps.fabric_tou_monitor.outcome }}" "${{ steps.health_monitor.outcome }}" "${{ steps.kubernetes_health_monitor.outcome }}" "${{ steps.fluentui_health_monitor.outcome }}" "${{ steps.devicon_health_monitor.outcome }}" "${{ steps.aws_health_monitor.outcome }}" "${{ steps.gcp_health_monitor.outcome }}")"
           exit 1
 
       - name: Run build scripts (all vendors)
@@ -126,9 +130,8 @@ jobs:
           bash scripts/build_kubernetes.sh
           bash scripts/build_fluentui_system.sh
           bash scripts/build_devicon.sh
-          # >>> AWS-UPDATE-BEGIN (verbatim copy — clones upstream + cp PNGs, no rsvg)
           bash scripts/build_aws.sh
-          # <<< AWS-UPDATE-END
+          bash scripts/build_gcp.sh
 
       - name: Open PR if dist/ changed
         env:
@@ -164,7 +167,8 @@ jobs:
           steps.kubernetes_health_monitor.outcome == 'success' &&
           steps.fluentui_health_monitor.outcome == 'success' &&
           steps.devicon_health_monitor.outcome == 'success' &&
-          steps.aws_health_monitor.outcome == 'success'
+          steps.aws_health_monitor.outcome == 'success' &&
+          steps.gcp_health_monitor.outcome == 'success'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

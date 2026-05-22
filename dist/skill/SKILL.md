@@ -1,8 +1,8 @@
 ---
 name: architecture-diagram
 description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.1.0
-requires_icons: ">=1.1.0"
+version: 1.2.0
+requires_icons: ">=1.2.0"
 ---
 
 # Architecture Diagram Skill (PlantUML)
@@ -127,6 +127,7 @@ Every icon ships with a flat markdown catalog you can grep. Each row carries the
 <!-- AWS-SKILL-BEGIN -->
 - AWS: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/INDEX.md>
 <!-- AWS-SKILL-END -->
+- GCP: <https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/INDEX.md>
 
 When the user names a service, **fetch the relevant INDEX.md once at the start of a session, search it (case-insensitive substring or tag match across name + description + tags), and use the `path` column from the matching row** verbatim in your `<img:URL>` token.
 
@@ -201,6 +202,10 @@ Each vendor uses a different canonical filename convention. The pattern is fixed
 - **Verbatim / no-resize**: AWS icons are CC-BY-ND 2.0 (NoDerivatives). They are redistributed byte-identical to upstream — do NOT resize, recolor, crop, or re-encode them; a resize is a derivative and is forbidden. Use the PNG as-is.
 - Worked example: `<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/AWS/Compute/Lambda.png>`
 <!-- AWS-SKILL-END -->
+**GCP** (`dist/GCP/INDEX.md` · `https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/INDEX.md`)
+- Pattern: `dist/GCP/png/<Stem>.png` (flat, one PNG per product). `<Stem>` is a sanitized PascalCase product key (e.g. `GKE`, `BigQuery`, `CloudStorage`, `CloudSQL`, `VertexAI`) — no size or variant suffix.
+- Quirk: a single uniform 64x64 raster per product (no size variants). Brand guidelines permit proportional scaling only — no distortion / recolor / crop. Stems keep product capitalization (`GKE.png`, not `gke.png`); always copy the exact `path` column from INDEX.md.
+- Worked example: `<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/BigQuery.png>`
 
 ### Filenames with parentheses (URL encoding required)
 
@@ -527,6 +532,37 @@ Common AWS references (filenames copied verbatim from `dist/AWS/INDEX.md`):
 
 See `examples/13-aws-architecture.puml` for a worked serverless AWS example.
 <!-- AWS-SKILL-END -->
+## Google Cloud icons (reference scope)
+
+The skill also covers **Google Cloud** — the official "core products" icon pack from the Google Cloud Icon Library. The set is full-color product glyphs (one per Google Cloud product) and composes naturally alongside Azure / Kubernetes nodes in a multi-cloud diagram.
+
+Google Cloud icons live under:
+
+```
+https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/
+```
+
+**Layout**: flat, one file per product. Filename pattern: `<Stem>.png` where `<Stem>` is a sanitized PascalCase product key (e.g. `GKE`, `BigQuery`, `CloudStorage`, `CloudSQL`, `ComputeEngine`, `VertexAI`).
+
+**Sizes available**: a single **uniform 64x64** raster per product. There are no size variants. PlantUML scales the icon inside an `<img:>` token automatically; because the source glyph is square, any PlantUML scaling stays proportional.
+
+**Index**: fetch `dist/GCP/INDEX.md` (`https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/INDEX.md`) and copy the `path` column verbatim. Guessing a filename from the product name (e.g. `bigquery.png` instead of `BigQuery.png`) is a 404.
+
+**Brand / trademark note (uniform-scale rule)**: Google permits these product icons to accurately reference Google Cloud products in architecture diagrams, governed by Google's brand and trademark guidelines (reference use). The guidelines permit **uniform / proportional scaling only** — do **not** distort, recolor, or crop the icons, and do not imply Google affiliation, sponsorship, or endorsement, or represent a Google Cloud service as your own product. This project is not affiliated with, sponsored by, or endorsed by Google LLC. See `dist/GCP/USAGE-RULES.txt` and `NOTICE` § Google Cloud Icons.
+
+### Common Google Cloud references
+
+```plantuml
+' Google Cloud product icons (64x64 uniform, one PNG per product)
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/GKE.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudRun.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/BigQuery.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudStorage.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudSQL.png>
+<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/VertexAI.png>
+```
+
+PascalCase stems = no URL encoding needed (no parentheses, no spaces). See `examples/14-gcp-architecture.puml` for a worked Google Cloud data + ML platform diagram.
 
 ## Pattern 1: System Architecture Diagram
 
@@ -864,5 +900,6 @@ Renderable example diagrams live in `examples/` (file list mirrors `manifest.jso
 <!-- AWS-SKILL-BEGIN -->
 - [`13-aws-architecture.puml`](examples/13-aws-architecture.puml) — AWS serverless web architecture (CloudFront → API Gateway → Lambda → DynamoDB + RDS, with S3 + SNS/SQS). Canonical AWS-vendor example; AWS icons are CC-BY-ND verbatim (no resize).
 <!-- AWS-SKILL-END -->
+- [`14-gcp-architecture.puml`](examples/14-gcp-architecture.puml) — Google Cloud data + ML platform (Cloud Run → GKE → Cloud SQL + Cloud Storage → BigQuery → Vertex AI). Canonical Google Cloud example; icons rastered at a uniform 64x64 per the brand-guidelines proportional-scaling rule.
 </content>
 </invoke>

@@ -1,0 +1,49 @@
+@startuml
+' System architecture (C4 level 2) — Google Cloud data + ML platform.
+' Demonstrates the canonical Google Cloud icon usage: a Cloud Run service
+' fronting GKE workloads, persisting to Cloud SQL + Cloud Storage, feeding
+' BigQuery analytics and a Vertex AI model.
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   Google Cloud product icons via the official Google Cloud Icon Library,
+'   used for reference in architecture diagrams under Google''s brand /
+'   trademark guidelines (reference use). Icons are rastered at a UNIFORM
+'   square size (64x64) — proportional scaling only; no distortion, recolor,
+'   or crop. Not affiliated with, sponsored by, or endorsed by Google LLC.
+'   See repo NOTICE § Google Cloud Icons + dist/GCP/USAGE-RULES.txt.
+'
+' Render: paste this file''s content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time from this
+' repository''s public raw URLs.
+
+left to right direction
+skinparam linetype ortho
+
+title Google Cloud data + ML platform
+
+actor "User" as user
+
+rectangle "**Cloud Run**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudRun.png>\napi service (serverless)" as run
+
+rectangle "**GKE**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/GKE.png>\nbatch + worker pods" as gke
+
+rectangle "**Cloud SQL**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudSQL.png>\ntransactional store" as sql
+
+rectangle "**Cloud Storage**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/CloudStorage.png>\nraw object landing" as gcs
+
+rectangle "**BigQuery**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/BigQuery.png>\nanalytics warehouse" as bq
+
+rectangle "**Vertex AI**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/VertexAI.png>\nmodel training + serving" as vertex
+
+user -right-> run : HTTPS
+run -right-> gke : enqueue jobs
+run -down-> sql : read / write
+gke -down-> gcs : write artifacts
+gcs -right-> bq : load
+bq -right-> vertex : training features
+vertex -up-> run : predictions
+
+@enduml
