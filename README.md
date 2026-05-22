@@ -10,8 +10,10 @@ npm: **`@hanv89/arch-skill`** · stable since **v1.0.0**.
 
 ## What ships
 
-- **Icons — 5 vendors, 1212 PNGs**: Microsoft Azure (528), Microsoft Fabric
-  (312), Kubernetes (148), Microsoft FluentUI System Icons (75), Devicon (149).
+- **Icons — 7 vendors, ~2100 PNGs**: Microsoft Azure (528), Microsoft Fabric
+  (312), Kubernetes (148), Microsoft FluentUI System Icons (75), Devicon (149),
+  AWS (868, redistributed **verbatim** under CC-BY-ND — no resize), Google Cloud
+  (19, official icon pack at uniform scale).
   Each redistributed from its upstream under that upstream's license (see
   [`NOTICE`](./NOTICE) + per-vendor `dist/<Vendor>/USAGE-RULES.txt`). Referenced
   by tag-pinned `raw.githubusercontent.com` URL — no CDN, no auth.
@@ -24,8 +26,10 @@ npm: **`@hanv89/arch-skill`** · stable since **v1.0.0**.
 - **IaC → diagram (experimental)**: `scripts/iac_to_diagram.mjs` (Terraform
   `azurerm` → PlantUML).
 
-> **AWS + Google Cloud** are planned (next releases) — `dist/AWS/` and
-> `dist/GCP/` are reserved and not yet populated.
+> **AWS** ships verbatim per its CC-BY-ND license (no resize/recolor — a CI
+> gate enforces byte-identity to upstream). **Google Cloud** ships at uniform
+> 64×64 per Google's brand guidelines. Both are not affiliated with / endorsed
+> by AWS or Google — see [`NOTICE`](./NOTICE) + each `dist/<V>/USAGE-RULES.txt`.
 
 ## Install
 
