@@ -2,14 +2,13 @@ name: lockfile-check
 
 # Asserts every "resolved" URL in package-lock.json (root + packages/cli)
 # starts with https://registry.npmjs.org/. Catches a malicious or
-# accidental switch to a private/mirror registry. Runs on every PR
-# that touches a lockfile.
+# accidental switch to a private/mirror registry. Runs on every PR + push
+# to main (the job self-skips when no lockfile is present).
 
 on:
   pull_request:
-    paths:
-      - 'package-lock.json'
-      - 'packages/cli/package-lock.json'
+  push:
+    branches: [main]
 
 permissions:
   contents: read

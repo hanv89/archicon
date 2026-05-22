@@ -16,9 +16,9 @@ documentation:
   - Devicon dev-tool icons (via devicons/devicon, community-maintained, MIT,
     Copyright (c) 2015 konpa).
   - AWS architecture icons (via awslabs/aws-icons-for-plantuml, CC-BY-ND 2.0 —
-    redistributed verbatim, no modification or resize).
+    redistributed verbatim, no modification or resize) [reserved — not yet shipped as of v1.0.0].
   - Google Cloud icons (via the official Google Cloud Icon Library, used for
-    reference in architecture diagrams under Google's brand guidelines).
+    reference in architecture diagrams under Google's brand guidelines) [reserved — not yet shipped as of v1.0.0].
 
 This project is not affiliated with or endorsed by Microsoft Corporation, the
 Cloud Native Computing Foundation, the Linux Foundation, Amazon Web Services,

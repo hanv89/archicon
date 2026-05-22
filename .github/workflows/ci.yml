@@ -130,10 +130,8 @@ jobs:
         with:
           fetch-depth: 0
       - name: Fetch fixture/skill-md-only
-        run: |
-          git fetch origin fixture/skill-md-only:fixture/skill-md-only || {
-            echo "fixture/skill-md-only does not exist on origin — skipping drift check"
-            exit 0
-          }
+        # Hard requirement — the fixture branch is a committed dependency; a
+        # missing branch is a real failure, not a skip.
+        run: git fetch origin fixture/skill-md-only:fixture/skill-md-only
       - name: scripts/test_fixture_drift.sh
         run: bash scripts/test_fixture_drift.sh
