@@ -63,13 +63,22 @@ jobs:
       - name: npm publish --provenance
         run: npm publish --provenance --access public --tag "${{ steps.dist.outputs.tag }}"
 
+      - name: Build chat-UI distribution bundle
+        # Downloadable artifact for chat-UI channels (Claude.ai Project +
+        # ChatGPT Custom GPT). Byte-reproducible (bundle-repro CI job).
+        working-directory: ${{ github.workspace }}
+        run: |
+          bash scripts/build_chat_ui_bundle.sh
+          test -s dist/chat-ui-bundle.zip
+
       - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           TARBALL=$(ls hanv89-arch-skill-*.tgz | head -1)
           VERSION="${GITHUB_REF_NAME#skill-v}"
-          NOTES="Release v${VERSION} of @hanv89/arch-skill. Published with Sigstore provenance attestation via Trusted Publisher OIDC."
-          gh release create "${GITHUB_REF_NAME}" "$TARBALL" \
+          BUNDLE="${{ github.workspace }}/dist/chat-ui-bundle.zip"
+          NOTES="Release v${VERSION} of @hanv89/arch-skill. Published with Sigstore provenance via Trusted Publisher OIDC. chat-ui-bundle.zip packages SKILL.md + per-vendor INDEX + examples + USAGE-RULES + NOTICE for upload into a chat-UI agent (Claude.ai Project or ChatGPT Custom GPT). Setup recipes: docs/chat-ui-distribution/."
+          gh release create "${GITHUB_REF_NAME}" "$TARBALL" "$BUNDLE" \
             --title "arch-skill v${VERSION}" \
             --notes "$NOTES"
