@@ -1,0 +1,34 @@
+@startuml
+' Azure 3-tier web application — context view
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:   Microsoft Azure architecture icons (subject to Microsoft ToU
+'          and Trademark Guidelines — see repo NOTICE).
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time from this
+' repository's public raw URLs.
+
+title Azure 3-tier web application — context
+
+actor "End user" as user
+
+rectangle "Edge" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\nAzure Front Door" as fd
+}
+
+rectangle "Application" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\nAzure App Service" as app
+}
+
+rectangle "Data" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nAzure SQL Database" as sql
+}
+
+user --> fd  : HTTPS
+fd   --> app : HTTPS
+app  --> sql : SQL/TLS
+
+@enduml
