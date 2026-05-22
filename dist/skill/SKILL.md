@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: Use this skill when creating Microsoft Azure architecture diagrams using PlantUML with official Azure icons. Covers icon usage from the canonical icon repository, layout patterns (clusters, alignment, edge styling), and Confluence/GitHub/PlantUML rendering. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]". Primary output is PlantUML with embedded Azure icons. More vendors (Fabric, Kubernetes, FluentUI, Devicon, AWS, Google Cloud), a Mermaid mode, and an IaC→diagram path are added in later releases.
-version: 0.1.0
+version: 0.2.0
 requires_icons: ">=0.1.0"
 ---
 
