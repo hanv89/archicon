@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.0.0
+version: 1.0.1
 requires_icons: ">=1.0.0"
 ---
 
@@ -785,24 +785,21 @@ See [`examples/11-mermaid-architecture.mmd`](examples/11-mermaid-architecture.mm
 
 ## Extending the icon set
 
-If an icon is **not available** in `hanv89/archicon`:
-
-1. **New Microsoft service**: Add to `dist/Azure/[Category]/` of the repo, push a PR.
-2. **Internal logo / brand**: Add to `dist/Custom/` using kebab-case naming (e.g., `your-brand.png`).
-3. **Third-party service**: Add to `dist/Custom/3rdparty/` with clear attribution.
-
-PNG specs:
-- Size: 70x70 px
-- Format: PNG with alpha channel
-- Background: Transparent
-- DPI: 72 (standard web)
+If an icon is **not available** in `hanv89/archicon`, contribute it upstream
+(see `CONTRIBUTING.md` in the repo): add the PNG under the relevant
+`dist/<Vendor>/` directory, regenerate that vendor's `INDEX.md`, update `NOTICE`,
+and open a PR. Each vendor keeps its **native size** — there is no single
+required dimension (Azure ships 70×70, Fabric 24/40/48, Kubernetes 128/256,
+FluentUI 24/32/48, Devicon 48). Use square PNGs with an alpha channel; do not
+upscale or distort. License compliance is gating — only add icons whose upstream
+license permits redistribution.
 
 ## Reference
 
 - **This repository**: `https://github.com/hanv89/archicon`
-- **License**: MIT — see [`LICENSE`](../../LICENSE)
-- **Third-party attribution + Microsoft ToU snapshot**: see [`NOTICE`](../../NOTICE)
-- **Icon-use rules (human-readable)**: see [`USAGE-RULES.txt`](../Azure/USAGE-RULES.txt)
+- **License**: MIT — `https://github.com/hanv89/archicon/blob/main/LICENSE`
+- **Third-party attribution + per-vendor terms**: `https://github.com/hanv89/archicon/blob/main/NOTICE`
+- **Icon-use rules (human-readable)**: per vendor at `https://github.com/hanv89/archicon/blob/main/dist/<Vendor>/USAGE-RULES.txt`
 - **Microsoft Azure Architecture Icons Terms of Use**: `https://learn.microsoft.com/en-us/azure/architecture/icons/`
 - **Microsoft Trademark and Brand Guidelines**: `https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general`
 - **PlantUML docs**: `https://plantuml.com/`
