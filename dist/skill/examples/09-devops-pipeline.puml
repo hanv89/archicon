@@ -1,0 +1,72 @@
+@startuml
+' DevOps pipeline (C4 level 2) — source → CI → CD → registry → runtime →
+' observability, decorated with Devicon dev-tool brand glyphs alongside
+' Azure (managed services) and Kubernetes (workload subgraph) icons.
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   Microsoft Azure architecture icons via Azure-PlantUML upstream (MIT)
+'     — subject to Microsoft Azure Architecture Icons ToU + Trademark
+'     Guidelines; see repo NOTICE.
+'   Kubernetes Icons (CNCF / Linux Foundation; Apache-2.0 / CC-BY-4.0)
+'     — Kubernetes(R) is a registered trademark of The Linux Foundation.
+'   Devicon (community-maintained MIT, Copyright (c) 2015 konpa) —
+'     each depicted brand is a trademark of its respective owner; the
+'     icons identify the depicted tool. See repo NOTICE § Devicon.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time.
+
+left to right direction
+skinparam linetype ortho
+
+title DevOps pipeline — source -> CI/CD -> AKS runtime -> observability
+
+actor "Developer\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/vscode-original_48.png>" as dev
+
+' ----- Source + CI/CD (Devicon dev tools) -----
+rectangle "**GitHub**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/github-original_48.png>\nsource of truth" as gh
+
+rectangle "**GitHub Actions**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/githubactions-original_48.png>\nbuild + test + push image" as ghactions
+
+rectangle "**Argo CD**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/argocd-original_48.png>\nGitOps continuous delivery" as argocd
+
+' ----- Registry + runtime (Azure managed services) -----
+rectangle "**Azure Container Registry**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureContainerRegistry.png>\ncontainer image storage" as acr
+
+rectangle "**Azure Kubernetes Service**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png>\nmanaged Kubernetes" as aks
+
+' ----- Kubernetes workload subgraph (CNCF icons) -----
+package "AKS cluster workload" {
+  rectangle "**Service**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/svc-128.png>\nClusterIP" as svc
+  rectangle "**Deployment**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/deploy-128.png>\nreplicaset controller" as deploy
+  rectangle "**Pod**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/pod-128.png>\napp containers" as pod
+}
+
+' ----- Data store (Azure managed Postgres labelled with Devicon brand glyph) -----
+rectangle "**Azure Database for PostgreSQL**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureDatabaseForPostgreSQL.png>\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/postgresql-original_48.png>\napp data" as pgdb
+
+' ----- Observability (Devicon brand glyphs) -----
+rectangle "**Prometheus**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/prometheus-original_48.png>\nmetrics scrape" as prom
+
+rectangle "**Grafana**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Devicon/png/grafana-original_48.png>\ndashboards + alerts" as graf
+
+' ----- Flow -----
+dev -right-> gh : git push
+gh -right-> ghactions : webhook trigger
+ghactions -right-> acr : docker push
+ghactions -down-> argocd : update Helm values\n(GitOps repo)
+argocd -right-> aks : kubectl apply
+acr -down-> aks : pull image
+
+aks --> svc
+svc --> deploy
+deploy --> pod
+pod -right-> pgdb : SQL
+
+pod -down-> prom : /metrics scrape
+prom -right-> graf : query
+
+@enduml

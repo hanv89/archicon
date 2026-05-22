@@ -1,0 +1,106 @@
+@startuml
+' System architecture (C4 level 2) — Azure AKS application feeding a
+' Microsoft Fabric data plane. Follows Microsoft canonical reference
+' architectures (AKS microservices baseline + Fabric end-to-end analytics).
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   Microsoft Azure architecture icons via Azure-PlantUML upstream (MIT) —
+'     subject to Microsoft's Azure Architecture Icons ToU + Trademark
+'     Guidelines; see repo NOTICE.
+'   Microsoft Fabric icons via @fabric-msft/svg-icons npm (MIT, published
+'     by Microsoft Corporation) — subject to Microsoft Fabric icon ToU
+'     + Trademark Guidelines; see repo NOTICE.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time from this
+' repository's public raw URLs.
+
+left to right direction
+skinparam linetype ortho
+
+title Azure AKS application + Microsoft Fabric data plane
+
+actor "End user" as user
+actor "Data analyst" as analyst
+
+' ============================================================
+' Cluster 1 — AKS application (Azure)
+' ============================================================
+rectangle "AKS application (Azure)" as aks_app {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\n**Front Door**\n(entry + WAF)" as fd
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png>\n**AKS cluster**\n(microservices)" as aks
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\n**Azure SQL Database**\n(OLTP state)" as sql
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png>\n**Service Bus**\n(async messaging)" as sb
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\n**Cache for Redis**\n(cache)" as redis
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureContainerRegistry.png>\n**Container Registry**\n(images)" as acr
+}
+
+' ============================================================
+' Cluster 2 — Platform services (cross-cutting)
+' ============================================================
+rectangle "Platform services" as platform {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Identity/AzureActiveDirectory.png>\n**Microsoft Entra ID**\n(workload identity)" as entra
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Security/AzureKeyVault.png>\n**Azure Key Vault**\n(secrets via CSI)" as kv
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Management/AzureMonitor.png>\n**Azure Monitor**\n(observability)" as mon
+}
+
+' ============================================================
+' Cluster 3 — Microsoft Fabric data plane
+'   Header: fabric_48_color (Family B umbrella brand)
+'   Foundation: one_lake_48_color (Family B — OneLake storage)
+' ============================================================
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/fabric_48_color.png>\n**Microsoft Fabric workspace**" as fabric_ws {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/one_lake_48_color.png>\n**OneLake**\n(Delta foundation)" as onelake
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/mirrored_catalog_40_item.png>\n**Mirrored Catalog**\n(zero-ETL Delta)" as mirror
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/eventstream_40_item.png>\n**Eventstream**\n(real-time)" as estream
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/lakehouse_40_item.png>\n**Lakehouse**\n(bronze/silver/gold)" as lake
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/notebook_40_item.png>\n**Notebook**\n(Spark transform)" as notebook
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/data_warehouse_40_item.png>\n**Data Warehouse**\n(T-SQL gold)" as wh
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/semantic_model_40_item.png>\n**Semantic Model**\n(dimensional layer)" as sem
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/power_bi_48_color.png>\n**Power BI**\n(consumption)" as pbi
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/report_40_item.png>\n**Report**" as report
+}
+
+' OneLake "foundation" hint: OneLake sits underneath the storage items.
+onelake -[hidden]- mirror
+onelake -[hidden]- lake
+onelake -[hidden]- wh
+
+' ============================================================
+' Edges
+' ============================================================
+
+' AKS request path
+user --> fd : "HTTPS"
+fd --> aks : "routes to ingress"
+aks --> sql : "OLTP reads/writes"
+aks --> sb : "publish events"
+aks --> redis : "cache"
+acr --> aks : "pulls images"
+
+' Platform services bind to AKS (workload identity / secrets / metrics)
+entra --> aks : "workload identity"
+kv --> aks : "secrets (CSI)"
+aks --> mon : "logs + metrics"
+sql --> mon : "diagnostics"
+
+' Ingestion into Fabric
+sql --> mirror : "Mirroring\n(zero-ETL)"
+sb --> estream : "real-time events"
+
+' Fabric data plane flow (medallion)
+mirror --> lake
+estream --> lake
+lake <--> notebook : "Spark transform"
+lake --> wh : "curate to gold"
+wh --> sem : "dimensional model"
+sem --> pbi
+pbi --> report
+
+' Consumption
+report --> analyst : "reads dashboards"
+
+@enduml

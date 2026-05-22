@@ -1,0 +1,87 @@
+@startuml
+' Component diagram (C4 level 3) — drilling into the AKS cluster from
+' 03-system-architecture.puml. Mirrors Microsoft's microservices-on-AKS
+' reference architecture: ingestion + workflow + worker microservices,
+' identity / secrets / observability cross-cuts, image pull from ACR.
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons: Microsoft Azure architecture icons via Azure-PlantUML upstream
+'        (MIT) — subject to Microsoft's Azure Architecture Icons ToU +
+'        Trademark Guidelines; see repo NOTICE.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+
+left to right direction
+skinparam linetype ortho
+
+title AKS cluster internals — microservices component view
+
+actor "End user" as user
+
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\n**Front Door**\n(public entry + WAF)" as fd
+
+' ============================================================
+' AKS cluster boundary — contains ingress + microservices + identity-binding
+' ============================================================
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png>\n**AKS cluster**" as aks {
+  rectangle "**ingress-controller**\n(NGINX / AGIC)" as ingress
+  rectangle "**ingestion-svc**\nPod (HTTP API)\n→ publishes events" as ingest
+  rectangle "**workflow-svc**\nPod (consumer)\n→ orchestrates workers" as workflow
+  rectangle "**delivery-svc**\nPod (worker)" as delivery
+  rectangle "**package-svc**\nPod (worker)" as pkg
+  rectangle "**csi-secrets-driver**\nDaemonSet\n(mounts Key Vault secrets)" as csi
+  rectangle "**workload-identity**\nFederated MI per pod" as wi
+}
+
+' ============================================================
+' External Azure services that AKS components bind to
+' ============================================================
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureContainerRegistry.png>\n**Container Registry**\n(images, MI auth)" as acr
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png>\n**Service Bus**\n(topic: orders.events)" as sb
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\n**Azure SQL Database**\n(OLTP state per service)" as sql
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\n**Cache for Redis**\n(hot reads, session)" as redis
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Identity/AzureActiveDirectory.png>\n**Microsoft Entra ID**\n(tenant + workload IDs)" as entra
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Security/AzureKeyVault.png>\n**Azure Key Vault**\n(secrets, certs)" as kv
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Management/AzureMonitor.png>\n**Azure Monitor**\n(metrics, logs, traces)" as mon
+
+' ============================================================
+' Edges
+' ============================================================
+
+' Request path
+user --> fd : "HTTPS"
+fd --> ingress : "TLS to internal LB"
+ingress --> ingest : "/orders"
+ingress --> workflow : "/status"
+
+' Microservice internal flow
+ingest --> sb : "publish OrderCreated"
+sb --> workflow : "subscribe"
+workflow --> delivery : "schedule shipment\n(HTTPS)"
+workflow --> pkg : "calculate manifest\n(HTTPS)"
+
+' State stores per service
+ingest --> sql : "writes orders table"
+delivery --> sql : "reads/writes shipments"
+pkg --> redis : "cache pricing rules"
+workflow --> redis : "idempotency keys"
+
+' Image pull + identity + secrets
+acr --> aks : "image pull\n(workload MI)"
+wi --> entra : "federated identity"
+csi --> kv : "fetch secrets\n(CSI inline volume)"
+ingest --> csi : "mount /secrets"
+delivery --> csi : "mount /secrets"
+pkg --> csi : "mount /secrets"
+workflow --> csi : "mount /secrets"
+
+' Observability
+ingest --> mon : "OTel metrics + logs"
+workflow --> mon
+delivery --> mon
+pkg --> mon
+aks --> mon : "cluster + node metrics"
+
+@enduml

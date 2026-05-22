@@ -1,0 +1,53 @@
+@startuml
+' Sequence flow (PlantUML sequence diagram) — temporal view of one event
+' moving from an Azure AKS microservice through a Microsoft Fabric data
+' plane to a Power BI consumer. Companion to 03-system-architecture.puml
+' (same icon set, different lens: time on the vertical axis).
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   Microsoft Azure architecture icons via Azure-PlantUML upstream (MIT) —
+'     subject to Microsoft's Azure Architecture Icons ToU + Trademark
+'     Guidelines; see repo NOTICE.
+'   Microsoft Fabric icons via @fabric-msft/svg-icons npm (MIT, published
+'     by Microsoft Corporation) — subject to Microsoft Fabric icon ToU
+'     + Trademark Guidelines; see repo NOTICE.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+
+title Event ingestion sequence — AKS → Fabric → Power BI
+
+actor "Data analyst" as analyst
+
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png>\n**AKS microservice**" as aks
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png>\n**Service Bus**" as sb
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/eventstream_40_item.png>\n**Eventstream**" as estream
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/lakehouse_40_item.png>\n**Lakehouse**" as lake
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/data_engineering_48_color.png>\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/notebook_40_item.png>\n**Data Engineering**\nSpark notebook" as nb
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/data_warehouse_40_item.png>\n**Data Warehouse**" as wh
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/semantic_model_40_item.png>\n**Semantic Model**" as sem
+participant "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/power_bi_48_color.png>\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/report_40_item.png>\n**Power BI**\nReport" as pbi
+
+== Ingest ==
+aks -> sb : publish OrderCreated event\n(AMQP)
+sb -> estream : route via SB destination
+estream -> lake : land event as Delta\n(bronze table)
+
+== Transform ==
+lake -> nb : trigger notebook\n(scheduled / event-driven)
+nb -> nb : cleanse + enrich\n(Spark)
+nb -> lake : write silver + gold\nDelta tables
+lake -> wh : load gold dim/fact\n(T-SQL COPY INTO)
+
+== Curate ==
+wh -> sem : refresh semantic model\n(DirectQuery / Import)
+
+== Consume ==
+analyst -> pbi : open report
+pbi -> sem : DAX query
+sem --> pbi : aggregated result
+pbi --> analyst : rendered dashboard
+
+@enduml

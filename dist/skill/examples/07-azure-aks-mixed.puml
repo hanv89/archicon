@@ -1,0 +1,72 @@
+@startuml
+' System architecture (C4 level 2-3) — Azure-fronted AKS deployment with
+' Kubernetes workload subgraph. Demonstrates the canonical Azure + Kubernetes
+' mixed pattern: Azure infra (Front Door, Application Gateway, SQL Database)
+' surrounding a managed Kubernetes cluster (AKS) that contains a Kubernetes
+' workload subgraph (Service, Deployment, Pods, ConfigMap, Secret).
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   Microsoft Azure architecture icons via Azure-PlantUML upstream (MIT) —
+'     subject to Microsoft's Azure Architecture Icons ToU + Trademark
+'     Guidelines; see repo NOTICE.
+'   Kubernetes icons via kubernetes/community/icons (Apache-2.0 / CC-BY-4.0
+'     dual licence) — Kubernetes is a registered trademark of The Linux
+'     Foundation; see repo NOTICE for the trademark policy URL + non-
+'     affiliation disclaimer.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time from this
+' repository's public raw URLs.
+
+left to right direction
+skinparam linetype ortho
+
+title Azure-fronted AKS deployment with Kubernetes workload subgraph
+
+actor "User" as user
+
+' ----- Azure edge (left) -----
+rectangle "**Azure Front Door**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\nglobal entry + WAF" as afd
+
+rectangle "**Application Gateway**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureApplicationGateway.png>\nregional L7 LB + Ingress controller" as agw
+
+' ----- AKS cluster cluster (center) -----
+rectangle "**Azure Kubernetes Service (AKS)**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png>" as aks {
+
+  rectangle "**Service**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/svc-128.png>\nClusterIP api-service" as svc
+
+  rectangle "**Deployment**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/deploy-128.png>\napi (replicas: 3)" as deploy {
+
+    rectangle "**Pod**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/pod-128.png>\napi-7c4f6c8" as pod1
+    rectangle "**Pod**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/pod-128.png>\napi-7c4f6d2" as pod2
+    rectangle "**Pod**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/pod-128.png>\napi-7c4f6e7" as pod3
+  }
+
+  rectangle "**ConfigMap**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/cm-128.png>\napi-config" as cm
+  rectangle "**Secret**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Kubernetes/png/resources/labeled/secret-128.png>\ndb-credentials" as secret
+}
+
+' ----- Azure data tier (right) -----
+rectangle "**Azure SQL Database**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nproduct catalog" as sql
+
+' ----- Flow -----
+user -right-> afd : HTTPS
+afd -right-> agw : within Azure backbone
+agw -right-> svc : Ingress
+svc -down-> pod1
+svc -down-> pod2
+svc -down-> pod3
+pod1 -.[#888]-> cm : mount /etc/api/config
+pod1 -.[#888]-> secret : mount /etc/api/secrets
+pod2 -.[#888]-> cm
+pod2 -.[#888]-> secret
+pod3 -.[#888]-> cm
+pod3 -.[#888]-> secret
+pod1 -right-> sql : T-SQL (read product catalog)
+pod2 -right-> sql
+pod3 -right-> sql
+
+@enduml

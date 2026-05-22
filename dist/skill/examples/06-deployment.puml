@@ -1,0 +1,106 @@
+@startuml
+' Deployment topology — multi-region active-active AKS application with
+' a region-agnostic Microsoft Fabric tenant consuming operational data
+' from both regions via Mirroring. Mirrors Microsoft's hub-spoke + AKS
+' baseline + active geo-replication reference architectures.
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   Microsoft Azure architecture icons via Azure-PlantUML upstream (MIT)
+'   Microsoft Fabric icons via @fabric-msft/svg-icons npm (MIT, Microsoft)
+'   See repo NOTICE for full attribution chain.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+
+left to right direction
+skinparam linetype ortho
+
+title Multi-region active-active AKS + region-agnostic Fabric tenant
+
+actor "End user" as user
+actor "Data analyst" as analyst
+
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\n**Azure Front Door**\nGlobal edge + WAF\n(geo-routing)" as fd
+
+' ============================================================
+' Region 1 — primary (East US)
+' ============================================================
+rectangle "**Region 1 — East US**" as region1 {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureVirtualNetwork.png>\n**Hub VNet** (R1)" as hub1 {
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFirewall.png>\n**Azure Firewall**\negress control" as fw1
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureBastion.png>\n**Bastion**\nops jump-host" as bastion1
+  }
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureVirtualNetwork.png>\n**Spoke VNet** (R1)" as spoke1 {
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png>\n**AKS** (R1)" as aks1
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\n**SQL DB** (R1)\nprimary" as sql1
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\n**Redis** (R1)" as redis1
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png>\n**Service Bus** (R1)\nprimary namespace" as sb1
+  }
+}
+
+' ============================================================
+' Region 2 — secondary (West Europe)
+' ============================================================
+rectangle "**Region 2 — West Europe**" as region2 {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureVirtualNetwork.png>\n**Hub VNet** (R2)" as hub2 {
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFirewall.png>\n**Azure Firewall**" as fw2
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureBastion.png>\n**Bastion**" as bastion2
+  }
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureVirtualNetwork.png>\n**Spoke VNet** (R2)" as spoke2 {
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png>\n**AKS** (R2)" as aks2
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\n**SQL DB** (R2)\ngeo-replica" as sql2
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\n**Redis** (R2)" as redis2
+    rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png>\n**Service Bus** (R2)\nfailover pair" as sb2
+  }
+}
+
+' ============================================================
+' Fabric tenant — region-agnostic (Microsoft routes to nearest)
+' ============================================================
+rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/fabric_48_color.png>\n**Microsoft Fabric tenant**\n(region-agnostic)" as fabric_t {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/one_lake_48_color.png>\n**OneLake**\nfoundation" as onelake
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/mirrored_catalog_40_item.png>\n**Mirrored Catalog**\n(both R1 + R2 sources)" as mirror
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/lakehouse_40_item.png>\n**Lakehouse**\n(unified gold)" as lake
+}
+
+onelake -[hidden]- mirror
+onelake -[hidden]- lake
+
+' ============================================================
+' Edges
+' ============================================================
+
+' Global entry — Front Door geo-routes to nearest healthy region
+user --> fd : "HTTPS"
+fd --> aks1 : "primary route\n(geo-distance / health)"
+fd --> aks2 : "secondary route\n(failover)"
+
+' Inside each region: hub-spoke
+spoke1 --> hub1 : "egress via firewall"
+spoke2 --> hub2 : "egress via firewall"
+bastion1 ..> aks1 : "ops access"
+bastion2 ..> aks2 : "ops access"
+
+' AKS to in-region state
+aks1 --> sql1
+aks1 --> redis1
+aks1 --> sb1
+aks2 --> sql2
+aks2 --> redis2
+aks2 --> sb2
+
+' Cross-region replication (Azure-native)
+sql1 -[#0078D4]-> sql2 : "active geo-\nreplication"
+sb1 -[#0078D4]-> sb2 : "geo-DR pairing"
+
+' Fabric ingestion from both regions
+sql1 --> mirror : "Mirroring (R1)"
+sql2 --> mirror : "Mirroring (R2)"
+mirror --> lake
+
+' Consumption
+lake --> analyst : "Power BI reports"
+
+@enduml

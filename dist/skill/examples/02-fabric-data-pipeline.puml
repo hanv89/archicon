@@ -1,0 +1,45 @@
+@startuml
+' Microsoft Fabric — data engineering pipeline (medallion architecture)
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:   Microsoft Fabric icons via @fabric-msft/svg-icons npm (MIT,
+'          published by Microsoft Corporation) — subject to Microsoft
+'          Fabric icon ToU and Trademark Guidelines; see repo NOTICE.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time from this
+' repository's public raw URLs.
+
+left to right direction
+
+title Microsoft Fabric — data engineering pipeline (Bronze → Silver → Gold)
+
+actor "Data engineer" as eng
+
+rectangle "Ingest" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/eventstream_40_item.png>\nEventstream" as stream
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/pipeline_40_item.png>\nPipeline" as pipeline
+}
+
+rectangle "Lakehouse (Bronze + Silver)" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/lakehouse_40_item.png>\nLakehouse" as lake
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/notebook_40_item.png>\nNotebook" as notebook
+}
+
+rectangle "Serving (Gold)" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/data_warehouse_40_item.png>\nData Warehouse" as warehouse
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/semantic_model_40_item.png>\nSemantic Model" as semantic
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Fabric/png/report_40_item.png>\nReport" as report
+}
+
+eng      --> pipeline : "author + schedule"
+stream   --> lake     : "real-time ingest"
+pipeline --> lake     : "batch ingest (Delta)"
+lake     --> notebook : "Spark transform"
+notebook --> warehouse : "load Gold (T-SQL)"
+warehouse --> semantic : "model build"
+semantic --> report   : "DAX query"
+
+@enduml

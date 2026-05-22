@@ -1,0 +1,41 @@
+@startuml ThreeTierEdit
+' Worked example for SKILL.md section "Editing an existing diagram".
+'
+' Scenario: the user already has the 3-tier diagram below (Front Door,
+' App Service, SQL Database) and asks to add a Redis cache between the
+' app tier and the database.
+'
+' The edit is a minimal diff against the original: it preserves the
+' startuml diagram name, the skinparam block, the cluster structure, and
+' the alias style. Only the redis rectangle and its two edges were added.
+'
+' Wrong approach: re-author from scratch and re-flow the layout, which
+' loses the user tuning and yields an unreviewable diff.
+' Right approach: add one rectangle for the cache (filename looked up in
+' the Azure INDEX as Databases/AzureRedisCache.png) plus two edges.
+
+top to bottom direction
+skinparam linetype ortho
+skinparam shadowing false
+skinparam roundcorner 10
+skinparam defaultFontName "Inter, Arial, sans-serif"
+skinparam defaultFontSize 13
+skinparam rectangle {
+  BackgroundColor transparent
+  BorderColor transparent
+  FontColor #1F2937
+}
+
+rectangle "Azure 3-tier web app" as app {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\nAzure Front Door" as fd
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\nApp Service" as app_svc
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nAzure SQL Database" as sql
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\nCache for Redis" as redis
+}
+
+fd --> app_svc : "HTTPS"
+app_svc --> sql : "OLTP reads/writes"
+app_svc --> redis : "cache reads"
+redis --> sql : "cache-miss fill"
+
+@enduml

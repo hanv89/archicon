@@ -1,0 +1,62 @@
+@startuml
+' System architecture (C4 level 2-3) — Azure web architecture decorated
+' with FluentUI UI affordances. Demonstrates the canonical Azure +
+' FluentUI mixed pattern: Azure service icons carry the infrastructure
+' backbone; FluentUI icons label cloud-boundary, identity, auth, status,
+' and notifications.
+'
+' Source: https://github.com/hanv89/archicon
+' License: MIT (this diagram); see repo LICENSE.
+' Icons:
+'   Microsoft Azure architecture icons via Azure-PlantUML upstream (MIT)
+'     — subject to Microsoft Azure Architecture Icons ToU + Trademark
+'     Guidelines; see repo NOTICE.
+'   Microsoft Fluent UI System Icons via microsoft/fluentui-system-icons
+'     (MIT, Microsoft Corporation 2020) — subject to the Microsoft
+'     Trademark and Brand Guidelines; see repo NOTICE.
+'
+' Render: paste this file's content into
+'   https://www.plantuml.com/plantuml/uml/
+' The PlantUML server fetches each <img:URL> at render time.
+
+left to right direction
+skinparam linetype ortho
+
+title Azure web architecture decorated with FluentUI UI affordances
+
+actor "User\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/person_48_color.png>" as user
+
+' ----- Azure backbone -----
+rectangle "**Azure Front Door**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\nglobal entry + WAF" as afd
+
+rectangle "**Azure App Service**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\nweb backend" as appsvc
+
+rectangle "**Azure SQL Database**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nuser + order data" as sql
+
+rectangle "**Azure Active Directory**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Identity/AzureActiveDirectory.png>\nIDP" as aad
+
+' ----- FluentUI decorators (clustered for visual grouping) -----
+rectangle "**Cloud boundary**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/cloud_48_color.png>\nAll resources inside the Azure tenant" as cloud_boundary
+
+rectangle "**Identity + AuthN**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/shield_48_color.png>\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/person_add_48_color.png>\nLogin + new-user onboarding flow" as auth_panel
+
+rectangle "**Status panel**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/checkmark_circle_32_color.png>  All checks green\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/warning_32_color.png>  Latency degraded\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/alert_32_color.png>  New incidents" as status_panel
+
+rectangle "**Org context**\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/building_32_color.png>  Enterprise tenant\n<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/FluentUI/png/calendar_32_color.png>  Maintenance window: Sun 02:00-04:00 UTC" as org_panel
+
+' ----- Flow -----
+user -right-> afd : HTTPS
+afd -right-> appsvc
+appsvc -right-> sql : T-SQL
+appsvc -down-> aad : OAuth2 token validation
+
+' ----- Decorator anchors (dotted lines to indicate labelling, not data flow) -----
+cloud_boundary -.[#888]-> afd
+cloud_boundary -.[#888]-> appsvc
+cloud_boundary -.[#888]-> sql
+cloud_boundary -.[#888]-> aad
+auth_panel    -.[#888]-> aad
+status_panel  -.[#888]-> appsvc
+org_panel     -.[#888]-> cloud_boundary
+
+@enduml
