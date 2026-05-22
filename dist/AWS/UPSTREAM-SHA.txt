@@ -1,0 +1,4 @@
+upstream=https://github.com/awslabs/aws-icons-for-plantuml
+sha=1540f226ffdd2ea0e188173c51b2c0392340dace
+license=CC-BY-ND-2.0
+mode=verbatim-copy (no resize/recolor/crop/re-encode)

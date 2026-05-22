@@ -1,0 +1,18 @@
+# Canonical fingerprint of the awslabs/aws-icons-for-plantuml LICENSE file.
+# Source: https://github.com/awslabs/aws-icons-for-plantuml (LICENSE, branch main)
+# Captured: 2026-05-23 at sha=1540f226ffdd2ea0e188173c51b2c0392340dace.
+# This file is the baseline that scripts/monitor_aws_health.sh diffs against.
+# If the upstream LICENSE changes away from CC-BY-ND (NoDerivatives), the
+# monitor fails, a watchdog issue is opened, and a license re-audit is owed
+# before the next AWS icon refresh — because the verbatim-only redistribution
+# regime in this repo depends on the NoDerivatives clause being unchanged.
+#
+# The monitor asserts BOTH the load-bearing license marker line AND the
+# sha256 of the whole LICENSE file. The marker survives whitespace reflow;
+# the sha catches any substantive edit.
+
+[LICENSE MARKER]
+Creative Commons Attribution-NoDerivs 2.0
+
+[LICENSE SHA256]
+79bb313f94c809be6a35b624b7e58c9480335bbb54c8d9b1546d1333481a9fac

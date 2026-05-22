@@ -1,26 +1,65 @@
-# AWS humanize acronym whitelist — PROVISIONAL stub (not yet shipped).
+# AWS humanize acronym whitelist (SHIPPED).
 # Same format/semantics as acronyms-azure.tsv: <pattern><TAB><replacement>,
-# applied after PascalCase splitting, single-token fixes before multi-token re-joins.
-# These rows are a best-effort seed for the common AWS acronyms; the authoritative
-# list is finalised against the actual awslabs/aws-icons-for-plantuml
-# filename set. DO NOT rely on this for a shipped AWS build yet.
-Ec2	EC2
-S3	S3
-Rds	RDS
-Vpc	VPC
-Iam	IAM
-Eks	EKS
-Ecs	ECS
-Sns	SNS
-Sqs	SQS
-Ebs	EBS
-Efs	EFS
-Elb	ELB
-Cdn	CDN
-Dns	DNS
-Api	API
-Db	DB
+# applied in order as `sed -E 's/\b<pattern>\b/<replacement>/g'` AFTER the
+# PascalCase splitter in build_icon_index.sh (aws_humanize). Single-token
+# acronym fixes come first; multi-token re-joins (split words glued back into
+# a canonical CamelCase service brand) come last so a rejoined token is not
+# itself re-split.
+#
+# Authoritative against awslabs/aws-icons-for-plantuml dist/ filenames at
+# sha=1540f226ffdd2ea0e188173c51b2c0392340dace.
+#
+# Upstream filenames are PascalCase with all-caps acronyms left INTACT — EC2,
+# S3, RDS, VPC, IAM, EKS, ECS, EBS, EFS, ELB, SNS, SQS, SES, KMS, ECR, EMR, AZ,
+# HSM, RUM, WAF, SDK — so the splitter never breaks those and they need no row
+# (e.g. "EC2" stays "EC2", never "Ec 2"; "S3" stays "S3", never "S 3"; "VPC"
+# stays "VPC", never "Vp c"). The rows below repair only the two cases the
+# splitter actually mangles in this filename set:
+#   (1) a mixed-case acronym followed by a lowercase letter, which the splitter
+#       breaks: IoT -> "Io T".
+#   (2) two-word brand names AWS writes as a single CamelCase word, which the
+#       splitter separates: CloudFront -> "Cloud Front", DynamoDB -> "Dynamo DB".
+#
+# ---- specific glued acronym chains the splitter cannot separate cleanly,
+#      applied BEFORE the generic "Io T" rule so the longer form wins ----
+Io THTTP2Protocol	IoT HTTP2 Protocol
+Io THTTP Protocol	IoT HTTP Protocol
+Io TMQTT Protocol	IoT MQTT Protocol
+EK Son Outposts	EKS on Outposts
+# ---- single-token / mixed-case acronym fixes (applied first) ----
+Io T	IoT
+# ---- multi-token CamelCase brand re-joins (applied last) ----
 Cloud Front	CloudFront
 Cloud Watch	CloudWatch
 Cloud Formation	CloudFormation
+Cloud Trail	CloudTrail
+Cloud Search	CloudSearch
+Cloud Shell	CloudShell
+Cloud Map	CloudMap
+Cloud HSM	CloudHSM
 Dynamo DB	DynamoDB
+Document DB	DocumentDB
+Quick Sight	QuickSight
+Open Search	OpenSearch
+Lake Formation	LakeFormation
+Sage Maker	SageMaker
+Code Build	CodeBuild
+Code Commit	CodeCommit
+Code Deploy	CodeDeploy
+Code Pipeline	CodePipeline
+Code Artifact	CodeArtifact
+Code Catalyst	CodeCatalyst
+Code Guru	CodeGuru
+Code Whisperer	CodeWhisperer
+Dev Ops	DevOps
+App Sync	AppSync
+App Flow	AppFlow
+App Config	AppConfig
+App Mesh	AppMesh
+App Runner	AppRunner
+Event Bridge	EventBridge
+Guard Duty	GuardDuty
+Data Brew	DataBrew
+Work Spaces	WorkSpaces
+Work Docs	WorkDocs
+Work Mail	WorkMail
