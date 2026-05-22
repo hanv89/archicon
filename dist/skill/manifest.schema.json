@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/hanv89/archicon/main/dist/skill/manifest.schema.json",
+  "title": "Architecture diagram skill bundle manifest",
+  "description": "Bundle file list + version metadata for the skill shipped to AI coding agents (Claude Code, Codex CLI, Cursor). Adapters fetch this file first and iterate `files` to install each entry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["name", "version", "requires_icons", "icons_version", "files"],
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "Pointer to this schema for editor validation. Optional at runtime."
+    },
+    "name": {
+      "type": "string",
+      "description": "Skill name. MUST match the `name` field in SKILL.md frontmatter and the destination folder under ~/.claude/skills/."
+    },
+    "version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(-[0-9A-Za-z.-]+)?$",
+      "description": "SemVer version of this skill bundle. MUST match SKILL.md frontmatter `version` and packages/cli/package.json `version`."
+    },
+    "requires_icons": {
+      "type": "string",
+      "description": "SemVer range of compatible icon-set releases (e.g. '>=0.2.2'). CLI verifies before install."
+    },
+    "icons_version": {
+      "type": "string",
+      "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$",
+      "description": "Exact icons-vX.Y.Z tag this skill bundle was built against. CLI matches it against `requires_icons` at install time. Bundles built before this field landed may omit it; the CLI falls back to inferring the lower bound of `requires_icons`."
+    },
+    "files": {
+      "type": "array",
+      "description": "Bundle file list. Index 0 MUST be SKILL.md so the install-time frontmatter precheck has a stable target.",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["src", "dest", "role"],
+        "properties": {
+          "src": {
+            "type": "string",
+            "description": "Path inside this repository (POSIX, relative to repo root). Used as the GitHub raw URL suffix."
+          },
+          "dest": {
+            "type": "string",
+            "description": "Path inside the destination skill folder under ~/.claude/skills/<name>/. POSIX."
+          },
+          "role": {
+            "type": "string",
+            "enum": ["skill", "example", "asset"],
+            "description": "`skill` for the top-level SKILL.md. `example` for entries under examples/. `asset` for example support files (e.g. examples/assets/icon.css, render-mermaid.sh) that are not themselves diagrams. Adapters MAY treat roles differently."
+          },
+          "sha256": {
+            "type": "string",
+            "pattern": "^[0-9a-fA-F]{64}$",
+            "description": "Optional. Lowercase hex sha256 of the fetched file body. When present, the CLI verifies the body before writing it and aborts the install on mismatch. When absent (back-compat with older bundles), the CLI prints a warning and proceeds."
+          }
+        }
+      }
+    }
+  }
+}
