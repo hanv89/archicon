@@ -1,0 +1,32 @@
+---
+config:
+  layout: elk
+  elk:
+    nodePlacementStrategy: NETWORK_SIMPLEX
+---
+%% Mermaid "icon mode" (sub-mode b) — vendor icons via inline <img> labels.
+%% Render with examples/assets/render-mermaid.sh (mermaid-cli + htmlLabels:true
+%% + securityLevel:loose + icon.css). Icons appear under cli/browser render;
+%% viewing this .mmd on GitHub strips the <img> (GitHub sanitises HTML).
+flowchart TB
+  user["End user"]
+
+  subgraph edge["Edge"]
+    fd["<img src='https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png'/><br/><b>Azure Front Door</b>"]
+  end
+
+  subgraph app["AKS application"]
+    aks["<img src='https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Containers/AzureKubernetesService.png'/><br/><b>AKS</b>"]
+    redis["<img src='https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png'/><br/><b>Cache for Redis</b>"]
+    sql["<img src='https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png'/><br/><b>Azure SQL Database</b>"]
+    sb["<img src='https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png'/><br/><b>Service Bus</b>"]
+  end
+
+  user --> fd
+  fd --> aks
+  aks --> sql
+  aks --> redis
+  aks --> sb
+
+  style edge fill:#FFE9D6,stroke:#EA580C,color:#9A3412;
+  style app fill:#EEF6DA,stroke:#84CC16,color:#365314;

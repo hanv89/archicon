@@ -1,0 +1,37 @@
+flowchart TB
+%% Worked Mermaid example for SKILL.md section "Mermaid mode".
+%% Mermaid is icon-light: nodes are text-labelled (no inline vendor PNGs).
+%% Every node carries the product word-mark so the diagram stays unambiguous
+%% without icons. Renders natively on GitHub when fenced with ```mermaid.
+%% For branded vendor icons, use the PlantUML examples (01-10) instead.
+
+  user([End user])
+
+  subgraph edge["Edge / entry"]
+    fd["Azure Front Door<br/>(WAF + global LB)"]
+  end
+
+  subgraph app["AKS application (Azure)"]
+    aks["Azure Kubernetes Service<br/>(microservices)"]
+    redis["Azure Cache for Redis"]
+    sql["Azure SQL Database<br/>(OLTP)"]
+    sb["Azure Service Bus<br/>(async)"]
+  end
+
+  subgraph data["Microsoft Fabric data plane"]
+    lake["Lakehouse"]
+    nb["Notebook<br/>(Spark)"]
+    wh["Data Warehouse"]
+    pbi["Power BI"]
+  end
+
+  user --> fd
+  fd --> aks
+  aks --> sql
+  aks --> redis
+  aks --> sb
+  sql --> lake
+  sb --> lake
+  lake --> nb
+  nb --> wh
+  wh --> pbi

@@ -1,0 +1,40 @@
+/* Canonical CSS for Mermaid "icon mode" (sub-mode b) — pass via mermaid-cli's
+ * -C / --cssFile flag. Fixes three render defects found in real use:
+ *   1. Icons distort ("squashed") under ELK, which stretches the foreignObject
+ *      that holds the <img> -> `object-fit: contain` (setting width/height alone
+ *      is NOT enough).
+ *   2. Uneven icon sizes when each node sets its own width -> force one size here.
+ *   3. Blocks of uneven width / truncated text -> fixed `width` + `white-space:
+ *      normal` so labels wrap. Do NOT use `min-width`: the cssFile is applied
+ *      AFTER the layout engine measured the nodes, so min-width truncates text
+ *      (e.g. "ns: trust-layer" -> "ns: trust-la").
+ *
+ * Resize icons by changing the single width/height below (~64-80px reads well
+ * next to a ~13px label); widen the block `width` to match when enlarging.
+ *
+ * NOTE: these selectors target mermaid-cli's internal rendered DOM
+ * (foreignObject / .nodeLabel) and are pinned to the current mermaid-cli major;
+ * re-verify after a mermaid-cli upgrade.
+ */
+
+/* (1)+(2) icons: one size, never distorted */
+.nodeLabel img,
+.label img,
+foreignObject img,
+span img {
+  width: 76px !important;          /* <-- single icon-size knob */
+  height: 76px !important;
+  object-fit: contain !important;
+  display: inline-block !important;
+  vertical-align: middle !important;
+}
+
+/* (3) blocks: uniform width + wrap (no min-width — it truncates) */
+.node .nodeLabel,
+.node foreignObject > div {
+  width: 170px !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  text-align: center !important;
+  line-height: 1.25 !important;
+}

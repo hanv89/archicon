@@ -1,0 +1,30 @@
+# Terraform azurerm resource type -> Azure icon path -> human label.
+# Used by scripts/iac_to_diagram.mjs.
+# Format: <azurerm_type><TAB><dist/Azure/.../Icon.png><TAB><label>
+# Every icon path must exist in dist/ (asserted by iac_to_diagram.test.sh).
+# Coverage is intentionally a curated subset of common resources; unknown
+# types are reported (not dropped) by the parser.
+azurerm_resource_group	dist/Azure/Management/AzureResourceGroups.png	Resource Group
+azurerm_virtual_network	dist/Azure/Networking/AzureVirtualNetwork.png	Virtual Network
+azurerm_subnet	dist/Azure/Networking/AzureSubnet.png	Subnet
+azurerm_kubernetes_cluster	dist/Azure/Containers/AzureKubernetesService.png	AKS
+azurerm_app_service	dist/Azure/Compute/AzureAppService.png	App Service
+azurerm_linux_web_app	dist/Azure/Compute/AzureAppService.png	App Service (Linux)
+azurerm_service_plan	dist/Azure/Compute/AzureAppServicePlan.png	App Service Plan
+azurerm_mssql_database	dist/Azure/Databases/AzureSqlDatabase.png	Azure SQL Database
+azurerm_mssql_server	dist/Azure/Databases/AzureSqlDatabase.png	Azure SQL Server
+azurerm_cosmosdb_account	dist/Azure/Databases/AzureCosmosDb.png	Cosmos DB
+azurerm_redis_cache	dist/Azure/Databases/AzureRedisCache.png	Cache for Redis
+azurerm_storage_account	dist/Azure/Storage/AzureStorage.png	Storage Account
+azurerm_key_vault	dist/Azure/Security/AzureKeyVault.png	Key Vault
+azurerm_frontdoor	dist/Azure/Networking/AzureFrontDoor.png	Front Door
+azurerm_cdn_frontdoor_profile	dist/Azure/Networking/AzureFrontDoor.png	Front Door
+azurerm_application_gateway	dist/Azure/Networking/AzureApplicationGateway.png	Application Gateway
+azurerm_lb	dist/Azure/Networking/AzureLoadBalancer.png	Load Balancer
+azurerm_public_ip	dist/Azure/Networking/AzurePublicIPAddress.png	Public IP
+azurerm_firewall	dist/Azure/Networking/AzureFirewall.png	Firewall
+azurerm_servicebus_namespace	dist/Azure/Integration/AzureServiceBus.png	Service Bus
+azurerm_container_registry	dist/Azure/Containers/AzureContainerRegistry.png	Container Registry
+azurerm_container_group	dist/Azure/Containers/AzureContainerInstance.png	Container Instance
+azurerm_monitor_diagnostic_setting	dist/Azure/Management/AzureMonitor.png	Azure Monitor
+azurerm_log_analytics_workspace	dist/Azure/Analytics/AzureLogAnalyticsWorkspace.png	Log Analytics

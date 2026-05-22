@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
-description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram". Primary output is PlantUML with embedded vendor icons.
-version: 0.3.0
+description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
+version: 0.4.0
 requires_icons: ">=0.2.0"
 ---
 
@@ -56,7 +56,7 @@ If a downstream PlantUML rendering pipeline applies a global transform that woul
 
 ## Setup
 
-> To revise a diagram the user already has, see § "Editing an existing diagram".
+> **Output modes**: this skill is PlantUML-first (vendor icons embedded via `<img:URL>`). For a GitHub-native, icon-light diagram, see § "Mermaid mode". To generate a starting diagram from a Terraform file, see the repo README § "IaC → diagram (experimental)". To revise a diagram the user already has, see § "Editing an existing diagram".
 
 Every diagram should include 3 setup blocks. Use **literal URLs** in every `<img:URL>` reference (see § "Do not use `!define` macros for icon URLs" below).
 
@@ -700,6 +700,76 @@ If the user pastes a diagram that uses `!define` macros or guessed filenames, fi
 
 See [`examples/10-edit-existing.puml`](examples/10-edit-existing.puml) for a worked before/after edit (adding a cache node to an existing 3-tier diagram).
 
+## Mermaid mode
+
+PlantUML is still the primary mode (it embeds the vendor PNGs via `<img:URL>` everywhere). But **Mermaid CAN show the vendor icons too** — via inline HTML in node labels — when rendered by a real browser engine. There are two sub-modes; pick by the **delivery target**.
+
+### Pick a sub-mode by where it renders
+
+| Sub-mode | When | Icons? |
+|---|---|---|
+| **(a) Mermaid icon-light** | The diagram must render **inline on GitHub** (a `.md` / PR / issue). GitHub sanitises Mermaid and **strips inline `<img>`**. | No — text labels only (use the product word-mark, e.g. `Azure Front Door`). |
+| **(b) Mermaid + icon (cli/local render)** — **default when the user wants icons** | The deliverable is a **PNG / Confluence / doc**, rendered with `mermaid-cli` (or any browser-based renderer). | **Yes** — vendor PNGs via inline `<img>`. |
+
+> Mermaid is icon-light only when **viewing the `.mmd` on GitHub** (HTML stripped). Icons render fine under cli/browser render with `htmlLabels:true` + `securityLevel:loose`.
+
+### Sub-mode (b): icons via inline HTML
+
+Put an `<img>` (with the project's `raw.githubusercontent.com` PNG URL) inside the node label, sized by the shipped CSS — not by per-node `width` attrs:
+
+```
+flowchart TB
+  fd["<img src='https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png'/><br/><b>Azure Front Door</b>"]
+```
+
+Look the icon path up in the relevant `INDEX.md` (the § "Filename rule" applies to the `src` URL exactly as to `<img:URL>`).
+
+### Render recipe (sub-mode b)
+
+`mermaid-cli` needs three non-obvious things or it crashes / renders wrong. Use the shipped [`examples/assets/render-mermaid.sh`](examples/assets/render-mermaid.sh) (copy + run), or inline:
+
+```bash
+npx -y @mermaid-js/mermaid-cli@latest \
+  -i diagram.mmd -o diagram.png -b white \
+  -c mmcfg.json -p pptr.json -C examples/assets/icon.css --width 2600
+```
+- `mmcfg.json`: `{"flowchart":{"htmlLabels":true},"securityLevel":"loose"}` — required so `<img>` labels render.
+- `pptr.json`: `{"args":["--no-sandbox","--disable-setuid-sandbox"]}` — required on Ubuntu 23.10+ (unprivileged user namespaces are blocked → Chromium `No usable sandbox!` crash without it).
+- `-C examples/assets/icon.css`: the canonical CSS that fixes icon distortion + sizing (below).
+
+> **Security note**: `--no-sandbox` and `securityLevel:loose` are accepted trade-offs **only because the `.mmd` source here is author-controlled** (you wrote it / the skill emitted it). Never render *untrusted* Mermaid with `loose` (it permits arbitrary HTML/JS in labels).
+
+### `icon.css` — fixes three render defects
+
+Ship + pass [`examples/assets/icon.css`](examples/assets/icon.css) via `-C`. It encodes three fixes found in real use: `object-fit: contain` (icons distort under ELK without it — width/height alone is not enough); one **single icon-size knob** (don't size per-node); fixed block `width` + `white-space: normal` so labels wrap. **Do not use `min-width`** for the block — the cssFile applies *after* the layout engine measured the nodes, so `min-width` truncates text (e.g. `ns: trust-layer` → `ns: trust-la`). To resize icons, change the one `width`/`height` in `icon.css` (~64–80px reads well next to a ~13px label) and widen the block to match.
+
+### Layout (ELK) + cluster colours
+
+For a clean top-down layout with fewer crossings than the default dagre, use ELK in the frontmatter — **but it stretches the icon `foreignObject`, so it must be paired with `object-fit: contain`** (already in `icon.css`):
+
+```
+---
+config:
+  layout: elk
+  elk:
+    nodePlacementStrategy: NETWORK_SIMPLEX
+---
+```
+(ELK is a renderer-version-dependent flag.) For cluster colours matching the PlantUML palette, add a `style` line per subgraph (cluster tint light, category-coloured border, nodes brighter than the background so they read as cards):
+
+| PlantUML stereotype | Mermaid subgraph `style` |
+|---|---|
+| `<<edge>>` | `style edge fill:#FFE9D6,stroke:#EA580C,color:#9A3412;` |
+| `<<vnet>>` / app | `style aks fill:#EEF6DA,stroke:#84CC16,color:#365314;` |
+| `<<data>>` | `style data fill:#EBF0F5,stroke:#94A3B8,color:#475569;` |
+| Fabric | `style fabric fill:#ECDDFA,stroke:#5C2D91,color:#3E1F5F;` |
+
+### Trademark note (sizing)
+
+The repo's icons are **square** (Azure 70×70, Fabric 40/48). Setting `width = height` (or the single `icon.css` size) is **uniform scaling**, which is ToU-compliant — no need to hesitate about normalising icon size. Do not set width ≠ height (non-uniform distortion is not allowed).
+
+See [`examples/11-mermaid-architecture.mmd`](examples/11-mermaid-architecture.mmd) (icon-light) and [`examples/12-mermaid-icons.mmd`](examples/12-mermaid-icons.mmd) (icon mode, ELK + inline `<img>` + styled clusters). For branded vendor-icon diagrams that must also work on GitHub, prefer the PlantUML examples (`01`–`09`).
+
 ## Troubleshooting
 
 | Symptom | Cause | Fix |
@@ -753,5 +823,7 @@ Renderable example diagrams live in `examples/` (file list mirrors `manifest.jso
 - [`08-azure-fluentui-mixed.puml`](examples/08-azure-fluentui-mixed.puml) — Azure web architecture decorated with FluentUI UI affordances (Cloud boundary, Shield + Person Add for auth, status indicators, organisation context). Canonical Azure + FluentUI mixed example.
 - [`09-devops-pipeline.puml`](examples/09-devops-pipeline.puml) — DevOps pipeline from source (GitHub) through CI/CD (GitHub Actions + Argo CD) into AKS / Kubernetes runtime, with Prometheus + Grafana observability and a Postgres data store. Canonical Devicon-decorated DevOps example.
 - [`10-edit-existing.puml`](examples/10-edit-existing.puml) — worked before/after **edit** of an existing 3-tier diagram (adds a Redis cache node + re-wires it) demonstrating the § "Editing an existing diagram" minimal-diff workflow.
+- [`11-mermaid-architecture.mmd`](examples/11-mermaid-architecture.mmd) — **Mermaid** (`.mmd`, not PlantUML) text-labelled topology demonstrating § "Mermaid mode" (icon-light, renders natively on GitHub).
+- [`12-mermaid-icons.mmd`](examples/12-mermaid-icons.mmd) — **Mermaid** icon-mode example (ELK layout + inline `<img>` vendor icons + styled clusters) demonstrating § "Mermaid mode" sub-mode (b); render with `examples/assets/render-mermaid.sh`.
 </content>
 </invoke>

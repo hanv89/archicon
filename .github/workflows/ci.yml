@@ -74,6 +74,16 @@ jobs:
         run: bash scripts/build_fluentui_system.test.sh
       - name: scripts/build_devicon.test.sh
         run: bash scripts/build_devicon.test.sh
+      - name: scripts/iac_to_diagram.test.sh
+        run: bash scripts/iac_to_diagram.test.sh
+
+  bundle-repro:
+    # Assert the chat-UI distribution bundle builds byte-reproducibly.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: scripts/test_chat_ui_bundle_repro.sh
+        run: bash scripts/test_chat_ui_bundle_repro.sh
 
   contract:
     # Offline contract gates: the shipped dist/ + skill bundle must be
