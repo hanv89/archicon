@@ -1,0 +1,38 @@
+# FluentUI System Icons curation list — 25 architecture-diagram concepts.
+# One concept name per line. Names match upstream `assets/<Concept>/SVG/` dir.
+# Build script (build_fluentui_system.sh) reads this file + emits PNGs at
+# sizes 24/32/48 of the `_color` variant for each concept.
+#
+# Selection criteria: concepts with explicit `_color` (filled-color) variant
+# at all 3 sizes, relevant to software architecture diagrams (cloud /
+# data / security / users / processes / status / docs).
+#
+# To add a concept: confirm it ships at `_color` across 24+32+48 via
+#   find source/fluentui-system-icons/assets/<Concept>/SVG -name 'ic_fluent_*_color.svg'
+# then append a line here, add a row to icon-index-tags-fluentui.tsv, and
+# re-run build_fluentui_system.sh + build_icon_index.sh.
+Cloud
+Cloud Dismiss
+Database
+Data Trending
+Shield
+Person
+People
+Person Add
+Apps
+Clock
+Calendar
+Building
+Briefcase
+Code Block
+Send
+Chat
+Settings
+Clipboard
+Checkmark Circle
+Warning
+Alert
+Book
+Puzzle Piece
+Pin
+Question Circle

@@ -1,0 +1,200 @@
+# Devicon curation list — 150 dev-tool concepts.
+# One stem per line. Stem matches upstream `icons/<stem>/<stem>-original.svg`.
+# Build script (build_devicon.sh) reads this file + emits 48x48 PNGs of the
+# `-original` variant for each stem.
+#
+# Selection criteria: stem ships `-original.svg` at upstream HEAD; widely
+# recognised in software-architecture / dev-platform / data / cloud /
+# DevOps / language / framework / IDE diagrams.
+#
+# To add an entry: confirm it ships `-original.svg` via
+#   ls source/devicon/icons/<stem>/<stem>-original.svg
+# then append the stem here, add a row to icon-index-tags-devicon.tsv, and
+# re-run build_devicon.sh + build_icon_index.sh.
+#
+# Groups (visual only — file order does not affect build):
+
+# --- Languages (25) ---
+python
+javascript
+typescript
+go
+java
+rust
+c
+cplusplus
+csharp
+ruby
+php
+kotlin
+swift
+scala
+r
+haskell
+lua
+clojure
+elixir
+erlang
+dart
+ocaml
+fsharp
+julia
+bash
+
+# --- Web frameworks + frontend (25) ---
+react
+vuejs
+angular
+nextjs
+svelte
+spring
+flask
+express
+fastapi
+nestjs
+laravel
+dotnetcore
+dot-net
+quarkus
+symfony
+phoenix
+gatsby
+nuxtjs
+remix
+astro
+tailwindcss
+bootstrap
+jquery
+redux
+alpinejs
+
+# --- Build / bundlers / package mgrs (10) ---
+webpack
+vite
+babel
+rollup
+sass
+postcss
+npm
+yarn
+pnpm
+bun
+
+# --- Containers + orchestration (5) ---
+docker
+kubernetes
+podman
+helm
+rancher
+
+# --- Cloud + IaC (12) ---
+azure
+googlecloud
+digitalocean
+heroku
+vercel
+netlify
+cloudflare
+firebase
+supabase
+terraform
+pulumi
+ansible
+
+# --- Databases (15) ---
+postgresql
+mysql
+mariadb
+mongodb
+redis
+sqlite
+cassandra
+dynamodb
+couchbase
+couchdb
+neo4j
+influxdb
+microsoftsqlserver
+oracle
+clickhouse
+
+# --- Observability + messaging (5) ---
+elasticsearch
+prometheus
+grafana
+kibana
+logstash
+
+# --- Web servers + proxies (3) ---
+nginx
+apache
+envoy
+
+# --- CI/CD + SCM + collab (10) ---
+argocd
+jenkins
+githubactions
+gitlab
+travis
+github
+bitbucket
+jira
+slack
+notion
+
+# --- Build/automation (3) ---
+maven
+gradle
+bazel
+
+# --- IDEs / editors (12) ---
+figma
+vscode
+intellij
+visualstudio
+pycharm
+webstorm
+androidstudio
+eclipse
+vim
+neovim
+emacs
+tmux
+
+# --- Data / AI / notebooks (5) ---
+pytorch
+tensorflow
+pandas
+numpy
+jupyter
+
+# --- Mobile + cross-platform (3) ---
+flutter
+ionic
+android
+
+# --- Testing (3) ---
+mocha
+playwright
+selenium
+
+# --- Misc dev platform (6) ---
+hadoop
+materialui
+storybook
+rabbitmq
+sentry
+anaconda
+
+# --- OS / runtime (4) ---
+linux
+ubuntu
+debian
+vagrant
+
+# --- Browsers (2) ---
+chrome
+firefox
+
+# --- Runtime (1) ---
+nodejs

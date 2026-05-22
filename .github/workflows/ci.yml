@@ -43,10 +43,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+      - name: Install librsvg2-bin (rsvg-convert) for build-script unit tests
+        run: sudo apt-get update && sudo apt-get install -y librsvg2-bin
       - name: scripts/_lib_icon_build.test.sh
         run: bash scripts/_lib_icon_build.test.sh
+      - name: scripts/test_monitor_ms_tou.sh (fixture-based)
+        run: bash scripts/test_monitor_ms_tou.sh
       - name: scripts/build_icon_index.test.sh
         run: bash scripts/build_icon_index.test.sh
+      - name: scripts/build_azure.test.sh
+        run: bash scripts/build_azure.test.sh
+      - name: scripts/build_fabric.test.sh
+        run: bash scripts/build_fabric.test.sh
+      - name: scripts/build_kubernetes.test.sh
+        run: bash scripts/build_kubernetes.test.sh
+      - name: scripts/build_fluentui_system.test.sh
+        run: bash scripts/build_fluentui_system.test.sh
+      - name: scripts/build_devicon.test.sh
+        run: bash scripts/build_devicon.test.sh
 
   contract:
     # Offline contract gates: the shipped dist/ + skill bundle must be
@@ -60,6 +74,8 @@ jobs:
         run: bash scripts/test_skill_refs.sh
       - name: scripts/test_index_integrity.sh
         run: bash scripts/test_index_integrity.sh
+      - name: scripts/test_icon_sync_completeness.sh
+        run: bash scripts/test_icon_sync_completeness.sh
       - name: scripts/lint_examples.sh
         run: bash scripts/lint_examples.sh
 

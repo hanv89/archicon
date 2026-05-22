@@ -1,0 +1,14 @@
+# Canonical extract of the Microsoft Azure Architecture Icons Terms of Use.
+# Source: https://learn.microsoft.com/en-us/azure/architecture/icons/
+# Captured: 2026-05-11.
+# This file is the baseline that scripts/monitor_ms_tou.sh diffs against.
+# If the upstream ToU changes, the monitor fails, an issue is opened, and
+# a license re-audit is owed before the next icon refresh.
+
+[ICON TERMS]
+Microsoft permits the use of these icons in architectural diagrams, training materials, or documentation. You can copy, distribute, and display the icons only for the permitted use unless granted explicit permission by Microsoft. Microsoft reserves all other rights.
+
+[DON'TS]
+Don't crop, flip, or rotate icons.
+Don't distort or change icon shape in any way.
+Don't use Microsoft product icons to represent your product or service.
