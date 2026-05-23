@@ -1,0 +1,62 @@
+@startuml 15-compact-layout
+' mode: strict
+'
+' Canonical compact-layout reference — exercises all five Layout compaction
+' rules from SKILL.md. Re-render after edits and confirm the aspect ratio
+' (width/height) stays below 1.4 and the Data Tier reads as a 2x2 grid.
+
+' Rule 1 — tighten dot defaults so a 10-node diagram fits on one page
+skinparam ranksep 28
+skinparam nodesep 22
+skinparam defaultFontSize 13
+skinparam wrapWidth 200
+
+title E-commerce frontend stack (compact)
+
+' Rule 4 — every node sits in a cluster (no orphans)
+package "Edge" {
+  ' Rule 2 — real edges horizontal so dot lays the cluster out left-to-right;
+  ' a hidden edge alone would not override the rank pull of a vertical arrow.
+  [DNS]    as dns
+  [CDN]    as cdn
+  [Static] as static
+  dns -r-> cdn
+  cdn -r-> static
+}
+
+package "Compute" {
+  [API]    as api
+  [Worker] as worker
+}
+
+package "Data Tier" {
+  ' Rule 3 — 4 nodes → 2x2 grid via combined horizontal + vertical hidden edges
+  [Aurora]      as aurora
+  [DynamoDB]    as dynamo
+  [ElastiCache] as cache
+  [S3]          as s3
+
+  aurora -[hidden]r- dynamo
+  cache  -[hidden]r- s3
+  aurora -[hidden]d- cache
+  dynamo -[hidden]d- s3
+}
+
+package "Async & Security" {
+  ' Rule 4 — Secrets Manager would orphan; absorb it into the nearest-meaning cluster
+  [Secrets Manager] as secrets
+}
+
+' Real cross-cluster flow
+static -d-> api
+api    -d-> aurora
+api    -d-> dynamo
+api    -r-> secrets
+worker -d-> cache
+worker -d-> s3
+
+' Rule 5 — anchor the Data Tier floor (s3) to the Async cluster floor (secrets)
+' so both clusters end up on the same rank instead of dot stacking them.
+s3 -[hidden]r- secrets
+
+@enduml
