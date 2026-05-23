@@ -14,3 +14,21 @@ architecture diagrams). Use is governed by Google's brand/trademark guidelines:
 
 This project is not affiliated with, sponsored by, or endorsed by Google LLC.
 Google Cloud and the Google Cloud logo are trademarks of Google LLC.
+
+Coverage (read me)
+------------------
+The "core products" icon pack is narrow on purpose — it ships about 19 product
+glyphs. Common services NOT in the pack include:
+  - Cloud Load Balancing
+  - Cloud CDN
+  - Pub/Sub
+  - Memorystore
+(Plus less-frequent gaps: Cloud Run, Cloud Build, Cloud Tasks, Workflows.)
+
+When a needed service is missing, prefer (in order):
+  1. A labeled rectangle without an icon.
+  2. A nearest-meaning Google Cloud icon with an explicit label override.
+  3. A FluentUI generic icon (Globe / Database / Queue).
+
+Tag the fallback in the diagram with a single header comment so reviewers know
+the gap is intentional, e.g. "' coverage-note: GCP missing icon for X".

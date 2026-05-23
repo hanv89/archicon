@@ -1,4 +1,5 @@
 @startuml
+' mode: strict
 ' Deployment topology — multi-region active-active AKS application with
 ' a region-agnostic Microsoft Fabric tenant consuming operational data
 ' from both regions via Mirroring. Mirrors Microsoft's hub-spoke + AKS

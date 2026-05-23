@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.2.0
+version: 1.3.0
 requires_icons: ">=1.2.0"
 ---
 
@@ -564,6 +564,35 @@ https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/
 
 PascalCase stems = no URL encoding needed (no parentheses, no spaces). See `examples/14-gcp-architecture.puml` for a worked Google Cloud data + ML platform diagram.
 
+### Coverage caveat (Google Cloud)
+
+The official **core products** icon pack is intentionally narrow — about 19 icons. It does **not** include some common services that frequently appear in cloud architectures:
+
+- **Cloud Load Balancing** — no icon in the core pack.
+- **Cloud CDN** — no icon.
+- **Pub/Sub** — no icon.
+- **Memorystore** — no icon.
+
+(Other less-frequent gaps: Cloud Run, Cloud Build, Cloud Tasks, Workflows. The shipped list lives in `dist/GCP/INDEX.md`.)
+
+If you need a missing service, apply this fallback ladder (preferred order):
+
+1. **Labeled rectangle, no icon** — explicit + unambiguous:
+   ```plantuml
+   rectangle "Cloud Load Balancing\n[L7 HTTPS]" as lb
+   ```
+2. **Nearest-meaning Google Cloud icon with a label override** — keep visual identity, clarify identity in text:
+   ```plantuml
+   rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/ComputeEngine.png>\nCloud Run\n[serverless container]" as cr
+   ```
+3. **FluentUI generic icon** — Globe / Database / Queue. Trade-off: loses Google Cloud identity but is concept-clear.
+
+Declare each fallback in a single header comment so reviewers know the gap is intentional, not an INDEX-lookup miss:
+
+```plantuml
+' coverage-note: GCP missing icon for Cloud Load Balancing — using labeled rectangle
+```
+
 ## Pattern 1: System Architecture Diagram
 
 For high-level deployment topology — hub-spoke, AKS, managed services.
@@ -728,6 +757,94 @@ title <size:20><b>Project Name</b></size>\n<size:13>Subtitle, stage, version</si
 ```plantuml
 rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\n**Display Name**\n//Subtitle italic//\n[Optional bracket]" as alias
 ```
+
+## Layout compaction
+
+When PlantUML's dot engine has to decide where to put nodes, its defaults bias toward "lots of whitespace, never overlap". Diagrams that aren't actively shaped end up airy and lopsided — clusters drift apart, orphan nodes float, single-row clusters stretch the page. Apply the five rules below and a 6–10 node diagram fits on one A4 page on the first render.
+
+### The five rules
+
+**Rule 1 — Tighten spacing defaults.** The dot defaults `ranksep 60` / `nodesep 50` leave excessive whitespace. Drop these into every diagram unless you have a specific reason to space out:
+
+```plantuml
+skinparam ranksep 28
+skinparam nodesep 22
+```
+
+**Rule 2 — Hidden edges are alignment hints, not direction overrides.** A common trap: you want a cluster to lay out horizontally, you add `dns -[hidden]r- cf`, and dot still stacks the nodes vertically. The reason: hidden edges suggest alignment, but the *real* edge `dns --> cf` carries a rank constraint that pulls `cf` below `dns`. Dot honors the real edge. To get a horizontal cluster, the real edges must also be horizontal:
+
+```plantuml
+' Wrong — real edge is vertical, hidden hint is ignored
+dns --> cf
+dns -[hidden]r- cf
+
+' Right — real edge horizontal, layout follows
+dns -r-> cf
+cf  -r-> s3
+```
+
+**Rule 3 — Cluster ≥4 nodes → grid 2×N.** Four nodes in a single row spreads the diagram wider than tall. Use a 2×N grid by combining horizontal *and* vertical hidden edges:
+
+```plantuml
+package "Data Tier" {
+  [Aurora]      [DynamoDB]
+  [ElastiCache] [S3]
+
+  Aurora      -[hidden]r- DynamoDB
+  ElastiCache -[hidden]r- S3
+  Aurora      -[hidden]d- ElastiCache
+  DynamoDB    -[hidden]d- S3
+}
+```
+
+The two rows + the two columns each get a hidden edge — dot now has enough hints to lock the 2×2 arrangement.
+
+**Rule 4 — Every node belongs to a cluster.** An orphan node (Key Vault, Secrets Manager, Security Command Center) gets pushed to a corner by dot and creates white-space wells. Gather auxiliary services into the nearest-meaning cluster. Suggested vendor-aware cluster names:
+
+- **AWS** — `Async & Security` (SNS / SQS / Secrets Manager / KMS), `Observability` (CloudWatch / X-Ray).
+- **Azure** — `Platform` (Key Vault / Managed Identity / Monitor), `Messaging` (Service Bus / Event Grid).
+- **Google Cloud** — `Analytics & Security` (BigQuery / Cloud KMS / Security Command Center).
+
+If a node truly has no neighbours, make a single-purpose cluster for it ("Edge", "Identity") rather than leaving it orphan.
+
+**Rule 5 — Cross-cluster row alignment.** Hidden edges work *between* clusters too. If two clusters belong on the same row but dot ranks one above the other, anchor a representative node of each cluster with a hidden edge:
+
+```plantuml
+package "Compute" {
+  [API]
+  [Worker]
+}
+package "Data Tier" {
+  [DB]
+  [Cache]
+}
+
+' Anchor Worker (compute floor) to DB (data floor) → same rank
+Worker -[hidden]r- DB
+```
+
+### Meta principle
+
+Hidden edge = **alignment hint**. Real edge = **flow and rank constraint**. When the two conflict, dot honors the real edge every time. If you want a horizontal layout, you must have at least one horizontal *real* edge in the cluster; hidden edges alone won't override the rank pull of an arrow.
+
+### Style modes — strict vs freestyle
+
+This skill ships two layout modes:
+
+- **`mode: strict`** *(default)* — the agent applies all five compaction rules + the spacing defaults above. Use when generating a canonical diagram for an HLD / TDD / release notes.
+- **`mode: freestyle`** — the agent checks only icon-lookup + INDEX rules; layout, label format, and clustering are left to the user. Use for exploratory brainstorming or when you have your own house style.
+
+Declare the mode in the first comment line of any `.puml` (or first `%% ` comment of any `.mmd`):
+
+```plantuml
+@startuml
+' mode: strict
+...
+```
+
+If the directive is absent, the skill treats the diagram as `mode: strict`.
+
+See `examples/15-compact-layout.puml` for a worked compact diagram that exercises all five rules.
 
 ## Confluence integration (PlantUML apps)
 
@@ -901,5 +1018,4 @@ Renderable example diagrams live in `examples/` (file list mirrors `manifest.jso
 - [`13-aws-architecture.puml`](examples/13-aws-architecture.puml) — AWS serverless web architecture (CloudFront → API Gateway → Lambda → DynamoDB + RDS, with S3 + SNS/SQS). Canonical AWS-vendor example; AWS icons are CC-BY-ND verbatim (no resize).
 <!-- AWS-SKILL-END -->
 - [`14-gcp-architecture.puml`](examples/14-gcp-architecture.puml) — Google Cloud data + ML platform (Cloud Run → GKE → Cloud SQL + Cloud Storage → BigQuery → Vertex AI). Canonical Google Cloud example; icons rastered at a uniform 64x64 per the brand-guidelines proportional-scaling rule.
-</content>
-</invoke>
+- [`15-compact-layout.puml`](examples/15-compact-layout.puml) — Layout compaction reference (E-commerce frontend stack, ~10 nodes). Exercises all five rules from § "Layout compaction" — tight `ranksep`/`nodesep`, horizontal cluster via real `-r->` edges, 2×2 grid Data Tier, no orphans (Secrets Manager absorbed into Async & Security), cross-cluster row anchor. Use this as the visual baseline for `mode: strict`.
