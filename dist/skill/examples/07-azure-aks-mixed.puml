@@ -6,6 +6,8 @@
 ' audience: Engineering team
 ' question: What's the topology of this Azure + AKS deployment, and how do workloads mix?
 ' adr:      n/a
+skinparam ranksep 28
+skinparam nodesep 22
 ' System architecture (C4 level 2-3) — Azure-fronted AKS deployment with
 ' Kubernetes workload subgraph. Demonstrates the canonical Azure + Kubernetes
 ' mixed pattern: Azure infra (Front Door, Application Gateway, SQL Database)

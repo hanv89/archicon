@@ -6,7 +6,9 @@
 ' audience: Exec / sponsor / business
 ' question: Who or what touches this 3-tier web application, and what's outside our boundary?
 ' adr:      n/a
-' Azure 3-tier web application — context view
+skinparam ranksep 28
+skinparam nodesep 22
+' Azure 3-tier web application — context view (no drill into internals)
 '
 ' Source: https://github.com/hanv89/archicon
 ' License: MIT (this diagram); see repo LICENSE.
@@ -18,24 +20,29 @@
 ' The PlantUML server fetches each <img:URL> at render time from this
 ' repository's public raw URLs.
 
-title Azure 3-tier web application — context
+title Azure 3-tier web application — context (Level 1)
 
+' Actors
 actor "End user" as user
+actor "Admin"    as admin
 
-rectangle "Edge" {
-  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\nAzure Front Door" as fd
+' System of interest — a single box, no internal containers.
+' Container drill-in lives in 03-system-architecture.puml.
+package "Our System" {
+  rectangle "3-tier Web App\n[Azure-hosted SaaS]" as system
 }
 
-rectangle "Application" {
-  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\nAzure App Service" as app
+' External systems we depend on
+package "External" {
+  rectangle "Microsoft Entra ID\n[OIDC auth]" as entra
+  rectangle "Payment Gateway\n[Stripe API]"   as stripe
+  rectangle "Email Provider\n[SendGrid]"      as email
 }
 
-rectangle "Data" {
-  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nAzure SQL Database" as sql
-}
-
-user --> fd  : HTTPS
-fd   --> app : HTTPS
-app  --> sql : SQL/TLS
+user  -d-> system : "Browses + transacts"
+admin -d-> system : "Manages content"
+system -d-> entra  : "Authenticates users"
+system -d-> stripe : "Charges card"
+system -d-> email  : "Sends receipts"
 
 @enduml

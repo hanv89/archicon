@@ -6,6 +6,8 @@
 ' audience: DevEx / DevOps
 ' question: How does code flow from commit to production, and where are the observability seams?
 ' adr:      n/a
+skinparam ranksep 28
+skinparam nodesep 22
 ' DevOps pipeline (C4 level 2) — source → CI → CD → registry → runtime →
 ' observability, decorated with Devicon dev-tool brand glyphs alongside
 ' Azure (managed services) and Kubernetes (workload subgraph) icons.

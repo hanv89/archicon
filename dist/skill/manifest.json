@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "name": "architecture-diagram",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "requires_icons": ">=1.2.0",
   "icons_version": "1.2.0",
   "files": [
@@ -9,25 +9,25 @@
       "src": "dist/skill/SKILL.md",
       "dest": "SKILL.md",
       "role": "skill",
-      "sha256": "38f0571b5bba735589ec31bee6d30d8fe09e6d5c53a13d3579169fde68ecfcfe"
+      "sha256": "42d1d961f699354bdba73cab334c1df4af47e45c92f3cdb4569382d430377743"
     },
     {
       "src": "dist/skill/examples/01-context.puml",
       "dest": "examples/01-context.puml",
       "role": "example",
-      "sha256": "02e5cef77088511e355cb845361048c2f4fbd3c8d14511f65c48c7f4cc8dbe6d"
+      "sha256": "ee330fe56654e8997bb4b4887dd6a5eb28d9e3908f9e2ba215955b9a22f71ab4"
     },
     {
       "src": "dist/skill/examples/02-fabric-data-pipeline.puml",
       "dest": "examples/02-fabric-data-pipeline.puml",
       "role": "example",
-      "sha256": "9c6f9c68362be95444169960aa8a9a67db830f025775789152fa3e108a5e7493"
+      "sha256": "c63c454b800111b480cd6ac281c134a7bb2d70040480e85143176c9b3b80c544"
     },
     {
       "src": "dist/skill/examples/03-system-architecture.puml",
       "dest": "examples/03-system-architecture.puml",
       "role": "example",
-      "sha256": "a713d607b59d471e65afd419cba8fa71ef3bb6a3d40cbdf65c9c25c9928dee91"
+      "sha256": "ef4eb1a78222f76f54615343c965bda186d7ce139e526d3d54e48ddf0b9d36a1"
     },
     {
       "src": "dist/skill/examples/04-sequence-flow.puml",
@@ -39,7 +39,7 @@
       "src": "dist/skill/examples/05-component.puml",
       "dest": "examples/05-component.puml",
       "role": "example",
-      "sha256": "b59235b73f0618591c1c9a692c7ec4f607443542a83d650ba3abb62966b96e35"
+      "sha256": "5b9d8275534a26e5a26b643f9d0d6983bcd80f6fc4da72417dee8e8817e9317f"
     },
     {
       "src": "dist/skill/examples/06-deployment.puml",
@@ -51,7 +51,7 @@
       "src": "dist/skill/examples/07-azure-aks-mixed.puml",
       "dest": "examples/07-azure-aks-mixed.puml",
       "role": "example",
-      "sha256": "44ba1e0e9401a10b669f86e9a2888c73bf519b5ccd00f040b759e78a55ca82ab"
+      "sha256": "fb9b87004f5f9cee6f0b59b023c7b8bfe7d7373ac582acced484c5a50b1b92b8"
     },
     {
       "src": "dist/skill/examples/08-azure-fluentui-mixed.puml",
@@ -63,13 +63,13 @@
       "src": "dist/skill/examples/09-devops-pipeline.puml",
       "dest": "examples/09-devops-pipeline.puml",
       "role": "example",
-      "sha256": "d954fd40bb9a0ea2dfeab369dd4b7a46d3e9179d09b93ddbfc6b3b1866230b28"
+      "sha256": "a2c037cc6fb826e8176804d785e4e7b65100f24085339853f701b22306180d9e"
     },
     {
       "src": "dist/skill/examples/10-edit-existing.puml",
       "dest": "examples/10-edit-existing.puml",
       "role": "example",
-      "sha256": "61c810552874557cd2ba1a43eed822c43b1c39c890182fd589e4ba3879911242"
+      "sha256": "176ad79f8b3ee1bc5e58a80175830ead18bb9425585aae162b9ea07667102d8f"
     },
     {
       "src": "dist/skill/examples/11-mermaid-architecture.mmd",
@@ -111,7 +111,7 @@
       "src": "dist/skill/examples/17-ladder-container.puml",
       "dest": "examples/17-ladder-container.puml",
       "role": "example",
-      "sha256": "f45d007e94f3b1cbf839c26062a55c4e8586443469e07e1ee65f8ffe831e891b"
+      "sha256": "e7c603338777db0abdb1534c429857572c359aeb1841f8ec633132bc58057fc7"
     },
     {
       "src": "dist/skill/examples/18-system-landscape.puml",
@@ -123,7 +123,7 @@
       "src": "dist/skill/examples/19-dynamic-flow.puml",
       "dest": "examples/19-dynamic-flow.puml",
       "role": "example",
-      "sha256": "28594ea3045425ba1f8ae8242624d9a23531f6523667abf85146413a49df9965"
+      "sha256": "9e8aeae081f2d29bdb43170ac36ceb92c7b633779661ae02c9924d4c5322192b"
     },
     {
       "src": "dist/skill/examples/assets/icon.css",

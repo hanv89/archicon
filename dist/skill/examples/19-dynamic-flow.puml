@@ -41,9 +41,11 @@ package "Data + integration" {
 rectangle "Payment Gateway\n[Stripe]" as stripe
 rectangle "Shipping\n[FedEx]" as fedex
 
-' Numbered flow — Dynamic-diagram convention; arrows tell a single story
-shopper  -d-> fd       : "1. POST /checkout"
-fd       -d-> web      : "2. routes"
+' Numbered flow — Dynamic-diagram convention; arrows tell a single story.
+' Verbs are present-tense to match dynamic semantics; the response path
+' (step 11) closes the loop through the same edge the request opened on.
+shopper  -d-> fd       : "1. posts /checkout"
+fd       -d-> web      : "2. routes request"
 web      -d-> checkout : "3. validates cart"
 checkout -d-> orders   : "4. writes order"
 checkout -r-> stripe   : "5. charges card"
@@ -51,6 +53,7 @@ checkout -d-> queue    : "6. enqueues fulfilment"
 worker   -u-> queue    : "7. consumes"
 worker   -r-> fedex    : "8. books shipping"
 worker   -u-> orders   : "9. updates status"
-web      -u-> shopper  : "10. order confirmation"
+web      -u-> fd       : "10. returns response"
+fd       -u-> shopper  : "11. confirms order"
 
 @enduml

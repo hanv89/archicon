@@ -6,6 +6,8 @@
 ' audience: Data engineering team
 ' question: How does data flow from sources through bronze → silver → gold in Fabric?
 ' adr:      n/a
+skinparam ranksep 28
+skinparam nodesep 22
 ' Microsoft Fabric — data engineering pipeline (medallion architecture)
 '
 ' Source: https://github.com/hanv89/archicon

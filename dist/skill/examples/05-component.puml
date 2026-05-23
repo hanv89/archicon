@@ -6,6 +6,8 @@
 ' audience: Devs working on this container
 ' question: How is the AKS-hosted service internally structured (modules, packages)?
 ' adr:      n/a
+skinparam ranksep 28
+skinparam nodesep 22
 ' Component diagram (C4 level 3) — drilling into the AKS cluster from
 ' 03-system-architecture.puml. Mirrors Microsoft's microservices-on-AKS
 ' reference architecture: ingestion + workflow + worker microservices,

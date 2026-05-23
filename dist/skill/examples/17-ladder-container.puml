@@ -38,10 +38,10 @@ package "Compute" {
 
 package "Data Tier" {
   ' Rule 3 — 4 nodes → 2×2 grid
-  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nOrders DB\n[Azure SQL]" as orders
-  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureCosmosDb.png>\nSessions\n[Cosmos DB]" as sessions
-  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\nCache\n[Redis]" as cache
-  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Storage/AzureBlobStorage.png>\nAssets\n[Blob Storage]" as assets
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nOrders DB\n[Azure SQL Database]"   as orders
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureCosmosDb.png>\nSessions\n[Azure Cosmos DB]"   as sessions
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\nCache\n[Azure Cache for Redis]"   as cache
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Storage/AzureBlobStorage.png>\nAssets\n[Azure Blob Storage]"   as assets
 
   orders   -[hidden]r- sessions
   cache    -[hidden]r- assets

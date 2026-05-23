@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.4.0
+version: 1.4.1
 requires_icons: ">=1.2.0"
 ---
 
@@ -780,7 +780,9 @@ Mode is metadata for the agent (PlantUML and Mermaid ignore the comment); it is 
 
 ## Diagram taxonomy
 
-The skill borrows Simon Brown's C4 model **as methodology + level names only**. No C4-PlantUML macros or shapes are imported — vendor icons remain the visual language. Six diagram types cover most needs; three off-ladder complementary types fill specific niches.
+The skill borrows Simon Brown's C4 model **as methodology + level names only**. No C4-PlantUML macros or shapes are imported — vendor icons remain the visual language via `<img:URL>`, NOT `Container(...)` / `Person(...)` C4-PlantUML macros (those will fail to parse). Six C4-family diagram types cover most needs; two off-ladder complementary types fill specific niches.
+
+**Terminology used below:** a **"snippet"** is a cropped diagram of any type with ≤4 boxes, used to illustrate one decision (typical inside an ADR). A **"focused"** Container diagram is the full Container view filtered down to one container of interest + its immediate neighbours (typical inside a TDD).
 
 | Type | Audience | Question it answers | Scope rule | Example |
 |---|---|---|---|---|
@@ -813,7 +815,7 @@ Every `.puml` and `.mmd` carries a 6-field header block declaring what the diagr
 ' adr:      <URL to the ADR this implements, or "n/a">
 ```
 
-**Backward compatibility**: a legacy diagram with only `' mode: strict` (the 3.11 format) still validates; the remaining 5 fields default to "n/a" when absent. The agent prompts to fill them on the next edit.
+**Backward compatibility**: a legacy diagram with only `' mode: strict` (the 3.11 format) is supported indefinitely; the remaining 5 fields default to `n/a` when absent. The agent **offers** to fill in the missing fields on the next edit *if the user is editing this diagram anyway*, but does **not** auto-rewrite headers as a standalone action — that would clash with the legacy-grandfather rule in § Style modes.
 
 For Mermaid (`.mmd`), use `%%` line comments with the same field names. See `examples/11-mermaid-architecture.mmd` for a worked example.
 
@@ -862,18 +864,20 @@ The two answers map to a diagram type via the table below. If the user says "ski
 
 | Audience ↓ / Document → | HLD | ADR | TDD | Standalone |
 |---|---|---|---|---|
-| **Exec** | Context | (rare — Context snippet) | (rare) | Context |
-| **Engineering manager** | Container | Container snippet or Dynamic | Container (focused) | Container |
-| **Engineering team** | Container | Container snippet or Dynamic | Container + Component + Dynamic (set) | Container or Dynamic |
+| **Exec** | Context | (skip diagram — text suffices, or Context snippet) | (skip diagram) | Context |
+| **Engineering manager** | Container | Container snippet *(default)*; Dynamic if the ADR is about a flow | Container (focused) | Container |
+| **Engineering team** | Container | Container snippet *(default)*; Dynamic if the ADR is about a flow | Container + Component + Dynamic | Container *(default)*; Dynamic if the question is "how does X flow" |
 | **Ops** | Deployment | Deployment snippet | Deployment | Deployment |
 
-When a cell shows a set (e.g., TDD × engineering team → Container + Component + Dynamic), the agent should offer to author them as a series and confirm before producing the full set.
+When a cell shows multiple diagrams (e.g., TDD × engineering team → Container + Component + Dynamic), the agent should offer to author them as a numbered series ("I'll produce 3 diagrams: 1/3 Container, 2/3 Component, 3/3 Dynamic") and confirm before producing the full set.
+
+**If the user is vague but says "skip questions"** → default to a Container diagram, `mode: strict`, audience "engineering team". The agent can still author it; the user can redirect afterward.
 
 ## Layout compaction
 
 When PlantUML's dot engine has to decide where to put nodes, its defaults bias toward "lots of whitespace, never overlap". Diagrams that aren't actively shaped end up airy and lopsided — clusters drift apart, orphan nodes float, single-row clusters stretch the page. Apply the five rules below and a 6–10 node diagram typically fits on one page on the first render.
 
-> **Scope**: these rules target the PlantUML `dot` layout engine. Mermaid uses a different layout engine — in Mermaid, `mode: strict` reduces to icon-lookup + INDEX rules; Mermaid's layout is engine-managed.
+> **Scope**: these rules target PlantUML diagrams rendered by the `dot` layout engine — Context / Container / Component / System Landscape / Dynamic / Deployment / Pipeline. **Sequence diagrams** (`type: Sequence`) use PlantUML's sequence-specific engine and don't honour `ranksep`/`nodesep`/`-[hidden]r-`; in a Sequence file, `mode: strict` reduces to icon-lookup + INDEX rules. **Mermaid** (`.mmd`) has its own layout engine — there too, `mode: strict` reduces to icon-lookup + INDEX rules.
 
 ### The five rules
 
