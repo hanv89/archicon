@@ -1,13 +1,13 @@
 ---
 name: architecture-diagram
-description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.4.1
+description: Use this skill when creating cloud and dev-tool architecture diagrams across seven vendors (Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI, Devicon, AWS, Google Cloud) using PlantUML or Mermaid. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon + AWS + GCP), layout patterns (clusters, alignment, edge styling), the C4 diagram taxonomy (Context / Container / Component / System Landscape / Dynamic / Deployment) + complementary types (Sequence / Pipeline), document scaffolds (HLD / ADR / Detailed Technical Design), strict-vs-freestyle style modes, Confluence integration, and an experimental Terraform→PlantUML generator. Triggers on requests like "draw Azure architecture", "draw AWS architecture", "AWS serverless diagram", "draw GCP architecture", "BigQuery pipeline", "GKE diagram", "Google Cloud data platform", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform", "draw a Context diagram", "draw a Container diagram", "draw a system landscape", "high-level design diagram", "ADR diagram", "technical design diagram". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
+version: 1.4.2
 requires_icons: ">=1.2.0"
 ---
 
-# Architecture Diagram Skill (PlantUML)
+# Architecture Diagram Skill (PlantUML + Mermaid)
 
-This skill describes how to draw architecture diagrams with PlantUML, using icons from the `hanv89/archicon` repository. Icons are referenced by public `raw.githubusercontent.com` URL — no local assets, no CDN. PlantUML fetches each `<img:URL>` at render time.
+This skill describes how to draw architecture diagrams with PlantUML (primary) or Mermaid (secondary), using icons from the `hanv89/archicon` repository covering 7 vendors (Azure, Fabric, Kubernetes, FluentUI, Devicon, AWS, GCP). Icons are referenced by public `raw.githubusercontent.com` URL — no local assets, no CDN. PlantUML fetches each `<img:URL>` at render time.
 
 ## When to use
 
@@ -241,7 +241,7 @@ PlantUML's preprocessor does not substitute `!define` symbols inside the `<img:>
 <img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>
 ```
 
-This rule was discovered while authoring `examples/01-context.puml` — the macro form silently produced broken images on `play.plantuml.com`; switching to literal URLs fixed it.
+This rule was discovered while authoring an early version of `examples/01-context.puml` (the file has since been rewritten as a true Level-1 Context view with no vendor icons) — the macro form silently produced broken images on `play.plantuml.com`; switching to literal URLs fixed it.
 
 ## Microsoft Fabric icons
 
@@ -600,7 +600,7 @@ For high-level deployment topology — hub-spoke, AKS, managed services.
 
 **When to use**: Reference architecture in the main project document.
 
-**Worked example**: see `examples/01-context.puml` for a minimal Azure 3-tier (Front Door → App Service → SQL Database) using exactly this pattern.
+**Worked examples**: see `examples/17-ladder-container.puml` for a worked Container view (Front Door → App Service → Functions → Cosmos/SQL/Cache/Blob with the technology-label format `Name\n[Tech]`); `examples/03-system-architecture.puml` for an Azure AKS + Fabric system architecture using the same template.
 
 **Template** (using literal URLs throughout):
 
@@ -763,7 +763,7 @@ rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azur
 
 The skill ships two layout modes; declare yours in the first comment line of any `.puml` (or first `%%` comment of any `.mmd`):
 
-- **`mode: strict`** *(default for newly authored diagrams)* — the agent applies the five Layout-compaction rules + the canonical 6-field header (see § "Header convention"). Use when generating diagrams for HLDs / TDDs / release notes / shared review.
+- **`mode: strict`** *(default for newly authored diagrams)* — the agent applies the five Layout-compaction rules + the canonical 7-field header (see § "Header convention"). Use when generating diagrams for HLDs / TDDs / release notes / shared review.
 - **`mode: freestyle`** — the agent enforces only icon-lookup + INDEX rules; layout, label format, and clustering are left to the user. Use for exploratory brainstorming or when you have your own house style.
 
 ```plantuml
@@ -773,7 +773,7 @@ The skill ships two layout modes; declare yours in the first comment line of any
 ```
 
 **If the `mode:` directive is absent:**
-- The agent **authoring a new diagram** defaults to `mode: strict` (applies all five Layout-compaction rules + the 6-field header).
+- The agent **authoring a new diagram** defaults to `mode: strict` (applies all five Layout-compaction rules + the 7-field header).
 - An **existing un-tagged diagram** is treated as legacy — the agent does not auto-rewrite layout, spacing, or header on edit. Re-label `' mode: strict` only when ready to apply the rules; `' mode: freestyle` is the explicit opt-out.
 
 Mode is metadata for the agent (PlantUML and Mermaid ignore the comment); it is not enforced by the renderer.
@@ -802,7 +802,7 @@ The skill borrows Simon Brown's C4 model **as methodology + level names only**. 
 
 ## Header convention
 
-Every `.puml` and `.mmd` carries a 6-field header block declaring what the diagram is, who it's for, and what it answers. Strict-mode diagrams must include all six; freestyle diagrams may omit fields (but `mode:` itself remains required).
+Every `.puml` and `.mmd` carries a 7-field header block declaring what the diagram is, who it's for, and what it answers. Strict-mode diagrams must include all six; freestyle diagrams may omit fields (but `mode:` itself remains required).
 
 ```plantuml
 @startuml
@@ -1118,7 +1118,7 @@ license permits redistribution.
 
 Renderable example diagrams live in `examples/` (file list mirrors `manifest.json`):
 
-- [`01-context.puml`](examples/01-context.puml) — Azure 3-tier system context (Front Door → App Service → SQL Database).
+- [`01-context.puml`](examples/01-context.puml) — 3-tier web application **Context** view (Level 1). Audience: exec / business. One system-of-interest box + 2 actors (End user, Admin) + 3 external systems (Microsoft Entra ID, Stripe, SendGrid). No vendor icons inside the boundary — this is the canonical "no drill" Context example.
 - [`02-fabric-data-pipeline.puml`](examples/02-fabric-data-pipeline.puml) — Microsoft Fabric data-engineering pipeline (Eventstream → Lakehouse → Notebook → Warehouse → Power BI).
 - [`03-system-architecture.puml`](examples/03-system-architecture.puml) — Azure AKS application feeding a Microsoft Fabric data plane (canonical Azure + Fabric mixed example, C4 level 2).
 - [`04-sequence-flow.puml`](examples/04-sequence-flow.puml) — Request sequence across Azure Front Door → AKS → Service Bus → Fabric Eventstream.

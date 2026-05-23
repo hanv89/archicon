@@ -19,7 +19,9 @@ npm: **`@hanv89/arch-skill`** · stable since **v1.0.0**.
   by tag-pinned `raw.githubusercontent.com` URL — no CDN, no auth.
 - **Skill** (`dist/skill/SKILL.md`): PlantUML authoring conventions, the
   per-vendor INDEX-lookup rule, an edit-existing-diagram workflow, and a Mermaid
-  mode. 12 worked examples under `dist/skill/examples/`.
+  mode, the C4 diagram taxonomy + 7-field header convention + HLD/ADR/TDD
+  document scaffolds + a 2-question selection workflow, and 9 layout-
+  compaction rules. **19 worked examples** under `dist/skill/examples/`.
 - **CLI** (`@hanv89/arch-skill`): installs the skill into your agent.
 - **Supply-chain integrity**: the install manifest carries a per-file `sha256`
   the CLI verifies before writing each file.

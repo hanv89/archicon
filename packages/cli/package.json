@@ -1,6 +1,6 @@
 {
   "name": "@hanv89/arch-skill",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "Install the architecture-diagram skill into your AI coding agent (Claude Code, Codex CLI, Cursor).",
   "bin": {
     "arch-skill": "dist/index.js"
