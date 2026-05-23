@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "name": "architecture-diagram",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "requires_icons": ">=1.2.0",
   "icons_version": "1.2.0",
   "files": [
@@ -9,7 +9,7 @@
       "src": "dist/skill/SKILL.md",
       "dest": "SKILL.md",
       "role": "skill",
-      "sha256": "ff02298b493a473487a3784aa3ddaad654a3a97d431f4a6448f85d14f4f8edf9"
+      "sha256": "48463f964d2885baf7ae659a6500d34b6994ebc52ab3685776493c09118a7f6f"
     },
     {
       "src": "dist/skill/examples/01-context.puml",
@@ -45,7 +45,7 @@
       "src": "dist/skill/examples/06-deployment.puml",
       "dest": "examples/06-deployment.puml",
       "role": "example",
-      "sha256": "6639bf3ac61ea6218c0354e95dab23e91eb579d6529aaffba32564db3a9896fe"
+      "sha256": "a0796c96a503226f25289d2cd49574342c5340c0928c4f77748a1e0b811f2ffb"
     },
     {
       "src": "dist/skill/examples/07-azure-aks-mixed.puml",
@@ -87,13 +87,13 @@
       "src": "dist/skill/examples/13-aws-architecture.puml",
       "dest": "examples/13-aws-architecture.puml",
       "role": "example",
-      "sha256": "0f8da3955a8b17209ba2ddba1889c1e49380975cc81487aa933aac2cad7d4b63"
+      "sha256": "0b85d3a39a88f0a9b9de5503e5b2e86bcee018c0b6d7e3aeb12c5902aa4452e6"
     },
     {
       "src": "dist/skill/examples/14-gcp-architecture.puml",
       "dest": "examples/14-gcp-architecture.puml",
       "role": "example",
-      "sha256": "1f271e76cd6d48ffa699c9ba2beb09e911dd6a5a61a067775f48fff05aa7fff4"
+      "sha256": "4e3767b9c062b6d3940b6f8f92ffbfeecf4d6b9715f660fcc344cb9a1c651507"
     },
     {
       "src": "dist/skill/examples/15-compact-layout.puml",

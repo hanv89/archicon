@@ -23,7 +23,10 @@ glyphs. Common services NOT in the pack include:
   - Cloud CDN
   - Pub/Sub
   - Memorystore
-(Plus less-frequent gaps: Cloud Run, Cloud Build, Cloud Tasks, Workflows.)
+(Plus less-frequent gaps: Cloud Build, Cloud Tasks, Workflows, Cloud
+Functions, plus most networking + observability glyphs. Always check
+INDEX.md first — if a service appears missing, confirm it isn't shipped
+before applying the fallback ladder.)
 
 When a needed service is missing, prefer (in order):
   1. A labeled rectangle without an icon.

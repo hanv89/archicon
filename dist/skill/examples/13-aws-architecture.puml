@@ -1,5 +1,7 @@
 @startuml
 ' mode: strict
+skinparam ranksep 28
+skinparam nodesep 22
 ' AWS serverless web architecture (C4 level 2). Demonstrates the AWS vendor
 ' icon set: CloudFront edge -> API Gateway -> Lambda compute -> DynamoDB +
 ' RDS data tier, with S3 for static assets and SNS/SQS for async fan-out.

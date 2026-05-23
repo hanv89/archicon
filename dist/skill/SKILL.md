@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.3.0
+version: 1.3.1
 requires_icons: ">=1.2.0"
 ---
 
@@ -66,8 +66,8 @@ Every diagram should include 3 setup blocks. Use **literal URLs** in every `<img
 ' 1. Skinparam: layout, fonts, default colors
 top to bottom direction
 skinparam linetype ortho
-skinparam ranksep 60
-skinparam nodesep 50
+skinparam ranksep 28
+skinparam nodesep 22
 skinparam shadowing false
 skinparam roundcorner 10
 skinparam defaultFontName "Inter, Arial, sans-serif"
@@ -573,7 +573,7 @@ The official **core products** icon pack is intentionally narrow — about 19 ic
 - **Pub/Sub** — no icon.
 - **Memorystore** — no icon.
 
-(Other less-frequent gaps: Cloud Run, Cloud Build, Cloud Tasks, Workflows. The shipped list lives in `dist/GCP/INDEX.md`.)
+(Other less-frequent gaps: Cloud Build, Cloud Tasks, Workflows, Cloud Functions, plus most networking + observability glyphs. **Always check `dist/GCP/INDEX.md` first** — if a service appears missing, confirm it isn't shipped before applying the fallback ladder.)
 
 If you need a missing service, apply this fallback ladder (preferred order):
 
@@ -583,8 +583,9 @@ If you need a missing service, apply this fallback ladder (preferred order):
    ```
 2. **Nearest-meaning Google Cloud icon with a label override** — keep visual identity, clarify identity in text:
    ```plantuml
-   rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/ComputeEngine.png>\nCloud Run\n[serverless container]" as cr
+   rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/GCP/png/AlloyDB.png>\nMemorystore\n[in-memory cache]" as ms
    ```
+   (The substitute icon must be a *truly missing* service standing in via a same-family icon — here Memorystore borrowing the AlloyDB database glyph. Never use a substitute for a service that *does* ship its own icon — check INDEX.md first.)
 3. **FluentUI generic icon** — Globe / Database / Queue. Trade-off: loses Google Cloud identity but is concept-clear.
 
 Declare each fallback in a single header comment so reviewers know the gap is intentional, not an INDEX-lookup miss:
@@ -607,8 +608,8 @@ For high-level deployment topology — hub-spoke, AKS, managed services.
 @startuml SystemArchitecture
 top to bottom direction
 skinparam linetype ortho
-skinparam ranksep 60
-skinparam nodesep 50
+skinparam ranksep 28
+skinparam nodesep 22
 skinparam shadowing false
 skinparam roundcorner 10
 skinparam defaultFontName "Inter, Arial, sans-serif"
@@ -732,7 +733,7 @@ a -[hidden]r- b
 
 ### Horizontal alignment within a group
 
-By default, the Graphviz dot engine arranges nodes following the flow direction. To force nodes within a group to align horizontally (in a TB diagram), use **hidden right edges**:
+By default, the Graphviz dot engine arranges nodes following the flow direction. To force nodes within a group to align horizontally (in a TB diagram), use **hidden right edges** — but note the constraint described in § "Layout compaction" Rule 2: a hidden right-edge cannot override a *real* downward edge between the same nodes. If you also have `a --> b`, you must use `a -r-> b` for the cluster to actually lay out horizontally; the hidden edge alone is only an alignment hint.
 
 ```plantuml
 rectangle "Group" {
@@ -760,11 +761,13 @@ rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azur
 
 ## Layout compaction
 
-When PlantUML's dot engine has to decide where to put nodes, its defaults bias toward "lots of whitespace, never overlap". Diagrams that aren't actively shaped end up airy and lopsided — clusters drift apart, orphan nodes float, single-row clusters stretch the page. Apply the five rules below and a 6–10 node diagram fits on one A4 page on the first render.
+When PlantUML's dot engine has to decide where to put nodes, its defaults bias toward "lots of whitespace, never overlap". Diagrams that aren't actively shaped end up airy and lopsided — clusters drift apart, orphan nodes float, single-row clusters stretch the page. Apply the five rules below and a 6–10 node diagram typically fits on one page on the first render.
+
+> **Scope**: these rules target the PlantUML `dot` layout engine. Mermaid uses a different layout engine — in Mermaid, `mode: strict` reduces to icon-lookup + INDEX rules; Mermaid's layout is engine-managed.
 
 ### The five rules
 
-**Rule 1 — Tighten spacing defaults.** The dot defaults `ranksep 60` / `nodesep 50` leave excessive whitespace. Drop these into every diagram unless you have a specific reason to space out:
+**Rule 1 — Tighten spacing defaults.** PlantUML's house defaults of `ranksep 60` / `nodesep 50` (used in earlier skeletons in this skill) leave excessive whitespace. Drop these into every diagram unless you have a specific reason to space out:
 
 ```plantuml
 skinparam ranksep 28
@@ -783,12 +786,14 @@ dns -r-> cf
 cf  -r-> s3
 ```
 
-**Rule 3 — Cluster ≥4 nodes → grid 2×N.** Four nodes in a single row spreads the diagram wider than tall. Use a 2×N grid by combining horizontal *and* vertical hidden edges:
+**Rule 3 — Cluster ≥4 nodes → grid 2×N.** Four nodes in a single row spreads the diagram wider than tall. Use a 2×N grid by combining horizontal *and* vertical hidden edges (each `[Name]` declaration must be on its own line in PlantUML):
 
 ```plantuml
 package "Data Tier" {
-  [Aurora]      [DynamoDB]
-  [ElastiCache] [S3]
+  [Aurora]
+  [DynamoDB]
+  [ElastiCache]
+  [S3]
 
   Aurora      -[hidden]r- DynamoDB
   ElastiCache -[hidden]r- S3
@@ -797,7 +802,7 @@ package "Data Tier" {
 }
 ```
 
-The two rows + the two columns each get a hidden edge — dot now has enough hints to lock the 2×2 arrangement.
+Each row gets one hidden horizontal edge, each column one hidden vertical — dot now has enough constraints to lock the 2×2 arrangement. For N>2, extend the column hidden edges (`DynamoDB -[hidden]d- Athena`, etc.).
 
 **Rule 4 — Every node belongs to a cluster.** An orphan node (Key Vault, Secrets Manager, Security Command Center) gets pushed to a corner by dot and creates white-space wells. Gather auxiliary services into the nearest-meaning cluster. Suggested vendor-aware cluster names:
 
@@ -842,7 +847,9 @@ Declare the mode in the first comment line of any `.puml` (or first `%% ` commen
 ...
 ```
 
-If the directive is absent, the skill treats the diagram as `mode: strict`.
+If the directive is absent:
+- The agent **authoring a new diagram** defaults to `mode: strict` (applies all five Layout-compaction rules).
+- An **existing un-tagged diagram** is treated as legacy — the agent does not auto-rewrite layout/spacing to fit the rules. Re-label `' mode: strict` only when ready to apply the rules; freestyle is the explicit opt-out.
 
 See `examples/15-compact-layout.puml` for a worked compact diagram that exercises all five rules.
 
@@ -885,7 +892,7 @@ Rules for an edit:
 2. **Make the minimal diff.** Touch only the lines the change requires. Adding a node = one new `rectangle` line + the edges that connect it. Removing a node = delete its declaration + every edge that references its alias. Swapping an icon = change only the `<img:URL>` (and the label if the product name changed).
 3. **Look up any new/changed icon in the relevant `INDEX.md`** before emitting its `<img:URL>` — the filename rule (see § "Filename rule (non-negotiable)") applies to edits exactly as to authoring. A guessed filename 404s and renders a broken-image placeholder.
 4. **Reuse the existing alias style.** If the diagram names nodes `as fd`, `as aks`, follow that convention for new nodes so the edge list stays readable.
-5. **Don't re-flow the layout unless asked.** Keep `direction`, `ranksep`/`nodesep`, and existing hidden edges as-is. Only restructure layout when the user explicitly asks for it (e.g. "make it left-to-right").
+5. **Don't re-flow the layout unless asked.** Keep `direction`, `ranksep`/`nodesep`, and existing hidden edges as-is when editing a pre-existing diagram. New diagrams should start with § "Layout compaction" Rule 1 defaults (`ranksep 28` / `nodesep 22`); only legacy diagrams keep their original spacing. Only restructure layout when the user explicitly asks for it (e.g. "make it left-to-right").
 6. **Preserve labels + cluster membership.** A new node usually belongs inside an existing cluster — place it there, not at the top level, unless it is genuinely a new boundary.
 
 If the user pastes a diagram that uses `!define` macros or guessed filenames, fix those to literal INDEX-verified URLs as part of the edit (and say so), since they would otherwise render broken.

@@ -1,5 +1,7 @@
 @startuml
 ' mode: strict
+skinparam ranksep 28
+skinparam nodesep 22
 ' System architecture (C4 level 2) — Google Cloud data + ML platform.
 ' Demonstrates the canonical Google Cloud icon usage: a Cloud Run service
 ' fronting GKE workloads, persisting to Cloud SQL + Cloud Storage, feeding
