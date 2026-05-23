@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "name": "architecture-diagram",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "requires_icons": ">=1.2.0",
   "icons_version": "1.2.0",
   "files": [
@@ -9,7 +9,7 @@
       "src": "dist/skill/SKILL.md",
       "dest": "SKILL.md",
       "role": "skill",
-      "sha256": "3df2806f57047f5db6d61e865009eb2eab74026f904ba7b617880f562abbd791"
+      "sha256": "6416b72b685dd8e2a84ff56da6f07e1902e8a58b9b12ee2bdadcdc52ab8462f1"
     },
     {
       "src": "dist/skill/examples/01-context.puml",

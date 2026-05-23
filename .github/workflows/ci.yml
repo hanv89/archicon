@@ -111,6 +111,15 @@ jobs:
       - name: scripts/test_aws_verbatim.sh
         run: bash scripts/test_aws_verbatim.sh
       # <<< AWS-CI-END
+      # SKILL.md frontmatter YAML parse contract — asserts js-yaml can load
+      # the frontmatter and that name / version / requires_icons are all
+      # present + string. Pre-empts the v1.4.3 class of regression (a
+      # colon-space inside an unquoted scalar broke yaml.load() and threw
+      # "fatal: SKILL.md missing requires_icons frontmatter" on every install).
+      - name: Install CLI deps (for js-yaml)
+        run: npm --prefix packages/cli ci
+      - name: scripts/test_skill_frontmatter_parse.sh
+        run: bash scripts/test_skill_frontmatter_parse.sh
 
   actionlint:
     runs-on: ubuntu-latest
