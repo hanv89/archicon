@@ -1,13 +1,30 @@
 ---
 name: architecture-diagram
-description: Use this skill when creating cloud and dev-tool architecture diagrams across seven vendors (Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI, Devicon, AWS, Google Cloud) using PlantUML or Mermaid. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon + AWS + GCP), layout patterns (clusters, alignment, edge styling), the C4 diagram taxonomy (Context / Container / Component / System Landscape / Dynamic / Deployment) + complementary types (Sequence / Pipeline), document scaffolds (HLD / ADR / Detailed Technical Design), strict-vs-freestyle style modes, Confluence integration, and an experimental Terraform→PlantUML generator. Triggers on requests like "draw Azure architecture", "draw AWS architecture", "AWS serverless diagram", "draw GCP architecture", "BigQuery pipeline", "GKE diagram", "Google Cloud data platform", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform", "draw a Context diagram", "draw a Container diagram", "draw a system landscape", "high-level design diagram", "ADR diagram", "technical design diagram". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.4.2
+description: Use this skill when creating cloud or dev-tool architecture diagrams in PlantUML (primary) or Mermaid. Covers seven vendors via the canonical icon repository: Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI, Devicon, AWS (CC-BY-ND verbatim), Google Cloud. Drives the C4 diagram taxonomy (Context / Container / Component / System Landscape / Dynamic / Deployment), HLD / ADR / Detailed Technical Design document scaffolds, strict-vs-freestyle style modes, layout-compaction rules, and an experimental Terraform→PlantUML generator. Triggers on requests like "draw Azure / AWS / GCP / Fabric / Kubernetes / AKS architecture diagram", "deployment diagram", "draw a Context / Container / Component / Landscape / Dynamic diagram", "high-level design diagram", "ADR diagram", "technical design diagram", "edit / update existing diagram", "Mermaid architecture diagram", "diagram from Terraform". Full feature list in the skill body under § "What this skill covers".
+version: 1.4.3
 requires_icons: ">=1.2.0"
 ---
 
 # Architecture Diagram Skill (PlantUML + Mermaid)
 
 This skill describes how to draw architecture diagrams with PlantUML (primary) or Mermaid (secondary), using icons from the `hanv89/archicon` repository covering 7 vendors (Azure, Fabric, Kubernetes, FluentUI, Devicon, AWS, GCP). Icons are referenced by public `raw.githubusercontent.com` URL — no local assets, no CDN. PlantUML fetches each `<img:URL>` at render time.
+
+## What this skill covers
+
+The YAML `description:` field above is kept under the 1024-character Claude UI import limit, so it carries only the highest-signal triggers + vendor list. Beyond icon usage, the skill drives the following — each with its own section in this document:
+
+- **C4 diagram taxonomy** (Context / Container / Component / System Landscape / Dynamic / Deployment) + complementary types (Sequence / Pipeline / Workflow). See [§ "Diagram taxonomy"](#diagram-taxonomy).
+- **Document scaffolds** for **HLD** (High-Level Design), **ADR** (Nygard format), and **Detailed Technical Design** — section skeletons + recommended diagrams per scaffold. See [§ "Choosing diagrams by document type"](#choosing-diagrams-by-document-type).
+- **`mode: strict | freestyle`** style modes — strict default applies the layout rules + 7-field header; freestyle = icon-lookup only. See [§ "Style modes"](#style-modes).
+- **7-field header convention** for every `.puml` / `.mmd` (`title / type / level / mode / audience / question / adr`). See [§ "Header convention"](#header-convention).
+- **Layout compaction** — five empirical rules (tight `ranksep`/`nodesep`; hidden-edge-as-alignment-hint; 2×N grids; every-node-in-a-cluster; cross-cluster row anchors). See [§ "Layout compaction"](#layout-compaction).
+- **Selection workflow** — when the user request is vague, the agent asks 2 questions (which document? who's the reader?) before drawing. See [§ "Selection workflow"](#selection-workflow).
+- **Anti-patterns** — 9 review-time pitfalls (mixing levels, drilling Component without a decision, HLD-for-small-change, …). See [§ "Anti-patterns"](#anti-patterns).
+- **Confluence integration** via PlantUML apps (AppsFoundry, weweave, …). See [§ "Confluence integration (PlantUML apps)"](#confluence-integration-plantuml-apps).
+- **Mermaid mode** — secondary output for GitHub-native rendering (icon-light) and CLI/browser render (icon-mode with vendor PNGs via `<img>`). See [§ "Mermaid mode"](#mermaid-mode).
+- **Experimental Terraform → PlantUML generator** — `scripts/iac_to_diagram.mjs` extracts `resource "azurerm_<type>"` blocks + maps to Azure icons. See repo `README.md`.
+
+Natural-language requests in any of the areas above will activate the skill, even if the exact trigger phrase doesn't appear in `description:`.
 
 ## When to use
 
