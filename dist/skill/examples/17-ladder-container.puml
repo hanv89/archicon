@@ -1,0 +1,75 @@
+@startuml 17-ladder-container
+' title:    Storefront — Container view
+' type:     Container
+' level:    2
+' mode:     strict
+' audience: Engineering team
+' question: What runs where, with what technology?
+' adr:      n/a
+'
+' Pedagogical pair with 16-ladder-context.puml — the SAME system at two levels.
+' Container level drills into Storefront's deployable units. Uses vendor icons
+' (Azure family) to show technology choices, with technology in each label.
+
+skinparam ranksep 28
+skinparam nodesep 22
+skinparam defaultFontSize 13
+skinparam wrapWidth 200
+
+title Storefront — Container (Level 2)
+
+' External actors / systems carried over from the Context view
+actor "Shopper" as shopper
+rectangle "Payment Gateway\n[Stripe API]" as payments
+rectangle "Shipping Provider\n[FedEx API]" as shipping
+
+' Rule 4 — every node belongs to a cluster
+package "Edge" {
+  ' Rule 2 — real edges horizontal so the cluster lays out left-to-right
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\nFront Door\n[Azure Front Door]" as fd
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\nWeb App\n[Next.js + Azure App Service]" as web
+  fd -r-> web
+}
+
+package "Compute" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureFunction.png>\nCheckout API\n[Node.js + Azure Functions]" as checkout
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureFunction.png>\nOrder Worker\n[Python + Azure Functions]" as worker
+}
+
+package "Data Tier" {
+  ' Rule 3 — 4 nodes → 2×2 grid
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nOrders DB\n[Azure SQL]" as orders
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureCosmosDb.png>\nSessions\n[Cosmos DB]" as sessions
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureRedisCache.png>\nCache\n[Redis]" as cache
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Storage/AzureBlobStorage.png>\nAssets\n[Blob Storage]" as assets
+
+  orders   -[hidden]r- sessions
+  cache    -[hidden]r- assets
+  orders   -[hidden]d- cache
+  sessions -[hidden]d- assets
+}
+
+package "Integration & Security" {
+  ' Rule 4 — orphan absorption: queue + secrets in one cluster
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png>\nOrder Queue\n[Service Bus]" as queue
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Security/AzureKeyVault.png>\nKey Vault\n[secrets]" as kv
+  queue -[hidden]d- kv
+}
+
+' Real flow
+shopper -d-> fd : "HTTPS"
+web      -d-> checkout : "REST"
+checkout -d-> orders : "Writes"
+checkout -d-> sessions : "Reads / writes"
+web      -d-> assets : "Serves"
+web      -d-> cache  : "Caches HTML"
+checkout -d-> queue  : "Enqueues fulfilment"
+worker   -u-> queue  : "Consumes"
+worker   -d-> shipping : "Books"
+checkout -d-> payments : "Charges"
+checkout -r-> kv : "Reads keys"
+
+' Rule 5 — cross-cluster row alignment
+assets -[hidden]r- kv
+
+@enduml

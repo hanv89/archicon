@@ -1,4 +1,11 @@
 @startuml
+' title:    Microsoft Fabric — data engineering pipeline (medallion)
+' type:     Pipeline
+' level:    n/a
+' mode:     strict
+' audience: Data engineering team
+' question: How does data flow from sources through bronze → silver → gold in Fabric?
+' adr:      n/a
 ' Microsoft Fabric — data engineering pipeline (medallion architecture)
 '
 ' Source: https://github.com/hanv89/archicon

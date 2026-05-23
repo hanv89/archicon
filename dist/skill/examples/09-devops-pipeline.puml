@@ -1,4 +1,11 @@
 @startuml
+' title:    DevOps pipeline — source → CI → CD → registry → runtime → observability
+' type:     Pipeline
+' level:    n/a
+' mode:     strict
+' audience: DevEx / DevOps
+' question: How does code flow from commit to production, and where are the observability seams?
+' adr:      n/a
 ' DevOps pipeline (C4 level 2) — source → CI → CD → registry → runtime →
 ' observability, decorated with Devicon dev-tool brand glyphs alongside
 ' Azure (managed services) and Kubernetes (workload subgraph) icons.

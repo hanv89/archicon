@@ -1,4 +1,11 @@
 @startuml
+' title:    Azure web architecture decorated with FluentUI status icons
+' type:     Container
+' level:    2
+' mode:     freestyle
+' audience: Engineering team (creative — annotated status indicators)
+' question: How do FluentUI decorator icons annotate an Azure architecture's runtime status?
+' adr:      n/a
 ' System architecture (C4 level 2-3) — Azure web architecture decorated
 ' with FluentUI UI affordances. Demonstrates the canonical Azure +
 ' FluentUI mixed pattern: Azure service icons carry the infrastructure
