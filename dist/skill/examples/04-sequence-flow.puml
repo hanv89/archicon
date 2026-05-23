@@ -1,4 +1,11 @@
 @startuml
+' title:    Order-event sequence flow
+' type:     Sequence
+' level:    n/a
+' mode:     strict
+' audience: Dev / debug
+' question: Step-by-step, how do these actors message each other during this event?
+' adr:      n/a
 ' Sequence flow (PlantUML sequence diagram) — temporal view of one event
 ' moving from an Azure AKS microservice through a Microsoft Fabric data
 ' plane to a Power BI consumer. Companion to 03-system-architecture.puml

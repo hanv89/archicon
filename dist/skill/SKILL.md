@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: Use this skill when creating Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI-decorated, or Devicon dev-tool architecture diagrams using PlantUML. Covers icon usage from the canonical icon repository (Azure + Fabric + Kubernetes + FluentUI + Devicon), layout patterns (clusters, alignment, edge styling), multiple diagram types (system architecture, sequence flow, component view, deployment topology, data engineering pipeline, mixed AKS deployment, UI-decorated Azure, DevOps pipeline with dev tools), and Confluence integration via PlantUML apps. Triggers on requests like "draw Azure architecture", "draw architecture for [service]", "create deployment diagram", "PlantUML diagram for [project]", "draw Fabric data pipeline", "Lakehouse + Notebook + Warehouse diagram", "Kubernetes deployment diagram", "AKS architecture", "K8s Pod + Service + Deployment diagram", "diagram with status icons", "Azure with user/auth/data icons", "devops pipeline diagram", "draw [language/framework/tool] in architecture", "edit/update an existing diagram", "Mermaid architecture diagram", "render on GitHub", "diagram from Terraform". Primary output is PlantUML with embedded vendor icons; a secondary Mermaid mode (§ "Mermaid mode") renders vendor icons via inline HTML under cli/browser render (icon-light when viewed inline on GitHub, which strips HTML), and an experimental Terraform→PlantUML generator exists (see the repo README).
-version: 1.3.1
+version: 1.4.0
 requires_icons: ">=1.2.0"
 ---
 
@@ -759,6 +759,116 @@ title <size:20><b>Project Name</b></size>\n<size:13>Subtitle, stage, version</si
 rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\n**Display Name**\n//Subtitle italic//\n[Optional bracket]" as alias
 ```
 
+## Style modes
+
+The skill ships two layout modes; declare yours in the first comment line of any `.puml` (or first `%%` comment of any `.mmd`):
+
+- **`mode: strict`** *(default for newly authored diagrams)* — the agent applies the five Layout-compaction rules + the canonical 6-field header (see § "Header convention"). Use when generating diagrams for HLDs / TDDs / release notes / shared review.
+- **`mode: freestyle`** — the agent enforces only icon-lookup + INDEX rules; layout, label format, and clustering are left to the user. Use for exploratory brainstorming or when you have your own house style.
+
+```plantuml
+@startuml
+' mode: strict
+@enduml
+```
+
+**If the `mode:` directive is absent:**
+- The agent **authoring a new diagram** defaults to `mode: strict` (applies all five Layout-compaction rules + the 6-field header).
+- An **existing un-tagged diagram** is treated as legacy — the agent does not auto-rewrite layout, spacing, or header on edit. Re-label `' mode: strict` only when ready to apply the rules; `' mode: freestyle` is the explicit opt-out.
+
+Mode is metadata for the agent (PlantUML and Mermaid ignore the comment); it is not enforced by the renderer.
+
+## Diagram taxonomy
+
+The skill borrows Simon Brown's C4 model **as methodology + level names only**. No C4-PlantUML macros or shapes are imported — vendor icons remain the visual language. Six diagram types cover most needs; three off-ladder complementary types fill specific niches.
+
+| Type | Audience | Question it answers | Scope rule | Example |
+|---|---|---|---|---|
+| **Context** (L1) | Exec / sponsor / business | "Who or what touches us, what's outside the line?" | 1 system-of-interest box + external actors + external systems. No drill. | `01-context.puml`, `16-ladder-context.puml` |
+| **Container** (L2) | Engineering managers / team-of-teams | "What runs where? Which technology?" | Deployable units (web / API / DB / queue / function / job) with technology in label. No internal modules. | `03-system-architecture.puml`, `07-azure-aks-mixed.puml`, `13-aws-architecture.puml`, `14-gcp-architecture.puml`, `17-ladder-container.puml` |
+| **Component** (L3) | Devs working on one container | "How is THIS container structured internally?" | Modules / packages / services inside one container. Draw only when a real internal decision is being discussed. | `05-component.puml` |
+| **System Landscape** | Enterprise architect / portfolio | "How do our N systems relate?" | N system boxes + shared backbones (auth / event bus / data warehouse). One box per system, no drill. | `18-system-landscape.puml` |
+| **Dynamic** | Engineering team | "How does request / event X flow through us?" | Containers (or components) + arrows **numbered** by step. One use case = one diagram. | `19-dynamic-flow.puml` |
+| **Deployment** | Ops / SRE / engineering | "Where do containers map onto infra (region / AZ / VM / cluster)?" | Infra nodes (region / cluster / VM / namespace) containing containers as nested boxes. | `06-deployment.puml` |
+| Sequence *(complementary)* | Dev / debug | "Step-by-step messaging between actors?" | UML sequence; small + focused (≤10 lifelines). | `04-sequence-flow.puml` |
+| Pipeline / Workflow *(complementary)* | DevEx / DevOps / data | "How does CI / CD / data flow?" | Linear or branching pipeline (build-time / data-time, not runtime). | `09-devops-pipeline.puml`, `02-fabric-data-pipeline.puml` |
+
+> **Decision tree (3 lines):**
+> 1. Audience is exec / business → **Context** (or **System Landscape** if you have >1 system).
+> 2. Audience is engineering managers → **Container** (default).
+> 3. Audience is devs on one container, with a non-trivial internal choice to discuss → **Component**. Add **Dynamic** for a critical use case, **Deployment** if infra mapping is non-trivial.
+
+## Header convention
+
+Every `.puml` and `.mmd` carries a 6-field header block declaring what the diagram is, who it's for, and what it answers. Strict-mode diagrams must include all six; freestyle diagrams may omit fields (but `mode:` itself remains required).
+
+```plantuml
+@startuml
+' title:    <Display name>
+' type:     Context | Container | Component | System Landscape | Dynamic | Deployment | Sequence | Pipeline
+' level:    1 | 2 | 3 | n/a   (only the three static C4 levels carry a level number)
+' mode:     strict | freestyle
+' audience: <one line — who reads this?>
+' question: <one sentence — what does this diagram answer?>
+' adr:      <URL to the ADR this implements, or "n/a">
+```
+
+**Backward compatibility**: a legacy diagram with only `' mode: strict` (the 3.11 format) still validates; the remaining 5 fields default to "n/a" when absent. The agent prompts to fill them on the next edit.
+
+For Mermaid (`.mmd`), use `%%` line comments with the same field names. See `examples/11-mermaid-architecture.mmd` for a worked example.
+
+## Choosing diagrams by document type
+
+Three documentation patterns cover most architecture writing. Each pattern names a section skeleton + recommended diagrams. Pick the pattern that matches the writing task; the selection workflow below maps the user's request to the pattern.
+
+### High-Level Design (HLD) — new system or major capability
+
+**Sections**: Purpose · Stakeholders & Audience · Context · Capabilities · Container view · Cross-cutting (security / scale / cost) · Deployment overview · Risks & open ADRs.
+
+**Recommended diagrams**:
+- 1× **Context** *(required)* — the system boundary, external actors, external systems.
+- 0–1× **System Landscape** — only if the new system sits inside a portfolio of >1 system.
+- 1× **Container** *(required)* — what runs where, with technology labels.
+- 1× **Deployment** *(high-level)* — region / AZ map; do NOT show instance counts at HLD level.
+
+### Architecture Decision Record (ADR) — Nygard format
+
+**Sections**: Title · Status *(Proposed / Accepted / Superseded by ADR-N)* · Context · Decision · Consequences.
+
+**Recommended diagrams** *(optional, small)*:
+- 0–1× **Dynamic** or **Container snippet** showing the decision point (before/after side-by-side is most informative).
+
+ADRs are short by design — if a section grows past one page, the ADR is probably hiding an HLD or a refactor.
+
+### Detailed Technical Design (TDD) — for the team building one container or feature
+
+**Sections**: Overview · Container in context · Component breakdown · Key workflows · Data model · API contracts · Deployment · Operability · Test strategy · Open questions.
+
+**Recommended diagrams**:
+- 1× **Container** *(focused)* — the container being designed + its immediate neighbours.
+- 1× **Component** — the container being designed, drilled to internal modules.
+- 1–N× **Dynamic** — one per critical workflow.
+- 1× **Deployment** — instance-level (replica counts, autoscaling triggers, region pinning).
+- 0–N× **Sequence** — for non-trivial protocols (handshake, multi-step async, retry semantics).
+
+## Selection workflow
+
+When the user's request is vague — e.g., "draw an architecture diagram" or "show me what we have" — the agent **must ask 2 questions before drawing**:
+
+1. **What document is this for?** Options: HLD / ADR / Detailed Technical Design / Standalone.
+2. **Who's the primary reader?** Options: Exec / Engineering manager / Engineering team / Ops.
+
+The two answers map to a diagram type via the table below. If the user says "skip questions" or provides a specific type ("draw a Container diagram for X"), the agent goes directly without asking.
+
+| Audience ↓ / Document → | HLD | ADR | TDD | Standalone |
+|---|---|---|---|---|
+| **Exec** | Context | (rare — Context snippet) | (rare) | Context |
+| **Engineering manager** | Container | Container snippet or Dynamic | Container (focused) | Container |
+| **Engineering team** | Container | Container snippet or Dynamic | Container + Component + Dynamic (set) | Container or Dynamic |
+| **Ops** | Deployment | Deployment snippet | Deployment | Deployment |
+
+When a cell shows a set (e.g., TDD × engineering team → Container + Component + Dynamic), the agent should offer to author them as a series and confirm before producing the full set.
+
 ## Layout compaction
 
 When PlantUML's dot engine has to decide where to put nodes, its defaults bias toward "lots of whitespace, never overlap". Diagrams that aren't actively shaped end up airy and lopsided — clusters drift apart, orphan nodes float, single-row clusters stretch the page. Apply the five rules below and a 6–10 node diagram typically fits on one page on the first render.
@@ -832,26 +942,21 @@ Worker -[hidden]r- DB
 
 Hidden edge = **alignment hint**. Real edge = **flow and rank constraint**. When the two conflict, dot honors the real edge every time. If you want a horizontal layout, you must have at least one horizontal *real* edge in the cluster; hidden edges alone won't override the rank pull of an arrow.
 
-### Style modes — strict vs freestyle
+See `examples/15-compact-layout.puml` for a worked compact diagram that exercises all five rules. The mode flag governing whether these rules apply is described in § "Style modes" above; the broader diagram taxonomy in § "Diagram taxonomy" tells you *which* diagram to draw before you start applying compaction.
 
-This skill ships two layout modes:
+## Anti-patterns
 
-- **`mode: strict`** *(default)* — the agent applies all five compaction rules + the spacing defaults above. Use when generating a canonical diagram for an HLD / TDD / release notes.
-- **`mode: freestyle`** — the agent checks only icon-lookup + INDEX rules; layout, label format, and clustering are left to the user. Use for exploratory brainstorming or when you have your own house style.
+Common authoring mistakes — call these out in review or fix them when editing:
 
-Declare the mode in the first comment line of any `.puml` (or first `%% ` comment of any `.mmd`):
-
-```plantuml
-@startuml
-' mode: strict
-...
-```
-
-If the directive is absent:
-- The agent **authoring a new diagram** defaults to `mode: strict` (applies all five Layout-compaction rules).
-- An **existing un-tagged diagram** is treated as legacy — the agent does not auto-rewrite layout/spacing to fit the rules. Re-label `' mode: strict` only when ready to apply the rules; freestyle is the explicit opt-out.
-
-See `examples/15-compact-layout.puml` for a worked compact diagram that exercises all five rules.
+- **Drawing every level of every system.** Pick the level your audience needs. A Context diagram for engineers is patronising; a Component diagram for an executive is noise.
+- **Mixing levels in one diagram.** A Context with one container drilled in is muddy. Drill the system in a separate Container diagram and link it.
+- **Drilling Component without an internal decision.** If no real architectural choice is being made about a container's internals, the Component diagram adds no information — skip it.
+- **Generating HLD scope for a small change.** A 2-system change does not need an HLD; an ADR captures the decision faster.
+- **Generating Context for an isolated container.** When the system has no external actors worth showing (an internal batch job, a one-off script), skip Context and go directly to Container.
+- **Relying on icons to convey meaning the label should carry.** An icon shows *type* (database, queue, function); the label must carry *identity* (which database, holding what data). Without the label, two databases look identical.
+- **Forcing strict layout on exploratory brainstorming.** When the user is brainstorming, the agent should not refuse to draw or auto-restructure — switch to `mode: freestyle` and let the user iterate.
+- **Adding `' mode: strict` without applying the rules.** Re-labeling a legacy diagram strict is a declaration of intent; the body must follow the five Layout-compaction rules. If you're not ready to compact, leave the diagram un-tagged.
+- **Forgetting `' coverage-note:` when using an icon fallback** (Google Cloud-only). Without the tag, reviewers cannot tell a deliberate fallback from an INDEX-lookup miss. See § "Google Cloud icons" → "Coverage caveat".
 
 ## Confluence integration (PlantUML apps)
 
@@ -1026,3 +1131,7 @@ Renderable example diagrams live in `examples/` (file list mirrors `manifest.jso
 <!-- AWS-SKILL-END -->
 - [`14-gcp-architecture.puml`](examples/14-gcp-architecture.puml) — Google Cloud data + ML platform (Cloud Run → GKE → Cloud SQL + Cloud Storage → BigQuery → Vertex AI). Canonical Google Cloud example; icons rastered at a uniform 64x64 per the brand-guidelines proportional-scaling rule.
 - [`15-compact-layout.puml`](examples/15-compact-layout.puml) — Layout compaction reference (E-commerce frontend stack, ~10 nodes). Exercises all five rules from § "Layout compaction" — tight `ranksep`/`nodesep`, horizontal cluster via real `-r->` edges, 2×2 grid Data Tier, no orphans (Secrets Manager absorbed into Async & Security), cross-cluster row anchor. Use this as the visual baseline for `mode: strict`.
+- [`16-ladder-context.puml`](examples/16-ladder-context.puml) — **Context** (Level 1) view of the same e-commerce system used by #17. Audience: exec / business sponsor. Shows the system box, three actors, three external systems. Pedagogical pair: render #16 + #17 side-by-side to see the same system at two C4 levels.
+- [`17-ladder-container.puml`](examples/17-ladder-container.puml) — **Container** (Level 2) view of the same system as #16. Audience: engineering team. Six Azure-hosted containers (Front Door, App Service, Functions × 2, SQL / Cosmos / Cache / Blob) plus a queue + Key Vault. Exercises every compaction rule (skinparams, horizontal Edge, 2×2 Data Tier, orphan absorption, cross-cluster row anchor) with real vendor icons.
+- [`18-system-landscape.puml`](examples/18-system-landscape.puml) — **System Landscape** view of a 4-system retail portfolio with shared identity / event bus / data warehouse backbones. Audience: enterprise architect / portfolio review. Off the C4 static ladder; useful when "how do our systems relate" matters more than "what runs where".
+- [`19-dynamic-flow.puml`](examples/19-dynamic-flow.puml) — **Dynamic** flow of a single order-placement request across the containers from #17. Audience: engineering team. Numbered arrows 1–10 trace one use case end-to-end. Use the Dynamic format when "what calls what, in order" matters more than the static topology.

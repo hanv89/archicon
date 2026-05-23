@@ -1,5 +1,11 @@
 @startuml 15-compact-layout
-' mode: strict
+' title:    Compact-layout reference (e-commerce frontend stack)
+' type:     Container
+' level:    2
+' mode:     strict
+' audience: Engineering team
+' question: How do the five Layout-compaction rules combine on one diagram?
+' adr:      n/a
 '
 ' Canonical compact-layout reference — exercises all five Layout compaction
 ' rules from SKILL.md. Re-render after edits and confirm the aspect ratio

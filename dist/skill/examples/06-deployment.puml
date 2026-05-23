@@ -1,5 +1,11 @@
 @startuml
-' mode: strict
+' title:    Multi-region active-active AKS + Fabric mirroring
+' type:     Deployment
+' level:    n/a
+' mode:     strict
+' audience: Ops / SRE / engineering
+' question: How do containers map onto regions, AZs, and clusters?
+' adr:      n/a
 skinparam ranksep 28
 skinparam nodesep 22
 ' Deployment topology — multi-region active-active AKS application with

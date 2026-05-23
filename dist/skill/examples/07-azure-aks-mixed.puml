@@ -1,4 +1,11 @@
 @startuml
+' title:    Azure-fronted AKS deployment with workload mix
+' type:     Container
+' level:    2
+' mode:     strict
+' audience: Engineering team
+' question: What's the topology of this Azure + AKS deployment, and how do workloads mix?
+' adr:      n/a
 ' System architecture (C4 level 2-3) — Azure-fronted AKS deployment with
 ' Kubernetes workload subgraph. Demonstrates the canonical Azure + Kubernetes
 ' mixed pattern: Azure infra (Front Door, Application Gateway, SQL Database)

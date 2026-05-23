@@ -1,5 +1,11 @@
 @startuml
-' mode: strict
+' title:    AWS serverless web architecture
+' type:     Container
+' level:    2
+' mode:     strict
+' audience: Engineering team
+' question: What runs where in this AWS serverless web stack, and which technology?
+' adr:      n/a
 skinparam ranksep 28
 skinparam nodesep 22
 ' AWS serverless web architecture (C4 level 2). Demonstrates the AWS vendor

@@ -1,5 +1,11 @@
 @startuml
-' mode: strict
+' title:    Google Cloud data + ML platform
+' type:     Container
+' level:    2
+' mode:     strict
+' audience: Engineering team
+' question: What runs where in this Google Cloud data + ML stack?
+' adr:      n/a
 skinparam ranksep 28
 skinparam nodesep 22
 ' System architecture (C4 level 2) — Google Cloud data + ML platform.

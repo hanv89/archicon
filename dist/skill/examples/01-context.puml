@@ -1,4 +1,11 @@
 @startuml
+' title:    Azure 3-tier web application — context
+' type:     Context
+' level:    1
+' mode:     strict
+' audience: Exec / sponsor / business
+' question: Who or what touches this 3-tier web application, and what's outside our boundary?
+' adr:      n/a
 ' Azure 3-tier web application — context view
 '
 ' Source: https://github.com/hanv89/archicon

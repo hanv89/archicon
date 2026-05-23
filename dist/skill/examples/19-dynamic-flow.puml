@@ -1,0 +1,56 @@
+@startuml 19-dynamic-flow
+' title:    Order placement — Dynamic flow
+' type:     Dynamic
+' level:    n/a
+' mode:     strict
+' audience: Engineering team
+' question: How does a single order request flow through the system, in order?
+' adr:      n/a
+'
+' Dynamic diagram: same containers as 17-ladder-container, but arrows are
+' numbered by step. One use case = one diagram. Use this format when "what
+' calls what" matters more than "what runs where".
+
+skinparam ranksep 28
+skinparam nodesep 22
+skinparam defaultFontSize 13
+skinparam wrapWidth 200
+
+title Order placement — Dynamic flow (one shopper request)
+
+actor "Shopper" as shopper
+
+' Rule 4 — every node in a cluster
+package "Edge" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Networking/AzureFrontDoor.png>\nFront Door" as fd
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureAppService.png>\nWeb App" as web
+  fd -r-> web
+}
+
+package "Compute" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureFunction.png>\nCheckout API" as checkout
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Compute/AzureFunction.png>\nOrder Worker" as worker
+}
+
+package "Data + integration" {
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Databases/AzureSqlDatabase.png>\nOrders DB" as orders
+  rectangle "<img:https://raw.githubusercontent.com/hanv89/archicon/main/dist/Azure/Integration/AzureServiceBus.png>\nOrder Queue" as queue
+  orders -[hidden]r- queue
+}
+
+rectangle "Payment Gateway\n[Stripe]" as stripe
+rectangle "Shipping\n[FedEx]" as fedex
+
+' Numbered flow — Dynamic-diagram convention; arrows tell a single story
+shopper  -d-> fd       : "1. POST /checkout"
+fd       -d-> web      : "2. routes"
+web      -d-> checkout : "3. validates cart"
+checkout -d-> orders   : "4. writes order"
+checkout -r-> stripe   : "5. charges card"
+checkout -d-> queue    : "6. enqueues fulfilment"
+worker   -u-> queue    : "7. consumes"
+worker   -r-> fedex    : "8. books shipping"
+worker   -u-> orders   : "9. updates status"
+web      -u-> shopper  : "10. order confirmation"
+
+@enduml

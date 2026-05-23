@@ -1,0 +1,75 @@
+@startuml 18-system-landscape
+' title:    Retail org — System landscape
+' type:     System Landscape
+' level:    n/a
+' mode:     strict
+' audience: Enterprise architect / portfolio review
+' question: How do our four customer-facing systems relate, and what's the shared backbone?
+' adr:      n/a
+'
+' Portfolio view: one box per system, no drill. Shows shared backbones
+' (auth, event bus, data warehouse) as their own boxes. External actors at
+' the top. Off the C4 static ladder — used to communicate org-wide shape.
+
+skinparam ranksep 28
+skinparam nodesep 22
+skinparam defaultFontSize 13
+skinparam wrapWidth 200
+
+title Retail org — System landscape
+
+' External actors (Rule 4 — clustered, not orphan)
+package "Actors" {
+  actor "Shopper"  as shopper
+  actor "Employee" as employee
+  actor "Partner"  as partner
+  shopper -[hidden]r- employee
+  employee -[hidden]r- partner
+}
+
+' Customer-facing systems (Rule 3 — 4 systems → 2×2 grid)
+package "Customer-facing systems" {
+  rectangle "Storefront\n[E-commerce SaaS]" as storefront
+  rectangle "Mobile App\n[iOS + Android]"   as mobile
+  rectangle "Loyalty\n[points + offers]"    as loyalty
+  rectangle "Support Portal\n[ticketing]"   as support
+
+  storefront -[hidden]r- mobile
+  loyalty    -[hidden]r- support
+  storefront -[hidden]d- loyalty
+  mobile     -[hidden]d- support
+}
+
+' Shared backbones (Rule 4 — internal infra clustered together)
+package "Shared backbones" {
+  rectangle "Identity\n[OIDC, all systems]"    as identity
+  rectangle "Event Bus\n[Kafka, async events]" as bus
+  rectangle "Data Warehouse\n[Snowflake]"      as dw
+  identity -[hidden]r- bus
+  bus      -[hidden]r- dw
+}
+
+' Real relationships (one line per system → shared component)
+shopper  -d-> storefront
+shopper  -d-> mobile
+employee -d-> support
+partner  -d-> loyalty
+
+storefront -d-> identity
+mobile     -d-> identity
+loyalty    -d-> identity
+support    -d-> identity
+
+storefront -d-> bus
+mobile     -d-> bus
+loyalty    -d-> bus
+
+storefront -d-> dw
+mobile     -d-> dw
+loyalty    -d-> dw
+support    -d-> dw
+
+' Rule 5 — cross-cluster row anchor (backbones below systems on same rank)
+support -[hidden]r- dw
+
+@enduml

@@ -1,4 +1,11 @@
 @startuml
+' title:    Azure AKS app feeding Fabric analytics — container view
+' type:     Container
+' level:    2
+' mode:     strict
+' audience: Engineering team
+' question: What runs where, with what technology, in this AKS + Fabric stack?
+' adr:      n/a
 ' System architecture (C4 level 2) — Azure AKS application feeding a
 ' Microsoft Fabric data plane. Follows Microsoft canonical reference
 ' architectures (AKS microservices baseline + Fabric end-to-end analytics).

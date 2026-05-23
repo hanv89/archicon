@@ -1,4 +1,11 @@
 @startuml ThreeTierEdit
+' title:    3-tier web app (edit-existing demo)
+' type:     Container
+' level:    2
+' mode:     strict
+' audience: Engineering team
+' question: How do you edit a pre-existing diagram (add a node, re-route, preserve layout)?
+' adr:      n/a
 ' Worked example for SKILL.md section "Editing an existing diagram".
 '
 ' Scenario: the user already has the 3-tier diagram below (Front Door,

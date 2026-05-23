@@ -1,0 +1,45 @@
+@startuml 16-ladder-context
+' title:    Storefront — Context view
+' type:     Context
+' level:    1
+' mode:     strict
+' audience: Exec / business sponsor
+' question: Who or what touches the storefront, and what's outside our boundary?
+' adr:      n/a
+'
+' Pedagogical pair with 17-ladder-container.puml — the SAME system at two levels.
+' Context level shows only: 1 system box + actors + external systems. No drill.
+
+skinparam ranksep 28
+skinparam nodesep 22
+skinparam defaultFontSize 13
+skinparam wrapWidth 200
+
+title Storefront — Context (Level 1)
+
+' Actors
+actor "Shopper" as shopper
+actor "Customer Service Rep" as csr
+actor "Merchant Admin" as merchant
+
+' Rule 4 — every node sits in a cluster
+package "Our System" {
+  rectangle "Storefront\n[E-commerce SaaS]" as storefront
+}
+
+package "External Systems" {
+  rectangle "Payment Gateway\n[Stripe API]" as payments
+  rectangle "Shipping Provider\n[FedEx API]" as shipping
+  rectangle "Email Provider\n[SendGrid]" as email
+}
+
+' Relationships — read top-down for storytelling
+shopper -d-> storefront : "Browses + orders"
+csr -d-> storefront : "Resolves tickets"
+merchant -d-> storefront : "Manages catalog"
+
+storefront -d-> payments : "Charges card"
+storefront -d-> shipping : "Books fulfillment"
+storefront -d-> email : "Sends receipts"
+
+@enduml
