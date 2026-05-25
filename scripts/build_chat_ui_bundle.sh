@@ -5,7 +5,7 @@
 #   - README.md             (top-level "what's in this bundle + how to use")
 #   - SKILL.md              (copy of dist/skill/SKILL.md)
 #   - NOTICE                (copy of repo-root NOTICE)
-#   - examples/<NN-name>.{puml,mmd}   (all dist/skill/examples/*.{puml,mmd} flat)
+#   - examples/<NN-name>.{puml,mmd,md} (all dist/skill/examples/*.{puml,mmd,md} flat; .md = worked agent-dialogue transcript such as 20-init-clarify.md)
 #   - indexes/<Vendor>-INDEX.md       (per-vendor catalog, 5 files)
 #   - usage-rules/<Vendor>-USAGE-RULES.txt (per-vendor licence/trademark, 5 files)
 #
@@ -74,9 +74,12 @@ mkdir -p "${STAGE}/examples" "${STAGE}/indexes" "${STAGE}/usage-rules"
 cp "${SKILL_SRC}"  "${STAGE}/SKILL.md"
 cp "${NOTICE_SRC}" "${STAGE}/NOTICE"
 
-# Examples — flatten dist/skill/examples/*.{puml,mmd} into examples/
-# (.puml = PlantUML, .mmd = Mermaid; both are worked diagram examples).
-for f in "${EXAMPLES_SRC_DIR}"/*.puml "${EXAMPLES_SRC_DIR}"/*.mmd; do
+# Examples — flatten dist/skill/examples/*.{puml,mmd,md} into examples/
+# (.puml = PlantUML, .mmd = Mermaid, .md = worked agent-dialogue transcript
+# such as 20-init-clarify.md). Without .md, SKILL.md cross-references the
+# dialogue example but the bundle would ship without it — chat-UI users
+# (claude.ai Projects, ChatGPT Custom GPT) would hit a broken link.
+for f in "${EXAMPLES_SRC_DIR}"/*.puml "${EXAMPLES_SRC_DIR}"/*.mmd "${EXAMPLES_SRC_DIR}"/*.md; do
   [ -e "${f}" ] || continue
   cp "${f}" "${STAGE}/examples/$(basename "${f}")"
 done
