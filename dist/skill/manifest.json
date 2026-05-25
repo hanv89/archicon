@@ -1,7 +1,7 @@
 {
   "$schema": "./manifest.schema.json",
   "name": "architecture-diagram",
-  "version": "1.4.5",
+  "version": "1.4.6",
   "requires_icons": ">=1.2.0",
   "icons_version": "1.2.0",
   "files": [
@@ -9,7 +9,7 @@
       "src": "dist/skill/SKILL.md",
       "dest": "SKILL.md",
       "role": "skill",
-      "sha256": "5ebcb4f0c61a54a8f552a98ad12e2a069d2676ef66e3c3516e11a0b8f5d575a3"
+      "sha256": "009c81a847dc297493afbab7c5ae646b9eff4120203d60389069e576fe443865"
     },
     {
       "src": "dist/skill/examples/01-context.puml",
@@ -124,6 +124,12 @@
       "dest": "examples/19-dynamic-flow.puml",
       "role": "example",
       "sha256": "9e8aeae081f2d29bdb43170ac36ceb92c7b633779661ae02c9924d4c5322192b"
+    },
+    {
+      "src": "dist/skill/examples/20-init-clarify.md",
+      "dest": "examples/20-init-clarify.md",
+      "role": "example",
+      "sha256": "d916c0fd2c2bbb8976c2ae5ecf88972c121732df1b071f14b06ea8f3f35d4858"
     },
     {
       "src": "dist/skill/examples/assets/icon.css",
