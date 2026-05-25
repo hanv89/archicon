@@ -28,13 +28,20 @@ function defineSubcommand(name: Subcommand, description: string): void {
     // the CLI tool's own version. The two are namespaced cleanly now that
     // the top-level flag is renamed.
     .option("--version <semver>", "pin to a specific skill version (X.Y.Z); default = latest from main")
+    // Install-scope flag: install scope. `user` = personal across all repos (~/.<agent>/skills/...);
+    // `project` = team-shared via git (<cwd>/.<agent>/skills/...). Default = user per-adapter
+    // for claude-code + codex; cursor is project-only and rejects --scope=user with a friendly note.
+    .option("--scope <scope>", "install scope: user (~/.<agent>/skills/, default) or project (<cwd>/.<agent>/skills/, team-shared via git)")
     .action(async (opts) => {
       // Validate --version pre-dispatch as defense-in-depth; baseUrl() in
       // _shared.ts also rejects malformed values when it builds the URL.
       if (opts.version !== undefined && !VERSION_RE.test(opts.version)) {
         throw new Error(`--version must match X.Y.Z (got: ${opts.version})`);
       }
-      const optsForAdapter = { target: opts.target, version: opts.version };
+      if (opts.scope !== undefined && opts.scope !== "user" && opts.scope !== "project") {
+        throw new Error(`--scope must be 'user' or 'project' (got: ${opts.scope})`);
+      }
+      const optsForAdapter = { target: opts.target, version: opts.version, scope: opts.scope };
       if (opts.agent === ALL_TARGET) {
         process.exitCode = await runOverAll(name, optsForAdapter);
         return;

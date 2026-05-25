@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: 'Use this skill when creating cloud or dev-tool architecture diagrams in PlantUML (primary) or Mermaid. Covers seven vendors via the canonical icon repository covering Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI, Devicon, AWS (CC-BY-ND verbatim), Google Cloud. Drives the C4 diagram taxonomy (Context / Container / Component / System Landscape / Dynamic / Deployment), HLD / ADR / Detailed Technical Design document scaffolds, strict-vs-freestyle style modes, layout-compaction rules, and an experimental Terraform→PlantUML generator. Triggers on requests like "draw Azure / AWS / GCP / Fabric / Kubernetes / AKS architecture diagram", "deployment diagram", "draw a Context / Container / Component / Landscape / Dynamic diagram", "high-level design diagram", "ADR diagram", "technical design diagram", "edit / update existing diagram", "Mermaid architecture diagram", "diagram from Terraform". Full feature list in the skill body under § "What this skill covers".'
-version: 1.4.6
+version: 1.4.7
 requires_icons: ">=1.2.0"
 ---
 

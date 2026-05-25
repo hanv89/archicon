@@ -3,7 +3,7 @@ import * as path from "node:path";
 import * as crypto from "node:crypto";
 import { load as yamlLoad } from "js-yaml";
 import pkg from "../../package.json";
-import type { Adapter, InstallOptions, UninstallOptions, UpdateOptions, ListOptions } from "./types";
+import type { Adapter, AdapterOpts, InstallOptions, UninstallOptions, UpdateOptions, ListOptions, Scope } from "./types";
 
 // Shared adapter plumbing. Helpers here must be agent-agnostic — anything
 // Claude-Code-specific (default install path, allowed root) lives in the
@@ -496,8 +496,17 @@ export async function withFatalReturn(fn: () => Promise<number>): Promise<number
  * `<cwd>/.cursor/rules/`) is structurally different.
  */
 export interface FolderAdapterConfig {
-  rootDir(): string;
-  rootDisplay(): string;
+  /**
+   * Absolute path to the agent's root dir for the given scope (the install-scope feature).
+   *   `user`    → e.g. `~/.claude`  (personal across all repos)
+   *   `project` → e.g. `<cwd>/.claude`  (team-shared via git)
+   * Adapter implementations decide the per-scope mapping (claude-code +
+   * codex follow the `~/.<agent>` vs `<cwd>/.<agent>` pattern; cursor does
+   * not use this factory because its on-disk layout differs).
+   */
+  rootDir(scope: Scope): string;
+  /** Human-readable name for the per-scope root (e.g. `~/.claude` vs `./.claude`). Used in error messages. */
+  rootDisplay(scope: Scope): string;
   agentFlag: string;
 }
 
@@ -515,9 +524,14 @@ export interface FolderAdapterConfig {
 const PERSISTED_MANIFEST_BASENAME = ".arch-skill-manifest.json";
 
 export function makeFolderInstallAdapter(cfg: FolderAdapterConfig): Adapter {
-  const defaultTarget = (): string => path.join(cfg.rootDir(), "skills", SKILL_NAME);
-  const defaultSkillsRoot = (): string => path.join(cfg.rootDir(), "skills");
-  const resolve = (target: string): Promise<string> => safeResolveTarget(target, cfg.rootDir(), cfg.rootDisplay());
+  // Install-scope flag: per-scope path resolution. `user` is the backward-compat default
+  // (the pre-flag default). `--scope=project` opts into `<cwd>/.<agent>/skills/...` for team-shared
+  // installs checked in via git.
+  const pickScope = (opts: AdapterOpts): Scope => opts.scope ?? "user";
+  const defaultTarget = (scope: Scope): string => path.join(cfg.rootDir(scope), "skills", SKILL_NAME);
+  const defaultSkillsRoot = (scope: Scope): string => path.join(cfg.rootDir(scope), "skills");
+  const resolve = (target: string, scope: Scope): Promise<string> =>
+    safeResolveTarget(target, cfg.rootDir(scope), cfg.rootDisplay(scope));
 
   const isOurSkillDir = async (dir: string): Promise<boolean> => {
     try {
@@ -530,11 +544,12 @@ export function makeFolderInstallAdapter(cfg: FolderAdapterConfig): Adapter {
 
   async function install(opts: InstallOptions): Promise<number> {
     return withFatalReturn(async () => {
-      const target = await resolve(opts.target ?? defaultTarget());
+      const scope = pickScope(opts);
+      const target = await resolve(opts.target ?? defaultTarget(scope), scope);
       const base = baseUrl(opts.version);
 
       if (!process.env.ARCH_SKILL_TARGET_ROOT && path.basename(target) !== SKILL_NAME) {
-        throw new Error(`refusing to install at ${target} - target basename must be '${SKILL_NAME}' (default ${cfg.rootDisplay()}/skills/${SKILL_NAME}/). Set ARCH_SKILL_TARGET_ROOT to install into a custom test root.`);
+        throw new Error(`refusing to install at ${target} - target basename must be '${SKILL_NAME}' (default ${cfg.rootDisplay(scope)}/skills/${SKILL_NAME}/). Set ARCH_SKILL_TARGET_ROOT to install into a custom test root.`);
       }
 
       const manifest = await fetchManifest(base);
@@ -600,7 +615,8 @@ export function makeFolderInstallAdapter(cfg: FolderAdapterConfig): Adapter {
 
   async function uninstall(opts: UninstallOptions): Promise<number> {
     return withFatalReturn(async () => {
-      const target = await resolve(opts.target ?? defaultTarget());
+      const scope = pickScope(opts);
+      const target = await resolve(opts.target ?? defaultTarget(scope), scope);
 
       const exists = await fs.stat(target).then(() => true).catch(() => false);
       if (!exists) {
@@ -681,7 +697,8 @@ export function makeFolderInstallAdapter(cfg: FolderAdapterConfig): Adapter {
 
   async function update(opts: UpdateOptions): Promise<number> {
     return withFatalReturn(async () => {
-      const target = await resolve(opts.target ?? defaultTarget());
+      const scope = pickScope(opts);
+      const target = await resolve(opts.target ?? defaultTarget(scope), scope);
       const base = baseUrl(opts.version);
       const manifest = await fetchManifest(base);
       if (manifest.name !== SKILL_NAME) {
@@ -707,27 +724,37 @@ export function makeFolderInstallAdapter(cfg: FolderAdapterConfig): Adapter {
 
   async function list(opts: ListOptions): Promise<number> {
     return withFatalReturn(async () => {
-      const root = await resolve(opts.target ?? defaultSkillsRoot());
+      // Install-scope flag: `list` scans BOTH user + project scope roots by default so
+      // a user sees every scope a skill is installed in. `--scope=user` or
+      // `--scope=project` restricts to one. `--target=<path>` overrides scope
+      // entirely (legacy behavior).
+      const scopesToScan: Scope[] = opts.target
+        ? [pickScope(opts)]
+        : opts.scope
+        ? [opts.scope]
+        : ["user", "project"];
 
-      const exists = await fs.stat(root).then(() => true).catch(() => false);
-      if (!exists) {
-        process.stdout.write("(no skills installed)\n");
-        return 0;
-      }
-      const entries = await fs.readdir(root, { withFileTypes: true });
-      const rows: string[] = [];
-      for (const e of entries) {
-        if (!e.isDirectory()) continue;
-        const skillMdPath = path.join(root, e.name, "SKILL.md");
-        try {
-          const md = await fs.readFile(skillMdPath, "utf8");
-          const fm = parseFrontmatter(md);
-          rows.push(`${fm.name ?? e.name}\t${fm.version ?? "?"}`);
-        } catch {
-          // not a skill folder; skip silently
+      const allRows: string[] = [];
+      for (const scope of scopesToScan) {
+        const root = opts.target
+          ? await resolve(opts.target, scope)
+          : await resolve(defaultSkillsRoot(scope), scope);
+        const exists = await fs.stat(root).then(() => true).catch(() => false);
+        if (!exists) continue;
+        const entries = await fs.readdir(root, { withFileTypes: true });
+        for (const e of entries) {
+          if (!e.isDirectory()) continue;
+          const skillMdPath = path.join(root, e.name, "SKILL.md");
+          try {
+            const md = await fs.readFile(skillMdPath, "utf8");
+            const fm = parseFrontmatter(md);
+            allRows.push(`${fm.name ?? e.name}\t${scope}\t${fm.version ?? "?"}\t${path.join(root, e.name)}`);
+          } catch {
+            // not a skill folder; skip silently
+          }
         }
       }
-      process.stdout.write(rows.length ? rows.join("\n") + "\n" : "(no skills installed)\n");
+      process.stdout.write(allRows.length ? allRows.join("\n") + "\n" : "(no skills installed)\n");
       return 0;
     });
   }

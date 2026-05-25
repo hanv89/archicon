@@ -206,3 +206,70 @@ for (const [name, adapter] of ADAPTER_ENTRIES) {
     }
   });
 }
+
+// ────────────────────────────────────────────────────────────────────────────
+// the install-scope feature — `--scope=user|project` flag tests
+// ────────────────────────────────────────────────────────────────────────────
+
+// Cursor is project-only by architecture (User Rules = settings-only). --scope=user
+// on install/update/uninstall must error cleanly with the documented message; on
+// list it returns a friendly note + exit 0.
+test("cursor --scope=user on install errors cleanly with the Cursor-user-rules message", async () => {
+  const tmpdir = mkTmpdir();
+  const prevEnv = process.env.ARCH_SKILL_TARGET_ROOT;
+  process.env.ARCH_SKILL_TARGET_ROOT = tmpdir;
+  let stderrBuf = "";
+  const origStderr = process.stderr.write.bind(process.stderr);
+  process.stderr.write = ((chunk: any) => { stderrBuf += chunk; return true; }) as any;
+  try {
+    const exit = await ADAPTERS["cursor"].install({ scope: "user" });
+    assert.equal(exit, 1, "cursor --scope=user must exit 1");
+    assert.match(stderrBuf, /Cursor User Rules are not writable/);
+    assert.match(stderrBuf, /--scope=project/);
+  } finally {
+    process.stderr.write = origStderr as any;
+    if (prevEnv === undefined) delete process.env.ARCH_SKILL_TARGET_ROOT;
+    else process.env.ARCH_SKILL_TARGET_ROOT = prevEnv;
+    rmTmpdir(tmpdir);
+  }
+});
+
+test("cursor --scope=user on list emits a note and exits 0 (read-only command, no hard error)", async () => {
+  let stdoutBuf = "";
+  const origStdout = process.stdout.write.bind(process.stdout);
+  process.stdout.write = ((chunk: any) => { stdoutBuf += chunk; return true; }) as any;
+  try {
+    const exit = await ADAPTERS["cursor"].list({ scope: "user" });
+    assert.equal(exit, 0);
+    assert.match(stdoutBuf, /cursor is project-only/);
+  } finally {
+    process.stdout.write = origStdout as any;
+  }
+});
+
+// --scope=user (default) and --scope=project resolve to different parent dirs on
+// folder-install adapters (claude-code / codex). Smoke this by installing with
+// each scope under the same ARCH_SKILL_TARGET_ROOT and asserting both succeed.
+// (The dispatch logic that picks the per-scope root is in claudeRootDir/codexRootDir;
+// this test just verifies the scope flag propagates through AdapterOpts.)
+test("claude-code --scope=user and --scope=project both succeed when --target overrides path", async () => {
+  const tmpdir = mkTmpdir();
+  const prevEnv = process.env.ARCH_SKILL_TARGET_ROOT;
+  process.env.ARCH_SKILL_TARGET_ROOT = tmpdir;
+  const { restore } = installFetchMock();
+  try {
+    const userTarget = path.join(tmpdir, "user-scope", "architecture-diagram");
+    const projTarget = path.join(tmpdir, "proj-scope", "architecture-diagram");
+    const userExit = await ADAPTERS["claude-code"].install({ scope: "user", target: userTarget });
+    const projExit = await ADAPTERS["claude-code"].install({ scope: "project", target: projTarget });
+    assert.equal(userExit, 0);
+    assert.equal(projExit, 0);
+    assert.ok(fs.existsSync(path.join(userTarget, "SKILL.md")));
+    assert.ok(fs.existsSync(path.join(projTarget, "SKILL.md")));
+  } finally {
+    restore();
+    if (prevEnv === undefined) delete process.env.ARCH_SKILL_TARGET_ROOT;
+    else process.env.ARCH_SKILL_TARGET_ROOT = prevEnv;
+    rmTmpdir(tmpdir);
+  }
+});
