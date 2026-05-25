@@ -1,6 +1,6 @@
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
-import { Adapter, InstallOptions, UninstallOptions, UpdateOptions, ListOptions } from "./types";
+import { Adapter, AdapterOpts, InstallOptions, UninstallOptions, UpdateOptions, ListOptions } from "./types";
 import {
   SKILL_NAME,
   baseUrl,
@@ -85,7 +85,24 @@ async function isOurRuleFile(file: string): Promise<{ ours: boolean; version?: s
   }
 }
 
+// Install-scope flag: Cursor is project-only by architecture. User Rules in Cursor are
+// settings-only — they live in Cursor's settings store and are NOT file-writable
+// from an external CLI. Reject `--scope=user` with a friendly error pointing the
+// caller at `--scope=project` (the existing project-scope install path).
+// `--scope=project` (and the absence of any --scope flag) both pass through to
+// the existing per-project install logic, so today's invocations stay unchanged.
+function rejectUserScope(opts: AdapterOpts): Error | null {
+  if (opts.scope === "user") {
+    return new Error(
+      "Cursor User Rules are not writable from an external CLI; pass --scope=project to install as Project Rules (writes to ./.cursor/rules/arch-skill.mdc).",
+    );
+  }
+  return null;
+}
+
 async function install(opts: InstallOptions): Promise<number> {
+  const reject = rejectUserScope(opts);
+  if (reject) { process.stderr.write(`fatal: ${reject.message}\n`); return 1; }
   return withFatalReturn(async () => {
     if (opts.target === undefined) {
       process.stderr.write(`note: Cursor target resolved to ${defaultTarget()} (per-project install). Pass --target=<path> to override.\n`);
@@ -134,6 +151,8 @@ async function install(opts: InstallOptions): Promise<number> {
 }
 
 async function uninstall(opts: UninstallOptions): Promise<number> {
+  const reject = rejectUserScope(opts);
+  if (reject) { process.stderr.write(`fatal: ${reject.message}\n`); return 1; }
   return withFatalReturn(async () => {
     const targetDir = await resolveTarget(opts.target ?? defaultTarget());
     const ruleFile = path.join(targetDir, RULE_BASENAME);
@@ -156,6 +175,8 @@ async function uninstall(opts: UninstallOptions): Promise<number> {
 }
 
 async function update(opts: UpdateOptions): Promise<number> {
+  const reject = rejectUserScope(opts);
+  if (reject) { process.stderr.write(`fatal: ${reject.message}\n`); return 1; }
   return withFatalReturn(async () => {
     const targetDir = await resolveTarget(opts.target ?? defaultTarget());
     const ruleFile = path.join(targetDir, RULE_BASENAME);
@@ -182,6 +203,13 @@ async function update(opts: UpdateOptions): Promise<number> {
 }
 
 async function list(opts: ListOptions): Promise<number> {
+  // `list` on cursor with --scope=user returns the same friendly note rather than a hard error
+  // (list is read-only; producing a fatal feels heavy-handed). list without --scope OR with
+  // --scope=project enumerates the project-scope .mdc as before.
+  if (opts.scope === "user") {
+    process.stdout.write("(cursor is project-only; --scope=user is not applicable. Run without --scope or with --scope=project to enumerate Project Rules)\n");
+    return 0;
+  }
   return withFatalReturn(async () => {
     const targetDir = await resolveTarget(opts.target ?? defaultTarget());
     const ruleFile = path.join(targetDir, RULE_BASENAME);

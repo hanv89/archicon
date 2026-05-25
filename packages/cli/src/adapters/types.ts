@@ -5,6 +5,12 @@
  * honest: `runOverAll` accepts AdapterOpts and any subcommand can read any
  * field — fields a subcommand doesn't consume are simply ignored.
  */
+/** Install scope (the install-scope feature). `user` = `~/.<agent>/skills/...` (personal across all repos);
+ * `project` = `<cwd>/.<agent>/skills/...` (team-shared via git). Adapter default = `user`
+ * for backward-compat with the pre-flag default; cursor overrides to `project` because Cursor User
+ * Rules are settings-only (not file-writable from a CLI). */
+export type Scope = "user" | "project";
+
 export interface AdapterOpts {
   /** Override target directory. Validation tests use this. */
   target?: string;
@@ -12,6 +18,8 @@ export interface AdapterOpts {
   version?: string;
   /** Force overwrite of an existing skill at the target. `update` passes true; `install` defaults false. Ignored by `uninstall` / `list`. */
   overwrite?: boolean;
+  /** Install scope (the install-scope feature). Default per-adapter (`user` for claude-code + codex; `project` for cursor). */
+  scope?: Scope;
 }
 
 // Aliases preserved so adapters + tests reading per-subcommand names stay

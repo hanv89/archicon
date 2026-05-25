@@ -2,7 +2,7 @@
 
 Architecture diagrams as code. A 7-vendor icon library + an AI-agent skill that
 turns plain-language prompts into rendered PlantUML diagrams. Output works on
-Confluence, GitHub, and `play.plantuml.com` — no CDN, no auth, no hosted assets.
+Confluence, GitHub, and `www.plantuml.com/plantuml/uml/` — no CDN, no auth, no hosted assets.
 
 📦 `@hanv89/arch-skill` · stable since v1.0.0 · 7 vendors / ~2100 icons · MIT (code) / upstream licences (icons)
 
@@ -14,13 +14,15 @@ Confluence, GitHub, and `play.plantuml.com` — no CDN, no auth, no hosted asset
 npx @hanv89/arch-skill install --agent=claude-code   # or codex | cursor | all
 ```
 
+> **Choose install scope** *(optional, default = `user`)*: add `--scope=project` to install into `<cwd>/.claude/skills/` for team-shared diagrams checked in via git; default `--scope=user` writes to `~/.claude/skills/` for personal use across all repos. Cursor is project-only by architecture (User Rules in Cursor are settings-only, not file-writable).
+
 **2.** Ask your agent (copy-paste this prompt):
 
 > Draw a Container diagram for a 3-tier web app on Azure: Front Door → App Service → Cosmos DB + Azure SQL + Cache for Redis, with Key Vault for secrets.
 
 **3.** Paste the PlantUML output the agent emits into
-[play.plantuml.com](https://www.plantuml.com/plantuml/uml/) — your diagram
-renders with real Azure icons in a few seconds.
+[www.plantuml.com/plantuml/uml/](https://www.plantuml.com/plantuml/uml/) —
+your diagram renders with real Azure icons in a few seconds.
 
 ![Example: Azure Container diagram rendered with vendor icons](docs/screenshots/17-ladder-container.png)
 
@@ -60,6 +62,7 @@ agent will produce for the prompt above.*
 | `update --agent=<…>` | Re-install the latest (idempotent) |
 | `list` | Show installed adapters |
 | `--version=X.Y.Z` | Pin a specific skill release |
+| `--scope=user\|project` | Install scope (default `user` for claude-code + codex; `project` writes to `<cwd>/.claude/skills/...` for team-shared installs via git; cursor is project-only) |
 
 Adapters supported: **Claude Code**, **Codex CLI**, **Cursor**.
 
