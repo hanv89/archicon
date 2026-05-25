@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: 'Use this skill when creating cloud or dev-tool architecture diagrams in PlantUML (primary) or Mermaid. Covers seven vendors via the canonical icon repository covering Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI, Devicon, AWS (CC-BY-ND verbatim), Google Cloud. Drives the C4 diagram taxonomy (Context / Container / Component / System Landscape / Dynamic / Deployment), HLD / ADR / Detailed Technical Design document scaffolds, strict-vs-freestyle style modes, layout-compaction rules, and an experimental Terraform→PlantUML generator. Triggers on requests like "draw Azure / AWS / GCP / Fabric / Kubernetes / AKS architecture diagram", "deployment diagram", "draw a Context / Container / Component / Landscape / Dynamic diagram", "high-level design diagram", "ADR diagram", "technical design diagram", "edit / update existing diagram", "Mermaid architecture diagram", "diagram from Terraform". Full feature list in the skill body under § "What this skill covers".'
-version: 1.4.5
+version: 1.4.6
 requires_icons: ">=1.2.0"
 ---
 
@@ -872,12 +872,14 @@ ADRs are short by design — if a section grows past one page, the ADR is probab
 
 ## Selection workflow
 
-When the user's request is vague — e.g., "draw an architecture diagram" or "show me what we have" — the agent **must ask 2 questions before drawing**:
+When the user's request is vague — e.g., "draw an architecture diagram" or "show me what we have" — the agent **must ask up to 6 questions before drawing**, but only the ones that aren't already answered in the prompt (skip-if-clear). The first 2 are about *what document the diagram is for*; the next 4 (Q3–Q6) clarify other init-time axes.
+
+### Q1 & Q2 — Document type + audience (skip if either is named in the prompt)
 
 1. **What document is this for?** Options: HLD / ADR / Detailed Technical Design / Standalone.
 2. **Who's the primary reader?** Options: Exec / Engineering manager / Engineering team / Ops.
 
-The two answers map to a diagram type via the table below. If the user says "skip questions" or provides a specific type ("draw a Container diagram for X"), the agent goes directly without asking.
+The two answers map to a diagram type via the 4×4 table below. **Vendor (Q3), format (Q5), and create-vs-edit (Q6) are orthogonal axes** asked separately from this table — they don't appear as columns or rows.
 
 | Audience ↓ / Document → | HLD | ADR | TDD | Standalone |
 |---|---|---|---|---|
@@ -888,7 +890,40 @@ The two answers map to a diagram type via the table below. If the user says "ski
 
 When a cell shows multiple diagrams (e.g., TDD × engineering team → Container + Component + Dynamic), the agent should offer to author them as a numbered series ("I'll produce 3 diagrams: 1/3 Container, 2/3 Component, 3/3 Dynamic") and confirm before producing the full set.
 
-**If the user is vague but says "skip questions"** → default to a Container diagram, `mode: strict`, audience "engineering team". The agent can still author it; the user can redirect afterward.
+### Q3 – Q6 — Init-time clarifying questions (each `skip-if-clear`)
+
+Each of these is asked **only when the answer isn't already in the prompt**. The skip-rules below name the prompt signals that bypass each question.
+
+| Question | Answer options | Skip if the prompt contains… |
+|---|---|---|
+| **Q3 — Cloud provider** | Azure / AWS / GCP / multi-cloud / vendor-neutral | a vendor name ("draw an AWS architecture" → skip Q3, vendor=AWS; "K8s deployment" → skip Q3, vendor=Kubernetes-neutral) |
+| **Q4 — Detail level** | Context / Container / Component / System Landscape / Dynamic / Deployment *(linked to § Diagram taxonomy)* | a diagram-type word ("draw a deployment topology" → skip Q4, type=Deployment; "system landscape" → skip Q4, type=System Landscape) — OR Q1+Q2 already resolved a type via the 4×4 table |
+| **Q5 — PNG export** | one-click render URL *(default for new diagrams)* / raw PlantUML only | a format hint ("give me the .puml" → skip Q5, format=puml-only; "I need a PNG" or "render it" → skip Q5, format=png-url) |
+| **Q6 — Create vs edit** | create new / edit existing `.puml` | a create verb ("draw / build / create / make / design / show me / vẽ cho tôi / tôi muốn vẽ" → skip Q6, mode=create) OR an edit verb / file reference ("edit / modify / add to / update / extend / change / sửa / thêm vào / cập nhật" or a `.puml` path → skip Q6, mode=edit) |
+
+**Most prompts skip Q6** because the verb makes intent obvious; Q6 fires only when the create-vs-edit intent is genuinely ambiguous (e.g. "I need a diagram for the payments service" — no verb signal either way).
+
+When **Q6 = edit**, route to § "Editing an existing diagram" — preserve the existing layout, aliases, cluster membership; apply the minimal-diff rules. Do NOT redraw the diagram from scratch.
+
+### Q5 — PNG-export URL helper
+
+When Q5 = "one-click render URL", the agent emits both the raw `.puml` and a URL that produces a PNG when clicked:
+
+```
+https://www.plantuml.com/plantuml/png/<deflate-encoded-source>
+```
+
+The encoding is PlantUML's standard `~1`-prefixed deflate-then-custom-6-bit-base64 scheme (search "PlantUML text encoding" for libraries in any language; in Node: `zlib.deflateRaw(text)` + the custom alphabet). The server-side render is free and needs no docker on the user's machine. Heavy `docker run plantuml/plantuml:latest -tpng <file>` is out of scope for the skill (a CLI subcommand that does this is a possible future addition).
+
+### Defaults + anti-patterns
+
+**If the agent has asked questions on a prior turn and the user said "just draw it"** → switch to defaults and skip all 6: vendor = infer-from-context-or-Azure, level = Container, format = puml-only, mode = create, document = Standalone, audience = Engineering team.
+
+- **Never ask the full 6-question battery at once.** Aim for **0–4 questions per init turn**; most realistic prompts fire 1–2. If you find yourself queueing up 5 or 6 questions, you're asking things that are inferable from the prompt or the project context.
+- **Don't re-ask a question the user already answered in a prior turn** — carry the answer forward across the conversation.
+- **Don't ask Q6 unless the create-vs-edit intent is genuinely ambiguous** — the prompt verb almost always settles it.
+
+See `examples/20-init-clarify.md` for two worked dialogue cases (one where Q6 fires, one where only Q5 fires).
 
 ## Layout compaction
 
