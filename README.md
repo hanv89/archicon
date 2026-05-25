@@ -39,8 +39,10 @@ agent will produce for the prompt above.*
 - **Skill** (`dist/skill/SKILL.md`): C4 diagram taxonomy (Context / Container /
   Component / System Landscape / Dynamic / Deployment), 7-field header
   convention, HLD / ADR / Detailed Technical Design document scaffolds,
-  strict-vs-freestyle style modes, 5 layout-compaction rules, and a 2-question
-  selection workflow. **19 worked examples**.
+  strict-vs-freestyle style modes, 5 layout-compaction rules, and a 6-question
+  skip-if-clear selection workflow (document / audience / cloud / level / format /
+  create-vs-edit; most prompts fire 0–4 questions). **20 worked examples**
+  (`.puml` diagrams + `.mmd` Mermaid + 1 `.md` agent-dialogue transcript).
 - **CLI** (`@hanv89/arch-skill`): one command installs the skill bundle into
   your agent's folder.
 - **Supply-chain integrity**: per-file `sha256` in the install manifest; the

@@ -1,7 +1,7 @@
 ---
 name: architecture-diagram
 description: 'Use this skill when creating cloud or dev-tool architecture diagrams in PlantUML (primary) or Mermaid. Covers seven vendors via the canonical icon repository covering Microsoft Azure, Microsoft Fabric, Kubernetes, Microsoft Fluent UI, Devicon, AWS (CC-BY-ND verbatim), Google Cloud. Drives the C4 diagram taxonomy (Context / Container / Component / System Landscape / Dynamic / Deployment), HLD / ADR / Detailed Technical Design document scaffolds, strict-vs-freestyle style modes, layout-compaction rules, and an experimental Terraform→PlantUML generator. Triggers on requests like "draw Azure / AWS / GCP / Fabric / Kubernetes / AKS architecture diagram", "deployment diagram", "draw a Context / Container / Component / Landscape / Dynamic diagram", "high-level design diagram", "ADR diagram", "technical design diagram", "edit / update existing diagram", "Mermaid architecture diagram", "diagram from Terraform". Full feature list in the skill body under § "What this skill covers".'
-version: 1.4.7
+version: 1.4.8
 requires_icons: ">=1.2.0"
 ---
 
@@ -18,7 +18,7 @@ The YAML `description:` field above is kept under the 1024-character Claude UI i
 - **`mode: strict | freestyle`** style modes — strict default applies the layout rules + 7-field header; freestyle = icon-lookup only. See [§ "Style modes"](#style-modes).
 - **7-field header convention** for every `.puml` / `.mmd` (`title / type / level / mode / audience / question / adr`). See [§ "Header convention"](#header-convention).
 - **Layout compaction** — five empirical rules (tight `ranksep`/`nodesep`; hidden-edge-as-alignment-hint; 2×N grids; every-node-in-a-cluster; cross-cluster row anchors). See [§ "Layout compaction"](#layout-compaction).
-- **Selection workflow** — when the user request is vague, the agent asks 2 questions (which document? who's the reader?) before drawing. See [§ "Selection workflow"](#selection-workflow).
+- **Selection workflow** — when the user request is vague, the agent asks up to 6 skip-if-clear questions (document type / audience / cloud provider / detail level / PNG-export format / create-vs-edit) before drawing. Each question fires only when the answer isn't already in the prompt; most realistic prompts fire 0–4. See [§ "Selection workflow"](#selection-workflow).
 - **Anti-patterns** — 9 review-time pitfalls (mixing levels, drilling Component without a decision, HLD-for-small-change, …). See [§ "Anti-patterns"](#anti-patterns).
 - **Confluence integration** via PlantUML apps (AppsFoundry, weweave, …). See [§ "Confluence integration (PlantUML apps)"](#confluence-integration-plantuml-apps).
 - **Mermaid mode** — secondary output for GitHub-native rendering (icon-light) and CLI/browser render (icon-mode with vendor PNGs via `<img>`). See [§ "Mermaid mode"](#mermaid-mode).
@@ -913,17 +913,27 @@ When Q5 = "one-click render URL", the agent emits both the raw `.puml` and a URL
 https://www.plantuml.com/plantuml/png/<deflate-encoded-source>
 ```
 
-The encoding is PlantUML's standard `~1`-prefixed deflate-then-custom-6-bit-base64 scheme (search "PlantUML text encoding" for libraries in any language; in Node: `zlib.deflateRaw(text)` + the custom alphabet). The server-side render is free and needs no docker on the user's machine. Heavy `docker run plantuml/plantuml:latest -tpng <file>` is out of scope for the skill (a CLI subcommand that does this is a possible future addition).
+The encoding is PlantUML's standard deflate-then-custom-6-bit-base64 scheme — **no prefix character is prepended** (PlantUML's `~1` selector indicates "data is hex" and is the wrong choice here). Use `plantuml-encoder` on npm (240k weekly downloads) as a tested reference implementation:
+
+```js
+const enc = require("plantuml-encoder");
+const url = "https://www.plantuml.com/plantuml/png/" + enc.encode(plantUmlSource);
+// → user clicks → server renders → browser downloads PNG. No docker dep.
+```
+
+In other languages, use any library that implements PlantUML text encoding (Python `plantuml`, Go `plantuml-encoder`, etc.) and concat the encoded result to `https://www.plantuml.com/plantuml/png/`. Heavy `docker run plantuml/plantuml:latest -tpng <file>` is out of scope for the skill (a CLI subcommand that does this is a possible future addition).
+
+**`--agent=all` + `--scope=user` limitation**: the cursor adapter always rejects `--scope=user` (Cursor User Rules are settings-only); the default `arch-skill install --agent=all` flow (which dispatches to claude-code → codex → cursor with the default `--scope=user`) halts on the cursor step and rolls back prior adapter installs. Workaround until a future release ships per-adapter default-scope handling: pass `--scope=project` to the all-flow (`arch-skill install --agent=all --scope=project`), or invoke each adapter separately and let cursor use its implicit project default.
 
 ### Defaults + anti-patterns
 
-**If the agent has asked questions on a prior turn and the user said "just draw it"** → switch to defaults and skip all 6: vendor = infer-from-context-or-Azure, level = Container, format = puml-only, mode = create, document = Standalone, audience = Engineering team.
+**If the agent has asked questions on a prior turn and the user said "just draw it"** → switch to defaults and skip all 6: vendor = infer-from-context-or-Azure, level = Container, format = one-click render URL *(matches Q5 table-row default for new diagrams)*, mode = create, document = Standalone, audience = Engineering team.
 
 - **Never ask the full 6-question battery at once.** Aim for **0–4 questions per init turn**; most realistic prompts fire 1–2. If you find yourself queueing up 5 or 6 questions, you're asking things that are inferable from the prompt or the project context.
 - **Don't re-ask a question the user already answered in a prior turn** — carry the answer forward across the conversation.
 - **Don't ask Q6 unless the create-vs-edit intent is genuinely ambiguous** — the prompt verb almost always settles it.
 
-See `examples/20-init-clarify.md` for two worked dialogue cases (one where Q6 fires, one where only Q5 fires).
+See `examples/20-init-clarify.md` for two worked dialogue cases (Case A: ambiguous prompt → 3 questions fire; Case B: clear create-verb prompt → 0 questions fire, Q5 default applied silently).
 
 ## Layout compaction
 
@@ -1191,3 +1201,4 @@ Renderable example diagrams live in `examples/` (file list mirrors `manifest.jso
 - [`17-ladder-container.puml`](examples/17-ladder-container.puml) — **Container** (Level 2) view of the same system as #16. Audience: engineering team. Six Azure-hosted containers (Front Door, App Service, Functions × 2, SQL / Cosmos / Cache / Blob) plus a queue + Key Vault. Exercises every compaction rule (skinparams, horizontal Edge, 2×2 Data Tier, orphan absorption, cross-cluster row anchor) with real vendor icons.
 - [`18-system-landscape.puml`](examples/18-system-landscape.puml) — **System Landscape** view of a 4-system retail portfolio with shared identity / event bus / data warehouse backbones. Audience: enterprise architect / portfolio review. Off the C4 static ladder; useful when "how do our systems relate" matters more than "what runs where".
 - [`19-dynamic-flow.puml`](examples/19-dynamic-flow.puml) — **Dynamic** flow of a single order-placement request across the containers from #17. Audience: engineering team. Numbered arrows 1–10 trace one use case end-to-end. Use the Dynamic format when "what calls what, in order" matters more than the static topology.
+- [`20-init-clarify.md`](examples/20-init-clarify.md) — **Worked dialogue** (markdown, not a renderable diagram) for the § "Selection workflow" Q3–Q6 skip-if-clear rules. Case A: ambiguous prompt fires 3 questions (Q3 cloud / Q4 level / Q6 create-vs-edit) before drawing. Case B: clear-create-verb prompt fires 0 questions (Q5 default applied silently). Use this as the prompt-flow reference when authoring agent system prompts that embed this skill.
