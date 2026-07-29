@@ -39,6 +39,24 @@ if ! git rev-parse --verify origin/main >/dev/null 2>&1 && ! git rev-parse --ver
 fi
 MAIN_REF="$(git rev-parse --verify main 2>/dev/null || git rev-parse --verify origin/main 2>/dev/null)"
 
+# Compare against the commit under test whenever it descends from main, rather
+# than against main itself.
+#
+# Comparing against main only is unsatisfiable for any change that alters the
+# bundle's shape. Rebuild the fixture before merging and this gate is red on
+# the pull request; rebuild it after, and main is red in the window between.
+# There is no ordering that keeps both green, so the check ends up either
+# blocking correct work or being waved through — and a waved-through gate
+# teaches everyone to wave through the next one.
+#
+# On a pull request the checked-out HEAD is the prospective merge, so this
+# asks the useful question: does the fixture match what main is about to
+# become? On a push to main, HEAD is main and the behaviour is identical.
+HEAD_REF="$(git rev-parse --verify HEAD)"
+if [ -n "${MAIN_REF}" ] && git merge-base --is-ancestor "${MAIN_REF}" "${HEAD_REF}" 2>/dev/null; then
+  MAIN_REF="${HEAD_REF}"
+fi
+
 if ! git rev-parse --verify fixture/skill-md-only >/dev/null 2>&1; then
   echo "FAIL: fixture/skill-md-only not reachable locally" >&2
   echo "Run: git fetch origin fixture/skill-md-only:fixture/skill-md-only" >&2
