@@ -18,15 +18,20 @@ const RAW_BASE_NO_REF = "https://raw.githubusercontent.com/hanv89/archicon";
 
 const VERSION_RE = /^\d+\.\d+\.\d+$/;
 
-// SKILL_NAME must stay in lockstep with dist/skill/SKILL.md frontmatter `name`.
-// Renaming the skill is a breaking change requiring a coordinated CLI release;
-// existing installs become un-uninstallable until users upgrade the CLI
-// (uninstall's allow-list refuses folders whose SKILL.md `name` differs).
+// SKILL_NAME must stay in lockstep with skills/architecture-diagram/SKILL.md
+// frontmatter `name`. Renaming the skill is a breaking change requiring a
+// coordinated CLI release; existing installs stay un-uninstallable until users
+// upgrade (uninstall's allow-list refuses folders whose SKILL.md `name` differs).
 export const SKILL_NAME = "architecture-diagram";
 
 // Fetched at install/update time from dist/skill/manifest.json. files[0] MUST
 // be SKILL.md so the frontmatter precheck has a stable target.
 export const MANIFEST_PATH = "dist/skill/manifest.json";
+
+// Repo-relative directory holding the skill source the manifest's files[].src
+// entries point into. The manifest itself deliberately stays at MANIFEST_PATH:
+// that URL is a published contract every released CLI fetches at install time.
+export const SKILL_SRC_DIR = "skills/architecture-diagram";
 
 export const CANARY_ICON_PATH = "dist/Azure/Compute/AzureVirtualMachine.png";
 

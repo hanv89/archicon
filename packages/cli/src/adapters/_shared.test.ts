@@ -149,7 +149,7 @@ test("fetchManifest: missing required field throws", async () => {
 test("fetchManifest: files[0] not SKILL.md is rejected", async () => {
   const m = mockFetchBody(JSON.stringify({
     name: "x", version: "1.0.0", requires_icons: ">=1.0.0",
-    files: [{ src: "dist/skill/examples/01.puml", dest: "examples/01.puml", role: "example" }],
+    files: [{ src: "skills/architecture-diagram/examples/01.puml", dest: "examples/01.puml", role: "example" }],
   }));
   try {
     await assert.rejects(() => fetchManifest(BASE), /files\[0\] must be SKILL\.md/);
@@ -160,7 +160,7 @@ test("fetchManifest: valid manifest parses", async () => {
   const m = mockFetchBody(JSON.stringify({
     name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.4.0",
     icons_version: "1.4.0",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill" }],
   }));
   try {
     const parsed = await fetchManifest(BASE);
@@ -174,7 +174,7 @@ test("fetchManifest: valid manifest with a per-file sha256 parses", async () => 
   const m = mockFetchBody(JSON.stringify({
     name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.4.0",
     icons_version: "1.4.0",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill", sha256: sha }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill", sha256: sha }],
   }));
   try {
     const parsed = await fetchManifest(BASE);
@@ -185,7 +185,7 @@ test("fetchManifest: valid manifest with a per-file sha256 parses", async () => 
 test("fetchManifest: malformed sha256 (not 64 hex) is rejected", async () => {
   const m = mockFetchBody(JSON.stringify({
     name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.4.0",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill", sha256: "deadbeef" }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill", sha256: "deadbeef" }],
   }));
   try {
     await assert.rejects(() => fetchManifest(BASE), /sha256 must be a 64-char hex string/);
@@ -244,7 +244,7 @@ test("verifyFileHash: Buffer body is hashed the same as its string form", () => 
 // must not be able to escape the install target.
 // ---------------------------------------------------------------------------
 
-const VALID_SKILL = { src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" };
+const VALID_SKILL = { src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill" };
 function manifestWith(extra: object) {
   return JSON.stringify({
     name: "architecture-diagram", version: "1.6.3", requires_icons: ">=1.4.0",
@@ -253,13 +253,13 @@ function manifestWith(extra: object) {
 }
 
 test("fetchManifest: rejects a `..` traversal in dest", async () => {
-  const m = mockFetchBody(manifestWith({ src: "dist/skill/x.puml", dest: "../../../../.bashrc", role: "example" }));
+  const m = mockFetchBody(manifestWith({ src: "skills/architecture-diagram/x.puml", dest: "../../../../.bashrc", role: "example" }));
   try { await assert.rejects(() => fetchManifest(BASE), /relative path with no '\.\.'/); }
   finally { m.restore(); }
 });
 
 test("fetchManifest: rejects an absolute dest", async () => {
-  const m = mockFetchBody(manifestWith({ src: "dist/skill/x.puml", dest: "/etc/cron.d/evil", role: "example" }));
+  const m = mockFetchBody(manifestWith({ src: "skills/architecture-diagram/x.puml", dest: "/etc/cron.d/evil", role: "example" }));
   try { await assert.rejects(() => fetchManifest(BASE), /relative path with no/); }
   finally { m.restore(); }
 });

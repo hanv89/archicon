@@ -124,7 +124,7 @@ function makeManifest(overrides: Partial<Manifest> = {}): Manifest {
     version: "0.8.0",
     requires_icons: ">=0.2.2",
     icons_version: "0.2.2",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill" }],
     ...overrides,
   };
 }
@@ -208,8 +208,8 @@ test("--version=0.5.0 integration: install fetches from skill-v0.5.0 ref", async
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
-    if (u.endsWith("/dist/skill/examples/01-context.puml")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
+    if (u.endsWith("/skills/architecture-diagram/examples/01-context.puml")) {
       return new Response(SYNTHETIC_EXAMPLE, { status: 200 });
     }
     return new Response("not found", { status: 404 });
@@ -222,7 +222,13 @@ test("--version=0.5.0 integration: install fetches from skill-v0.5.0 ref", async
     const tagPinned = requestedUrls.filter(u => u.includes("/skill-v0.5.0/"));
     assert.ok(tagPinned.length >= 1, `expected at least one URL with /skill-v0.5.0/, got: ${JSON.stringify(requestedUrls)}`);
 
-    const mainRefHit = requestedUrls.filter(u => u.includes("/main/dist/"));
+    // Match the ref segment itself, not a path under it. An earlier form
+    // checked "/main/dist/", which was equivalent only while every fetched
+    // file lived under dist/. Now that SKILL.md and the examples sit under
+    // skills/, that form would miss an unpinned fetch of exactly the files
+    // this test exists to protect. No legitimate path segment is named
+    // "main", so the ref position is the only thing this can match.
+    const mainRefHit = requestedUrls.filter(u => u.includes("/main/"));
     assert.equal(mainRefHit.length, 0, `expected no /main/ URLs when --version is set, got: ${JSON.stringify(mainRefHit)}`);
   } finally {
     globalThis.fetch = realFetch;
@@ -292,7 +298,7 @@ test("update: already-at-version emits no-op, does not re-fetch examples", async
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) {
       return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
     }
     return new Response("not found", { status: 404 });
@@ -308,7 +314,7 @@ test("update: already-at-version emits no-op, does not re-fetch examples", async
     assert.equal(exit, 0);
     assert.match(captured, /already at version 0\.5\.0 \(no-op\)/);
     // No SKILL.md GET should have happened during update (only manifest + HEAD).
-    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/dist/skill/SKILL.md"));
+    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/skills/architecture-diagram/SKILL.md"));
     assert.equal(skillMdGets.length, 0, `expected zero SKILL.md GETs during no-op update, got: ${JSON.stringify(skillMdGets)}`);
   } finally {
     process.stdout.write = origStdout as any;
@@ -418,7 +424,7 @@ test("cursor: update already-at-version emits no-op, does not overwrite", async 
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) {
       return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
     }
     return new Response("not found", { status: 404 });
@@ -435,7 +441,7 @@ test("cursor: update already-at-version emits no-op, does not overwrite", async 
     assert.match(captured, /already at version 0\.5\.0 \(no-op\)/);
     // No SKILL.md GET during update — only manifest.json (and no HEADs because
     // verifyIconsAvailability is only called in install, not update no-op).
-    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/dist/skill/SKILL.md"));
+    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/skills/architecture-diagram/SKILL.md"));
     assert.equal(skillMdGets.length, 0, `expected zero SKILL.md GETs during Cursor no-op update, got: ${JSON.stringify(skillMdGets)}`);
   } finally {
     process.stdout.write = origStdout as any;

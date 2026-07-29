@@ -32,8 +32,8 @@ export const SYNTHETIC_MANIFEST = {
   requires_icons: SYNTHETIC_REQUIRES_ICONS,
   icons_version: SYNTHETIC_ICONS_VERSION,
   files: [
-    { src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" },
-    { src: "dist/skill/examples/01-context.puml", dest: "examples/01-context.puml", role: "example" },
+    { src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill" },
+    { src: "skills/architecture-diagram/examples/01-context.puml", dest: "examples/01-context.puml", role: "example" },
   ],
 };
 
@@ -53,10 +53,10 @@ export function installFetchMock(): { restore: () => void } {
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) {
       return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
     }
-    if (u.endsWith("/dist/skill/examples/01-context.puml")) {
+    if (u.endsWith("/skills/architecture-diagram/examples/01-context.puml")) {
       return new Response(SYNTHETIC_EXAMPLE, { status: 200 });
     }
     return new Response("not found", { status: 404 });
@@ -84,10 +84,10 @@ export function failOnNthHeadFetchMock(failOnHeadIndex: number): { restore: () =
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) {
       return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
     }
-    if (u.endsWith("/dist/skill/examples/01-context.puml")) {
+    if (u.endsWith("/skills/architecture-diagram/examples/01-context.puml")) {
       return new Response(SYNTHETIC_EXAMPLE, { status: 200 });
     }
     return new Response("not found", { status: 404 });
