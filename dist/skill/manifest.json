@@ -6,139 +6,139 @@
   "icons_version": "1.2.0",
   "files": [
     {
-      "src": "dist/skill/SKILL.md",
+      "src": "skills/architecture-diagram/SKILL.md",
       "dest": "SKILL.md",
       "role": "skill",
       "sha256": "6e09f8b297d6012fbfce55b7a6f5a90f36829610cd6ace75cb925aa6cd754a77"
     },
     {
-      "src": "dist/skill/examples/01-context.puml",
+      "src": "skills/architecture-diagram/examples/01-context.puml",
       "dest": "examples/01-context.puml",
       "role": "example",
       "sha256": "ee330fe56654e8997bb4b4887dd6a5eb28d9e3908f9e2ba215955b9a22f71ab4"
     },
     {
-      "src": "dist/skill/examples/02-fabric-data-pipeline.puml",
+      "src": "skills/architecture-diagram/examples/02-fabric-data-pipeline.puml",
       "dest": "examples/02-fabric-data-pipeline.puml",
       "role": "example",
       "sha256": "c63c454b800111b480cd6ac281c134a7bb2d70040480e85143176c9b3b80c544"
     },
     {
-      "src": "dist/skill/examples/03-system-architecture.puml",
+      "src": "skills/architecture-diagram/examples/03-system-architecture.puml",
       "dest": "examples/03-system-architecture.puml",
       "role": "example",
       "sha256": "ef4eb1a78222f76f54615343c965bda186d7ce139e526d3d54e48ddf0b9d36a1"
     },
     {
-      "src": "dist/skill/examples/04-sequence-flow.puml",
+      "src": "skills/architecture-diagram/examples/04-sequence-flow.puml",
       "dest": "examples/04-sequence-flow.puml",
       "role": "example",
       "sha256": "ed811d9f614fee04e0176f25cf07a87f9f2e672b61ffbe62ea5321a482e517a2"
     },
     {
-      "src": "dist/skill/examples/05-component.puml",
+      "src": "skills/architecture-diagram/examples/05-component.puml",
       "dest": "examples/05-component.puml",
       "role": "example",
       "sha256": "5b9d8275534a26e5a26b643f9d0d6983bcd80f6fc4da72417dee8e8817e9317f"
     },
     {
-      "src": "dist/skill/examples/06-deployment.puml",
+      "src": "skills/architecture-diagram/examples/06-deployment.puml",
       "dest": "examples/06-deployment.puml",
       "role": "example",
       "sha256": "3f0908e63ded54239d19bb48e9ef27c463c3dae3cb7dc64fc98968241bc2e9d4"
     },
     {
-      "src": "dist/skill/examples/07-azure-aks-mixed.puml",
+      "src": "skills/architecture-diagram/examples/07-azure-aks-mixed.puml",
       "dest": "examples/07-azure-aks-mixed.puml",
       "role": "example",
       "sha256": "fb9b87004f5f9cee6f0b59b023c7b8bfe7d7373ac582acced484c5a50b1b92b8"
     },
     {
-      "src": "dist/skill/examples/08-azure-fluentui-mixed.puml",
+      "src": "skills/architecture-diagram/examples/08-azure-fluentui-mixed.puml",
       "dest": "examples/08-azure-fluentui-mixed.puml",
       "role": "example",
       "sha256": "45e9e7487ad3f6133b76454c8869e0c2bc1c5bce93d6f4a61568657722a035f0"
     },
     {
-      "src": "dist/skill/examples/09-devops-pipeline.puml",
+      "src": "skills/architecture-diagram/examples/09-devops-pipeline.puml",
       "dest": "examples/09-devops-pipeline.puml",
       "role": "example",
       "sha256": "a2c037cc6fb826e8176804d785e4e7b65100f24085339853f701b22306180d9e"
     },
     {
-      "src": "dist/skill/examples/10-edit-existing.puml",
+      "src": "skills/architecture-diagram/examples/10-edit-existing.puml",
       "dest": "examples/10-edit-existing.puml",
       "role": "example",
       "sha256": "176ad79f8b3ee1bc5e58a80175830ead18bb9425585aae162b9ea07667102d8f"
     },
     {
-      "src": "dist/skill/examples/11-mermaid-architecture.mmd",
+      "src": "skills/architecture-diagram/examples/11-mermaid-architecture.mmd",
       "dest": "examples/11-mermaid-architecture.mmd",
       "role": "example",
       "sha256": "4e66a7c61cbc2547747fbe6ec1be79eae1f7387380b1f8c0291d3abce0b130eb"
     },
     {
-      "src": "dist/skill/examples/12-mermaid-icons.mmd",
+      "src": "skills/architecture-diagram/examples/12-mermaid-icons.mmd",
       "dest": "examples/12-mermaid-icons.mmd",
       "role": "example",
       "sha256": "d44142907386ea1fc2ca2c3cf61cf50194de4a13e8c256356117a7be15f62078"
     },
     {
-      "src": "dist/skill/examples/13-aws-architecture.puml",
+      "src": "skills/architecture-diagram/examples/13-aws-architecture.puml",
       "dest": "examples/13-aws-architecture.puml",
       "role": "example",
       "sha256": "d64d9748c1551a7496934903c70a00ba005852b6f7c414ac422df55500149315"
     },
     {
-      "src": "dist/skill/examples/14-gcp-architecture.puml",
+      "src": "skills/architecture-diagram/examples/14-gcp-architecture.puml",
       "dest": "examples/14-gcp-architecture.puml",
       "role": "example",
       "sha256": "06946ba582b18c3917bb9c8d663b8a7908a89636acfc47d9fa6e8fc16f13288f"
     },
     {
-      "src": "dist/skill/examples/15-compact-layout.puml",
+      "src": "skills/architecture-diagram/examples/15-compact-layout.puml",
       "dest": "examples/15-compact-layout.puml",
       "role": "example",
       "sha256": "485039f9c73e77a3be09258c447c204fd49c521950064507fb564e768c6ce626"
     },
     {
-      "src": "dist/skill/examples/16-ladder-context.puml",
+      "src": "skills/architecture-diagram/examples/16-ladder-context.puml",
       "dest": "examples/16-ladder-context.puml",
       "role": "example",
       "sha256": "4c0e6d68c47b5d2e01ca3ea8ea0c777fd8d502931b847f2908d5cb28cfadbcca"
     },
     {
-      "src": "dist/skill/examples/17-ladder-container.puml",
+      "src": "skills/architecture-diagram/examples/17-ladder-container.puml",
       "dest": "examples/17-ladder-container.puml",
       "role": "example",
       "sha256": "e7c603338777db0abdb1534c429857572c359aeb1841f8ec633132bc58057fc7"
     },
     {
-      "src": "dist/skill/examples/18-system-landscape.puml",
+      "src": "skills/architecture-diagram/examples/18-system-landscape.puml",
       "dest": "examples/18-system-landscape.puml",
       "role": "example",
       "sha256": "97af093837aaf9a8cfb1afdef9bc3c03561f8cfe30fdc21d857c51cdae83759d"
     },
     {
-      "src": "dist/skill/examples/19-dynamic-flow.puml",
+      "src": "skills/architecture-diagram/examples/19-dynamic-flow.puml",
       "dest": "examples/19-dynamic-flow.puml",
       "role": "example",
       "sha256": "9e8aeae081f2d29bdb43170ac36ceb92c7b633779661ae02c9924d4c5322192b"
     },
     {
-      "src": "dist/skill/examples/20-init-clarify.md",
+      "src": "skills/architecture-diagram/examples/20-init-clarify.md",
       "dest": "examples/20-init-clarify.md",
       "role": "example",
       "sha256": "849528a91569011d7f4428d887e4742c393c61dedec434c6386f1af897a7926d"
     },
     {
-      "src": "dist/skill/examples/assets/icon.css",
+      "src": "skills/architecture-diagram/examples/assets/icon.css",
       "dest": "examples/assets/icon.css",
       "role": "asset",
       "sha256": "230bece2bc2423a05dfcac14ee1fa4818460817846e9d5152ef678b64db504e6"
     },
     {
-      "src": "dist/skill/examples/assets/render-mermaid.sh",
+      "src": "skills/architecture-diagram/examples/assets/render-mermaid.sh",
       "dest": "examples/assets/render-mermaid.sh",
       "role": "asset",
       "sha256": "8e6ee717914c6fd91cd2af6f45054c293285ec624eb83d1bc10920855d5b17fc"
