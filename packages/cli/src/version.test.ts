@@ -222,14 +222,64 @@ test("--version=0.5.0 integration: install fetches from skill-v0.5.0 ref", async
     const tagPinned = requestedUrls.filter(u => u.includes("/skill-v0.5.0/"));
     assert.ok(tagPinned.length >= 1, `expected at least one URL with /skill-v0.5.0/, got: ${JSON.stringify(requestedUrls)}`);
 
-    // Match the ref segment itself, not a path under it. An earlier form
-    // checked "/main/dist/", which was equivalent only while every fetched
-    // file lived under dist/. Now that SKILL.md and the examples sit under
-    // skills/, that form would miss an unpinned fetch of exactly the files
-    // this test exists to protect. No legitimate path segment is named
-    // "main", so the ref position is the only thing this can match.
-    const mainRefHit = requestedUrls.filter(u => u.includes("/main/"));
-    assert.equal(mainRefHit.length, 0, `expected no /main/ URLs when --version is set, got: ${JSON.stringify(mainRefHit)}`);
+    // Match the ref segment positionally, not as a whole-URL substring. An
+    // earlier form checked "/main/dist/", which was equivalent only while every
+    // fetched file lived under dist/; now that SKILL.md and the examples sit
+    // under skills/, that form would miss an unpinned fetch of exactly the
+    // files this test exists to protect. raw.githubusercontent.com paths are
+    // /<owner>/<repo>/<ref>/<path...>, so pathname segment 3 is the ref.
+    const mainRefHit = requestedUrls.filter(u => new URL(u).pathname.split("/")[3] === "main");
+    assert.equal(mainRefHit.length, 0, `expected no main-ref URLs when --version is set, got: ${JSON.stringify(mainRefHit)}`);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (prevEnv === undefined) delete process.env.ARCH_SKILL_TARGET_ROOT;
+    else process.env.ARCH_SKILL_TARGET_ROOT = prevEnv;
+    if (prevBase === undefined) delete process.env.ARCH_SKILL_BASE_URL;
+    else process.env.ARCH_SKILL_BASE_URL = prevBase;
+    rmTmpdir(tmpdir);
+  }
+});
+
+test("--version=1.4.8 integration: a legacy dist/skill/ manifest still installs", async () => {
+  // Every tag published before the skill source moved to
+  // skills/architecture-diagram/ serves a manifest whose files[].src start with
+  // dist/skill/. Installing from such a tag (`--version=1.4.8`) is a supported
+  // path, so the CLI must accept the legacy shape as well as the current one.
+  // The rest of the suite only exercises the current shape.
+  const tmpdir = mkTmpdir();
+  const target = path.join(tmpdir, "skills", "architecture-diagram");
+  const prevEnv = process.env.ARCH_SKILL_TARGET_ROOT;
+  const prevBase = process.env.ARCH_SKILL_BASE_URL;
+  process.env.ARCH_SKILL_TARGET_ROOT = tmpdir;
+  delete process.env.ARCH_SKILL_BASE_URL;
+
+  const legacyManifest = {
+    ...SYNTHETIC_MANIFEST,
+    files: [
+      { src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" },
+      { src: "dist/skill/examples/01-context.puml", dest: "examples/01-context.puml", role: "example" },
+    ],
+  };
+
+  globalThis.fetch = (async (url: any, init?: any) => {
+    const u = url.toString();
+    const method = (init?.method ?? "GET").toUpperCase();
+    if (method === "HEAD") return new Response(null, { status: 200 });
+    if (u.endsWith("/dist/skill/manifest.json")) {
+      return new Response(JSON.stringify(legacyManifest), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    if (u.endsWith("/dist/skill/SKILL.md")) return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
+    if (u.endsWith("/dist/skill/examples/01-context.puml")) {
+      return new Response(SYNTHETIC_EXAMPLE, { status: 200 });
+    }
+    return new Response("not found", { status: 404 });
+  }) as typeof fetch;
+
+  try {
+    const exit = await claudeCodeAdapter.install({ target, version: "1.4.8" });
+    assert.equal(exit, 0, "install from a legacy-shape manifest should succeed");
+    assert.equal(fs.readFileSync(path.join(target, "SKILL.md"), "utf8"), SYNTHETIC_SKILL_MD);
+    assert.equal(fs.readFileSync(path.join(target, "examples", "01-context.puml"), "utf8"), SYNTHETIC_EXAMPLE);
   } finally {
     globalThis.fetch = realFetch;
     if (prevEnv === undefined) delete process.env.ARCH_SKILL_TARGET_ROOT;
@@ -456,6 +506,3 @@ test("cursor: update already-at-version emits no-op, does not overwrite", async 
     rmTmpdir(tmpdir);
   }
 });
-
-// Use fs imports so node:test doesn't complain about unused imports.
-void fs;

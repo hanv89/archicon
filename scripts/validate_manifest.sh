@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
-# Validate dist/skill/manifest.json against dist/skill/manifest.schema.json
-# AND assert every files[].src path exists on disk.
+# Validate the skill manifest against its schema AND assert every files[].src
+# exists on disk and lives under the skill source dir. Both paths come from
+# archicon.config (SKILL_MANIFEST_PATH, SKILL_SRC_DIR) so this script and the
+# CLI share one origin.
 #
 # Dependency-free: a small Node script enforces the schema's load-bearing
 # constraints (required keys, additionalProperties, role enum, version
@@ -9,9 +11,9 @@
 # is the executable guard.
 #
 # Exit codes:
-#   0 — manifest valid + every files[].src exists.
-#   1 — schema-conformance failure or a missing src file.
-#   2 — environment problem (node missing, manifest/schema absent).
+#   0 — manifest valid + every files[].src exists under the skill source dir.
+#   1 — schema-conformance failure, a missing src file, or an off-tree src.
+#   2 — environment problem (node missing, config/manifest/schema absent).
 set -uo pipefail
 export LC_ALL=C
 
@@ -20,14 +22,20 @@ command -v node >/dev/null 2>&1 || { echo "ERROR: node not installed" >&2; exit 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${REPO_ROOT}"
 
-MANIFEST="dist/skill/manifest.json"
-SCHEMA="dist/skill/manifest.schema.json"
+# archicon.config is the single source of truth for both paths (KEY=value,
+# shell-sourceable). Sourced rather than duplicated so a move shows up here.
+[ -f "${REPO_ROOT}/archicon.config" ] || { echo "ERROR: archicon.config missing" >&2; exit 2; }
+# shellcheck source=../archicon.config
+. "${REPO_ROOT}/archicon.config"
+
+MANIFEST="${SKILL_MANIFEST_PATH}"
+SCHEMA="$(dirname "${MANIFEST}")/manifest.schema.json"
 [ -f "${MANIFEST}" ] || { echo "ERROR: ${MANIFEST} missing" >&2; exit 2; }
 [ -f "${SCHEMA}" ]   || { echo "ERROR: ${SCHEMA} missing"   >&2; exit 2; }
 
-node - "${MANIFEST}" "${SCHEMA}" <<'NODE'
+node - "${MANIFEST}" "${SCHEMA}" "${SKILL_SRC_DIR}" <<'NODE'
 const fs = require("fs");
-const [manifestPath, schemaPath] = process.argv.slice(2);
+const [manifestPath, schemaPath, skillSrcDir] = process.argv.slice(2);
 
 let manifest, schema;
 try { manifest = JSON.parse(fs.readFileSync(manifestPath, "utf8")); }
@@ -78,9 +86,11 @@ if (!Array.isArray(manifest.files) || manifest.files.length < 1) {
   if (manifest.files[0] && manifest.files[0].role !== "skill") {
     fail(`files[0].role must be "skill" (is "${manifest.files[0].role}")`);
   }
-  // --- every files[].src exists on disk ---
+  // --- every files[].src exists on disk, under the skill source dir ---
   manifest.files.forEach((f, i) => {
-    if (f.src && !fs.existsSync(f.src)) fail(`files[${i}].src does not exist on disk: ${f.src}`);
+    if (!f.src) return;
+    if (!fs.existsSync(f.src)) fail(`files[${i}].src does not exist on disk: ${f.src}`);
+    if (!f.src.startsWith(`${skillSrcDir}/`)) fail(`files[${i}].src is outside ${skillSrcDir}/: ${f.src}`);
   });
 }
 

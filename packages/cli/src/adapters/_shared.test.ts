@@ -11,7 +11,21 @@ import {
   stripFrontmatter,
   joinWithinTarget,
   verifyFileHash,
+  MANIFEST_PATH,
 } from "./_shared";
+
+// ---------------------------------------------------------------------------
+// MANIFEST_PATH — frozen published contract.
+// ---------------------------------------------------------------------------
+
+test("MANIFEST_PATH is frozen at dist/skill/manifest.json", () => {
+  // Every CLI version already published to npm has this path compiled in and
+  // fetches it from the repo at install time. Moving the manifest breaks
+  // installs and updates for releases already in users' hands — a change here
+  // is a breaking release, never a tidy-up. The skill content moved to
+  // skills/architecture-diagram/; the manifest deliberately did not follow.
+  assert.equal(MANIFEST_PATH, "dist/skill/manifest.json");
+});
 
 // ---------------------------------------------------------------------------
 // safeResolveTarget — the symlink/escape security guard.
