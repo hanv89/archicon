@@ -11,8 +11,13 @@ Confluence, GitHub, and `www.plantuml.com/plantuml/uml/` — no CDN, no auth, no
 **1.** Install the skill into your AI agent:
 
 ```bash
-npx @hanv89/arch-skill install --agent=claude-code   # or codex | cursor | all
+npx skills add hanv89/archicon                       # ecosystem CLI, 70+ agents
+npx @hanv89/arch-skill install --agent=claude-code   # this repo's CLI — or codex | cursor | all
 ```
+
+The ecosystem CLI copies or symlinks the whole skill directory and does not
+verify checksums. This repo's CLI checks every file's `sha256` against the
+install manifest before writing it.
 
 > **Choose install scope** *(optional, default = `user`)*: add `--scope=project` to install into `<cwd>/.claude/skills/` for team-shared diagrams checked in via git; default `--scope=user` writes to `~/.claude/skills/` for personal use across all repos. Cursor is project-only by architecture (User Rules in Cursor are settings-only, not file-writable).
 
@@ -26,7 +31,7 @@ your diagram renders with real Azure icons in a few seconds.
 
 ![Example: Azure Container diagram rendered with vendor icons](docs/screenshots/17-ladder-container.png)
 
-*From [`dist/skill/examples/17-ladder-container.puml`](dist/skill/examples/17-ladder-container.puml)
+*From [`skills/architecture-diagram/examples/17-ladder-container.puml`](skills/architecture-diagram/examples/17-ladder-container.puml)
 — the canonical Container-level view of an e-commerce stack. Same shape your
 agent will produce for the prompt above.*
 
@@ -36,7 +41,7 @@ agent will produce for the prompt above.*
   FluentUI 75 / Devicon 149 / AWS 868 / GCP 19. Tag-pinned
   `raw.githubusercontent.com` URLs; no CDN, no auth. Per-vendor licence terms
   in [`NOTICE`](./NOTICE) + `dist/<Vendor>/USAGE-RULES.txt`.
-- **Skill** (`dist/skill/SKILL.md`): C4 diagram taxonomy (Context / Container /
+- **Skill** (`skills/architecture-diagram/SKILL.md`): C4 diagram taxonomy (Context / Container /
   Component / System Landscape / Dynamic / Deployment), 7-field header
   convention, HLD / ADR / Detailed Technical Design document scaffolds,
   strict-vs-freestyle style modes, 5 layout-compaction rules, and a 6-question

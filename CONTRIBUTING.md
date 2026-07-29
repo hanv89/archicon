@@ -26,7 +26,10 @@ Icons are redistributed **unmodified** from documented upstreams (see
 
 ## Skill / CLI changes
 
-- Skill content lives in `dist/skill/` (SKILL.md + examples + manifest). A
+- Skill content (SKILL.md + examples) lives in `skills/architecture-diagram/`.
+  The install manifest stays at `dist/skill/manifest.json` — that URL is
+  compiled into every published CLI and fetched at install time, so moving it
+  would break releases already in users' hands. Do not reunite the two. A
   user-facing change bumps the version across `packages/cli/package.json`,
   `package-lock.json`, `dist/skill/manifest.json`, and the SKILL.md frontmatter
   (kept in lockstep), and the manifest's per-file `sha256` is regenerated.
