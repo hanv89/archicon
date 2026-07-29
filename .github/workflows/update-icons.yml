@@ -138,9 +138,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          # Both paths: icons land in dist/, but a refresh can also touch the
-          # skill content under skills/ (icon index, examples). Omitting skills/
-          # would silently drop those edits from the generated PR.
+          # Icons land in dist/; none of the build scripts above write under
+          # skills/ today. skills/ is staged defensively so that if a future
+          # generator does emit skill content (a regenerated icon index, say),
+          # its output reaches the PR instead of being silently dropped.
           if [[ -n "$(git status --porcelain dist/ skills/)" ]]; then
             # Branch name carries date + run_id so cron + manual dispatch on the
             # same day don't collide, and a previous unmerged PR isn't blocked.

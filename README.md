@@ -8,18 +8,30 @@ Confluence, GitHub, and `www.plantuml.com/plantuml/uml/` — no CDN, no auth, no
 
 ## Quick start (60 seconds)
 
-**1.** Install the skill into your AI agent:
+**1.** Install the skill into your AI agent — **pick one** of the two commands
+below. Both write to the same directory, so running both just has one overwrite
+the other.
+
+**Option A — this repo's CLI** (recommended: it verifies every file's `sha256`
+against the install manifest before writing it):
 
 ```bash
-npx skills add hanv89/archicon                       # ecosystem CLI, 70+ agents
-npx @hanv89/arch-skill install --agent=claude-code   # this repo's CLI — or codex | cursor | all
+npx @hanv89/arch-skill install --agent=claude-code   # or codex | cursor | all
 ```
 
-The ecosystem CLI copies or symlinks the whole skill directory and does not
-verify checksums. This repo's CLI checks every file's `sha256` against the
-install manifest before writing it.
+> **Choose install scope** *(optional, `@hanv89/arch-skill` only, default = `user`)*: add `--scope=project` to install into `<cwd>/.claude/skills/` for team-shared diagrams checked in via git; default `--scope=user` writes to `~/.claude/skills/` for personal use across all repos. Cursor is project-only by architecture (User Rules in Cursor are settings-only, not file-writable).
 
-> **Choose install scope** *(optional, default = `user`)*: add `--scope=project` to install into `<cwd>/.claude/skills/` for team-shared diagrams checked in via git; default `--scope=user` writes to `~/.claude/skills/` for personal use across all repos. Cursor is project-only by architecture (User Rules in Cursor are settings-only, not file-writable).
+**Option B — the ecosystem CLI** (use it if you already manage your skills with
+it; it reaches 70+ agents but copies or symlinks the whole skill directory
+without verifying checksums):
+
+```bash
+npx skills add hanv89/archicon
+```
+
+To switch channels later, uninstall with the tool you installed with
+(`npx @hanv89/arch-skill uninstall --agent=…` or
+`npx skills remove architecture-diagram`) before running the other one.
 
 **2.** Ask your agent (copy-paste this prompt):
 

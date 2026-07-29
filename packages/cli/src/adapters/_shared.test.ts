@@ -12,6 +12,8 @@ import {
   joinWithinTarget,
   verifyFileHash,
   MANIFEST_PATH,
+  SKILL_SRC_DIR,
+  LEGACY_SKILL_SRC_DIR,
 } from "./_shared";
 
 // ---------------------------------------------------------------------------
@@ -25,6 +27,22 @@ test("MANIFEST_PATH is frozen at dist/skill/manifest.json", () => {
   // is a breaking release, never a tidy-up. The skill content moved to
   // skills/architecture-diagram/; the manifest deliberately did not follow.
   assert.equal(MANIFEST_PATH, "dist/skill/manifest.json");
+});
+
+// ---------------------------------------------------------------------------
+// SKILL_SRC_DIR — the second frozen published contract.
+// ---------------------------------------------------------------------------
+
+test("the accepted files[].src prefixes are frozen", () => {
+  // fetchManifest rejects any files[].src outside these two prefixes, and that
+  // rejection is compiled into every CLI published from 1.4.9 onward. Moving
+  // the skill content elsewhere makes those released CLIs refuse the install
+  // outright — the same breakage MANIFEST_PATH carries, one level down.
+  // Widening the prefix set has to ship and reach users BEFORE the content
+  // moves; dropping the legacy prefix breaks `--version=X.Y.Z` installs
+  // pinned to tags published before the move.
+  assert.equal(SKILL_SRC_DIR, "skills/architecture-diagram");
+  assert.equal(LEGACY_SKILL_SRC_DIR, "dist/skill");
 });
 
 // ---------------------------------------------------------------------------
@@ -193,6 +211,31 @@ test("fetchManifest: valid manifest with a per-file sha256 parses", async () => 
   try {
     const parsed = await fetchManifest(BASE);
     assert.equal(parsed.files[0].sha256, sha);
+  } finally { m.restore(); }
+});
+
+test("fetchManifest: a src outside both accepted prefixes is rejected", async () => {
+  // The behavioural half of the SKILL_SRC_DIR freeze above: proof the constant
+  // is load-bearing at install time rather than a label. Every published 1.4.9+
+  // CLI runs this rejection, which is why moving the content is a coordinated
+  // breaking release and not a refactor.
+  const m = mockFetchBody(JSON.stringify({
+    name: "architecture-diagram", version: "1.4.9", requires_icons: ">=1.2.0",
+    files: [{ src: "skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+  }));
+  try {
+    await assert.rejects(() => fetchManifest(BASE), /must live under/);
+  } finally { m.restore(); }
+});
+
+test("fetchManifest: the legacy prefix is still accepted (pinned old-tag installs)", async () => {
+  const m = mockFetchBody(JSON.stringify({
+    name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.2.0",
+    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+  }));
+  try {
+    const parsed = await fetchManifest(BASE);
+    assert.equal(parsed.files[0].src, "dist/skill/SKILL.md");
   } finally { m.restore(); }
 });
 

@@ -3,7 +3,12 @@
 # exists on disk, lives under the skill source dir, hashes to the sha256 the
 # manifest claims, and that the skill source dir holds nothing the manifest
 # omits. Both paths come from archicon.config (SKILL_MANIFEST_PATH,
-# SKILL_SRC_DIR) so this script and the CLI share one origin.
+# SKILL_SRC_DIR).
+#
+# The CLI does NOT read archicon.config — it compiles its own copies of both
+# paths into packages/cli/src/adapters/_shared.ts. scripts/test_version_sync.sh
+# is the gate that asserts the two agree; without it, editing the config would
+# repoint every bash gate here while the CLI kept fetching the old path.
 #
 # Dependency-free: a small Node script enforces the schema's load-bearing
 # constraints (required keys, additionalProperties, role enum, version
@@ -15,7 +20,8 @@
 #   - sha256 recompute: the CLI verifies each fetched body against the
 #     manifest hash and aborts the install on mismatch, so a content edit
 #     that forgets to regenerate hashes ships a bundle nobody can install.
-#     Asserting the file merely exists never catches that.
+#     Asserting the file merely exists never catches that. Every entry must
+#     declare a hash — see the coverage assertion in the node block.
 #   - src set == skill dir: the skill directory is itself an install unit —
 #     the ecosystem `skills` CLI copies it wholesale, while this project's CLI
 #     installs exactly manifest.files[]. A file present in one and not the
@@ -23,9 +29,10 @@
 #
 # Exit codes:
 #   0 — manifest valid; every files[].src exists under the skill source dir,
-#       hashes as claimed, and matches the directory contents exactly.
-#   1 — schema-conformance failure, a missing/off-tree src, a hash mismatch,
-#       or a directory/manifest set difference.
+#       declares a sha256 that recomputes from its git-index bytes, and matches
+#       the directory contents exactly.
+#   1 — schema-conformance failure, a missing/off-tree src, an entry with no
+#       sha256, a hash mismatch, or a directory/manifest set difference.
 #   2 — environment problem (node or git missing, config/manifest/schema absent).
 set -uo pipefail
 export LC_ALL=C
@@ -60,6 +67,7 @@ export SKILL_DIR_FILES
 node - "${MANIFEST}" "${SCHEMA}" "${SKILL_SRC_DIR}" <<'NODE'
 const fs = require("fs");
 const crypto = require("crypto");
+const { execFileSync } = require("child_process");
 const [manifestPath, schemaPath, skillSrcDir] = process.argv.slice(2);
 
 let manifest, schema;
@@ -114,19 +122,48 @@ if (!Array.isArray(manifest.files) || manifest.files.length < 1) {
   // --- every files[].src exists on disk, under the skill source dir ---
   manifest.files.forEach((f, i) => {
     if (!f.src) return;
-    if (!fs.existsSync(f.src)) fail(`files[${i}].src does not exist on disk: ${f.src}`);
+    if (!fs.existsSync(f.src)) {
+      fail(`files[${i}].src does not exist on disk: ${f.src}\n      the CLI fetches every files[].src at install time, so this entry would 404 and abort the install\n      fix: restore the file, or drop the entry from ${manifestPath}`);
+    }
     if (!f.src.startsWith(`${skillSrcDir}/`)) fail(`files[${i}].src is outside ${skillSrcDir}/: ${f.src}`);
   });
 
-  // --- every files[].sha256 recomputes from the bytes at its src ---
-  // sha256 is optional in the schema (older bundles omit it and the CLI warns
-  // instead of failing), so only entries that declare one are checked.
+  // --- every files[] entry declares a sha256, and it recomputes from the
+  //     bytes git carries at that src ---
+  // sha256 is optional in the schema because the CLI warns rather than fails on
+  // entries that lack one, keeping manifests served from pre-existing tags
+  // installable. That allowance does NOT extend to this repo's manifest: if
+  // hash-less entries were merely skipped, a manifest regenerated without
+  // hashes would hash zero files and still report success. Assert coverage
+  // first, then the hashes themselves.
+  //
+  // Bytes are read from the git index (`git show :<path>`), not the working
+  // tree, so this check and the directory-versus-manifest set check below
+  // consult the same source. Hashing the working tree instead would go green on
+  // a file that was staged and then edited, while the bytes the commit ships
+  // contradict the manifest.
+  const unhashed = manifest.files
+    .map((f, i) => (f.sha256 ? null : `files[${i}] (${f.src || "no src"})`))
+    .filter(Boolean);
+  if (unhashed.length > 0) {
+    fail(`${unhashed.length}/${manifest.files.length} files[] entries declare no sha256: ${unhashed.join(", ")}\n      every entry in this repo's manifest must carry one — an entry without a hash is installed unverified\n      fix: add "sha256" to each entry (see the recompute command below)`);
+  }
   let hashed = 0;
   manifest.files.forEach((f, i) => {
-    if (!f.src || !f.sha256 || !fs.existsSync(f.src)) return;
-    const actual = crypto.createHash("sha256").update(fs.readFileSync(f.src)).digest("hex");
+    if (!f.src || !f.sha256) return;
+    let bytes;
+    try {
+      bytes = execFileSync("git", ["show", `:${f.src}`], {
+        maxBuffer: 256 * 1024 * 1024,
+        stdio: ["ignore", "pipe", "ignore"],
+      });
+    } catch {
+      fail(`files[${i}].src has no git index entry: ${f.src}\n      the hash is checked against indexed bytes, which an unstaged file does not have\n      fix: git add ${f.src}`);
+      return;
+    }
+    const actual = crypto.createHash("sha256").update(bytes).digest("hex");
     if (actual !== String(f.sha256).toLowerCase()) {
-      fail(`files[${i}].sha256 does not match ${f.src}\n      manifest: ${f.sha256}\n      on disk:  ${actual}\n      regenerate the manifest hash for this file`);
+      fail(`files[${i}].sha256 does not match ${f.src}\n      manifest: ${f.sha256}\n      in index: ${actual}\n      fix: stage the file, recompute, and paste the value into ${manifestPath}:\n        git add ${f.src} && node -e 'console.log(require("crypto").createHash("sha256").update(require("fs").readFileSync("${f.src}")).digest("hex"))'`);
     } else {
       hashed++;
     }
@@ -148,7 +185,7 @@ if (!Array.isArray(manifest.files) || manifest.files.length < 1) {
     }
   }
   if (failures === 0) {
-    console.log(`PASS  ${hashed}/${manifest.files.length} files[] hashes recomputed and matched.`);
+    console.log(`PASS  all ${manifest.files.length} files[] declare a sha256; all ${hashed} recomputed from the git index and matched.`);
     console.log(`PASS  ${skillSrcDir}/ and manifest.files[] hold the same ${dirFiles.size} paths.`);
   }
 }

@@ -33,8 +33,13 @@ export const SKILL_NAME = "architecture-diagram";
 export const MANIFEST_PATH = "dist/skill/manifest.json";
 
 // Repo-relative directory holding the skill source the manifest's files[].src
-// entries point into. fetchManifest asserts every src sits under this dir or
-// under LEGACY_SKILL_SRC_DIR.
+// entries point into. FROZEN, for the same reason as MANIFEST_PATH: fetchManifest
+// rejects any files[].src outside this dir or LEGACY_SKILL_SRC_DIR, and that
+// check is compiled into every CLI published from 1.4.9 onward. Moving the skill
+// content anywhere else makes those released CLIs hard-fail the install against
+// the new manifest — not degrade, refuse. A move is therefore a coordinated
+// breaking release: widen the accepted prefixes here first, let that CLI reach
+// users, and only then relocate the content.
 export const SKILL_SRC_DIR = "skills/architecture-diagram";
 
 // Where the skill source lived before it moved to SKILL_SRC_DIR. Tags published

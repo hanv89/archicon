@@ -21,8 +21,9 @@
 #   bash scripts/test_skills_cli_discovery.sh
 #
 # Exit codes:
-#   0 — skill discoverable; no SKILL.md under a pruned directory; manifest dir clean.
-#   1 — at least one of those three assertions failed.
+#   0 — skill discoverable on disk AND in git; no SKILL.md under a pruned
+#       directory; manifest dir clean.
+#   1 — at least one of those four assertions failed.
 #   2 — environment problem (git missing, not a work tree, config absent).
 set -uo pipefail
 export LC_ALL=C
@@ -35,28 +36,47 @@ cd "${REPO_ROOT}"
 git rev-parse --is-inside-work-tree >/dev/null 2>&1 \
   || { echo "ERROR: ${REPO_ROOT} is not a git work tree" >&2; exit 2; }
 
-# archicon.config is the single source of truth for both paths, so a move
-# shows up here instead of drifting silently.
+# Both paths come from archicon.config, so a move shows up here instead of
+# drifting silently. The CLI keeps its own copies; scripts/test_version_sync.sh
+# is the gate that asserts the two agree.
 [ -f "${REPO_ROOT}/archicon.config" ] || { echo "ERROR: archicon.config missing" >&2; exit 2; }
 # shellcheck source=../archicon.config
 . "${REPO_ROOT}/archicon.config"
 
+# Both halves of the manifest pair are derived from the config value, never
+# spelled out: renaming the manifest in archicon.config must not leave this gate
+# demanding a basename that no longer exists.
 MANIFEST_DIR="$(dirname "${SKILL_MANIFEST_PATH}")"
+MANIFEST_BASE="$(basename "${SKILL_MANIFEST_PATH}")"
+SCHEMA_BASE="${MANIFEST_BASE%.json}.schema.json"
 
 # Directory names the ecosystem CLI prunes while walking for SKILL.md.
-# Source: the SKIP_DIRS constant in the `skills` CLI. Pinned here as a copy so
-# the gate stays offline — re-read that constant in a newer CLI release before
-# assuming this list is still current.
+# Source: `skills@1.5.20`, `dist/cli.mjs`, verified 2026-07-29 — the same five
+# names appear at both discovery paths (the clone walk's SKIP_DIRS array and the
+# git-tree walk's SKIP_DIRS Set). Pinned here as a copy so the gate stays
+# offline — re-read that constant in a newer CLI release before assuming this
+# list is still current.
+#
+# Only `dist` and `build` can actually fire against this repo: `.git` is never
+# listed by `git ls-files`, and `node_modules` / `__pycache__` are excluded by
+# .gitignore. The other three are kept for parity with upstream so the copy can
+# be diffed against the constant it came from.
 SKIP_DIRS=(dist build node_modules .git __pycache__)
 
-# Tracked files plus untracked-but-not-ignored ones.
-mapfile -t FILES < <(git ls-files --cached --others --exclude-standard)
+# Tracked files plus untracked-but-not-ignored ones. Read with a `while read`
+# loop rather than `mapfile`, which is bash 4+: on macOS's default /bin/bash 3.2
+# the builtin is missing and the script would die under `set -u` with exit 1,
+# reading as "an assertion failed" instead of "wrong environment".
+FILES=()
+while IFS= read -r line; do
+  FILES+=("${line}")
+done < <(git ls-files --cached --others --exclude-standard)
 [ "${#FILES[@]}" -gt 0 ] || { echo "ERROR: git listed no files" >&2; exit 2; }
 
 failures=0
 fail() { echo "FAIL  $1" >&2; failures=$((failures + 1)); }
 
-# --- 1. the skill is where the CLI looks ---
+# --- 1. the skill is where the CLI looks, on disk ---
 SKILL_MD="${SKILL_SRC_DIR}/SKILL.md"
 if [ -f "${SKILL_MD}" ]; then
   echo "OK    ${SKILL_MD} present"
@@ -64,7 +84,27 @@ else
   fail "${SKILL_MD} does not exist — the ecosystem CLI has nothing to discover"
 fi
 
-# --- 2. no SKILL.md anywhere under a pruned directory name ---
+# --- 2. the same file is visible to git ---
+# Assertion 1 tests the working tree; assertion 3 iterates the git-visible list.
+# Without this bridge the two views can disagree: drop SKILL.md from the index
+# (or let a future ignore rule match it) and assertion 3 scans a list containing
+# no SKILL.md at all, finds nothing under a pruned directory, and reports OK for
+# a repo that publishes no skill. What git does not carry never reaches a clone,
+# so on-disk presence alone proves nothing.
+skill_md_tracked=0
+for path in "${FILES[@]}"; do
+  if [ "${path}" = "${SKILL_MD}" ]; then
+    skill_md_tracked=1
+    break
+  fi
+done
+if [ "${skill_md_tracked}" -eq 1 ]; then
+  echo "OK    ${SKILL_MD} is git-visible"
+else
+  fail "${SKILL_MD} exists on disk but git does not list it — it would never reach a clone, and the scan below would report OK having seen no SKILL.md at all. Run: git add ${SKILL_MD}"
+fi
+
+# --- 3. no SKILL.md anywhere under a pruned directory name ---
 hidden=0
 for path in "${FILES[@]}"; do
   [ "$(basename "${path}")" = "SKILL.md" ] || continue
@@ -81,8 +121,12 @@ for path in "${FILES[@]}"; do
 done
 [ "${hidden}" -eq 0 ] && echo "OK    no SKILL.md under a pruned directory (${SKIP_DIRS[*]})"
 
-# --- 3. the manifest directory holds the manifest pair and nothing else ---
-EXPECTED_PAIR="$(printf '%s\n' "${MANIFEST_DIR}/manifest.json" "${MANIFEST_DIR}/manifest.schema.json" | sort)"
+# --- 4. the manifest directory holds the manifest pair and nothing else ---
+# Why: the manifest stayed at its published URL under a directory the ecosystem
+# CLI prunes. Anything else left behind there is invisible to that CLI while
+# this repo's CLI would still install it from manifest.files[], so the two
+# install channels would ship different trees from one commit.
+EXPECTED_PAIR="$(printf '%s\n' "${SKILL_MANIFEST_PATH}" "${MANIFEST_DIR}/${SCHEMA_BASE}" | sort)"
 ACTUAL_PAIR="$(printf '%s\n' "${FILES[@]}" | grep "^${MANIFEST_DIR}/" | sort || true)"
 if [ "${ACTUAL_PAIR}" = "${EXPECTED_PAIR}" ]; then
   echo "OK    ${MANIFEST_DIR}/ holds the manifest pair only"
