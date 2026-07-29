@@ -29,7 +29,7 @@ export LC_ALL=C
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${REPO_ROOT}"
 
-SKILL="dist/skill/SKILL.md"
+SKILL="skills/architecture-diagram/SKILL.md"
 [ -f "${SKILL}" ] || { echo "ERROR: ${SKILL} missing" >&2; exit 2; }
 
 REPO_SLUG="hanv89/archicon"
@@ -57,7 +57,7 @@ strip_wrong_fences() {
 # Collect unique repo-hosted img paths (relative to repo root) from all sources.
 collect_refs() {
   strip_wrong_fences "${SKILL}" | grep -ohE "${IMG_RE}"
-  for ex in dist/skill/examples/*.puml; do
+  for ex in skills/architecture-diagram/examples/*.puml; do
     [ -f "${ex}" ] && grep -ohE "${IMG_RE}" "${ex}"
   done
 }

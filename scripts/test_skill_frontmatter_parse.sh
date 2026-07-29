@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Asserts dist/skill/SKILL.md frontmatter parses as YAML + carries the three
+# Asserts skills/architecture-diagram/SKILL.md frontmatter parses as YAML + carries the three
 # required scalar fields (name, version, requires_icons) the CLI's install
 # path depends on (packages/cli/src/adapters/_shared.ts:328 parseFrontmatter +
 # adapters/_shared.ts:566 / adapters/cursor.ts:114 requires_icons enforcement).
@@ -19,7 +19,7 @@
 set -euo pipefail
 export LC_ALL=C
 
-SKILL_MD="${SKILL_MD:-dist/skill/SKILL.md}"
+SKILL_MD="${SKILL_MD:-skills/architecture-diagram/SKILL.md}"
 # Resolve js-yaml location: prefer packages/cli/node_modules (where it's a
 # CLI dep), fall back to repo-root node_modules if installed there.
 JS_YAML_PATH=""
