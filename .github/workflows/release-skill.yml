@@ -35,8 +35,15 @@ jobs:
         # NOTE: do NOT set 'registry-url' — it injects a .npmrc _authToken
         # that conflicts with the Trusted Publisher OIDC flow.
 
-      - name: Upgrade npm to latest (trusted publishing needs >= 11.5.1)
-        run: npm install -g npm@latest
+      - name: Upgrade npm (trusted publishing needs >= 11.5.1)
+        # Pinned to the 11.x line rather than @latest. The real constraint is
+        # >= 11.5.1 for OIDC; @latest merely happened to satisfy it. It stopped
+        # doing so when npm 12 raised its own engine floor above the Node 20
+        # this job runs on, which failed a release two months after the last
+        # one worked, with nothing in this repo having changed. Naming the
+        # actual requirement keeps the job pinned to something Node 20 can
+        # install for as long as 11.x is published.
+        run: npm install -g npm@11
 
       - name: Tag must match the packaged version
         # A mistyped tag would publish this tree under the wrong version, after
