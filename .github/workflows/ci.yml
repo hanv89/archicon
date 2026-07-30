@@ -105,6 +105,19 @@ jobs:
         run: bash scripts/test_icon_sync_completeness.sh
       - name: scripts/lint_examples.sh
         run: bash scripts/lint_examples.sh
+      # Layout contract for the ecosystem `skills` CLI: it walks a checkout for
+      # SKILL.md and prunes a fixed set of directory names, so a skill stored
+      # under one of them is silently undiscoverable — the install finds zero
+      # skills and still exits 0. Every other gate here checks files in
+      # isolation and would stay green through that move.
+      - name: scripts/test_skills_cli_discovery.sh
+        run: bash scripts/test_skills_cli_discovery.sh
+      # Version lockstep across package.json, package-lock.json (both fields),
+      # the manifest, and SKILL.md frontmatter. The schema documents the rule;
+      # this enforces it. A partial bump has no symptom until install time,
+      # when the CLI's version comparison quietly skips the update.
+      - name: scripts/test_version_sync.sh
+        run: bash scripts/test_version_sync.sh
       # >>> AWS-CI-BEGIN (CC-BY-ND verbatim contract gate: build has no rsvg +
       #     shipped dist/AWS PNGs are sha256-identical to upstream; offline via
       #     the cached scripts/fixtures/aws-upstream-sha256.tsv)

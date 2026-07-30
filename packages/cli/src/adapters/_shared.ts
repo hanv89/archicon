@@ -18,15 +18,34 @@ const RAW_BASE_NO_REF = "https://raw.githubusercontent.com/hanv89/archicon";
 
 const VERSION_RE = /^\d+\.\d+\.\d+$/;
 
-// SKILL_NAME must stay in lockstep with dist/skill/SKILL.md frontmatter `name`.
-// Renaming the skill is a breaking change requiring a coordinated CLI release;
-// existing installs become un-uninstallable until users upgrade the CLI
-// (uninstall's allow-list refuses folders whose SKILL.md `name` differs).
+// SKILL_NAME must stay in lockstep with skills/architecture-diagram/SKILL.md
+// frontmatter `name`. Renaming the skill is a breaking change requiring a
+// coordinated CLI release; existing installs become un-uninstallable until
+// users upgrade the CLI (uninstall's allow-list refuses folders whose
+// SKILL.md `name` differs).
 export const SKILL_NAME = "architecture-diagram";
 
-// Fetched at install/update time from dist/skill/manifest.json. files[0] MUST
-// be SKILL.md so the frontmatter precheck has a stable target.
+// Fetched at install/update time from this repo-relative path. FROZEN: that URL
+// is a published contract every released CLI fetches at install time, so moving
+// the manifest breaks installs already in users' hands. The skill content moved
+// to SKILL_SRC_DIR; the manifest deliberately did not follow it.
+// files[0] MUST be SKILL.md so the frontmatter precheck has a stable target.
 export const MANIFEST_PATH = "dist/skill/manifest.json";
+
+// Repo-relative directory holding the skill source the manifest's files[].src
+// entries point into. FROZEN, for the same reason as MANIFEST_PATH: fetchManifest
+// rejects any files[].src outside this dir or LEGACY_SKILL_SRC_DIR, and that
+// check is compiled into every CLI published from 1.4.9 onward. Moving the skill
+// content anywhere else makes those released CLIs hard-fail the install against
+// the new manifest — not degrade, refuse. A move is therefore a coordinated
+// breaking release: widen the accepted prefixes here first, let that CLI reach
+// users, and only then relocate the content.
+export const SKILL_SRC_DIR = "skills/architecture-diagram";
+
+// Where the skill source lived before it moved to SKILL_SRC_DIR. Tags published
+// before the move still serve manifests whose files[].src start here, and
+// `--version=X.Y.Z` against those tags is a supported install path.
+export const LEGACY_SKILL_SRC_DIR = "dist/skill";
 
 export const CANARY_ICON_PATH = "dist/Azure/Compute/AzureVirtualMachine.png";
 
@@ -308,6 +327,15 @@ export async function fetchManifest(base: string): Promise<Manifest> {
       if (path.isAbsolute(p) || p.split(/[\\/]/).includes("..")) {
         throw new Error(`manifest ${url} files[${i}].${key} must be a relative path with no '..' segment (got: ${p})`);
       }
+    }
+    // Every src must sit inside the skill source dir. BOTH prefixes are
+    // accepted on purpose: tags published before the skill moved still serve
+    // manifests rooted at LEGACY_SKILL_SRC_DIR, and `--version=X.Y.Z` against
+    // those tags is a supported install path. Narrowing this to the current
+    // shape alone would break every pinned install of an older tag.
+    const src = (f as ManifestFile).src;
+    if (!src.startsWith(`${SKILL_SRC_DIR}/`) && !src.startsWith(`${LEGACY_SKILL_SRC_DIR}/`)) {
+      throw new Error(`manifest ${url} files[${i}].src must live under ${SKILL_SRC_DIR}/ or ${LEGACY_SKILL_SRC_DIR}/ (got: ${src})`);
     }
   }
   if (m.files[0].dest !== "SKILL.md" || m.files[0].role !== "skill") {

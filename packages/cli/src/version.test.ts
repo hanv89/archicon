@@ -124,7 +124,7 @@ function makeManifest(overrides: Partial<Manifest> = {}): Manifest {
     version: "0.8.0",
     requires_icons: ">=0.2.2",
     icons_version: "0.2.2",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill" }],
     ...overrides,
   };
 }
@@ -208,8 +208,8 @@ test("--version=0.5.0 integration: install fetches from skill-v0.5.0 ref", async
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
-    if (u.endsWith("/dist/skill/examples/01-context.puml")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
+    if (u.endsWith("/skills/architecture-diagram/examples/01-context.puml")) {
       return new Response(SYNTHETIC_EXAMPLE, { status: 200 });
     }
     return new Response("not found", { status: 404 });
@@ -222,8 +222,64 @@ test("--version=0.5.0 integration: install fetches from skill-v0.5.0 ref", async
     const tagPinned = requestedUrls.filter(u => u.includes("/skill-v0.5.0/"));
     assert.ok(tagPinned.length >= 1, `expected at least one URL with /skill-v0.5.0/, got: ${JSON.stringify(requestedUrls)}`);
 
-    const mainRefHit = requestedUrls.filter(u => u.includes("/main/dist/"));
-    assert.equal(mainRefHit.length, 0, `expected no /main/ URLs when --version is set, got: ${JSON.stringify(mainRefHit)}`);
+    // Match the ref segment positionally, not as a whole-URL substring. An
+    // earlier form checked "/main/dist/", which was equivalent only while every
+    // fetched file lived under dist/; now that SKILL.md and the examples sit
+    // under skills/, that form would miss an unpinned fetch of exactly the
+    // files this test exists to protect. raw.githubusercontent.com paths are
+    // /<owner>/<repo>/<ref>/<path...>, so pathname segment 3 is the ref.
+    const mainRefHit = requestedUrls.filter(u => new URL(u).pathname.split("/")[3] === "main");
+    assert.equal(mainRefHit.length, 0, `expected no main-ref URLs when --version is set, got: ${JSON.stringify(mainRefHit)}`);
+  } finally {
+    globalThis.fetch = realFetch;
+    if (prevEnv === undefined) delete process.env.ARCH_SKILL_TARGET_ROOT;
+    else process.env.ARCH_SKILL_TARGET_ROOT = prevEnv;
+    if (prevBase === undefined) delete process.env.ARCH_SKILL_BASE_URL;
+    else process.env.ARCH_SKILL_BASE_URL = prevBase;
+    rmTmpdir(tmpdir);
+  }
+});
+
+test("--version=1.4.8 integration: a legacy dist/skill/ manifest still installs", async () => {
+  // Every tag published before the skill source moved to
+  // skills/architecture-diagram/ serves a manifest whose files[].src start with
+  // dist/skill/. Installing from such a tag (`--version=1.4.8`) is a supported
+  // path, so the CLI must accept the legacy shape as well as the current one.
+  // The rest of the suite only exercises the current shape.
+  const tmpdir = mkTmpdir();
+  const target = path.join(tmpdir, "skills", "architecture-diagram");
+  const prevEnv = process.env.ARCH_SKILL_TARGET_ROOT;
+  const prevBase = process.env.ARCH_SKILL_BASE_URL;
+  process.env.ARCH_SKILL_TARGET_ROOT = tmpdir;
+  delete process.env.ARCH_SKILL_BASE_URL;
+
+  const legacyManifest = {
+    ...SYNTHETIC_MANIFEST,
+    files: [
+      { src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" },
+      { src: "dist/skill/examples/01-context.puml", dest: "examples/01-context.puml", role: "example" },
+    ],
+  };
+
+  globalThis.fetch = (async (url: any, init?: any) => {
+    const u = url.toString();
+    const method = (init?.method ?? "GET").toUpperCase();
+    if (method === "HEAD") return new Response(null, { status: 200 });
+    if (u.endsWith("/dist/skill/manifest.json")) {
+      return new Response(JSON.stringify(legacyManifest), { status: 200, headers: { "Content-Type": "application/json" } });
+    }
+    if (u.endsWith("/dist/skill/SKILL.md")) return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
+    if (u.endsWith("/dist/skill/examples/01-context.puml")) {
+      return new Response(SYNTHETIC_EXAMPLE, { status: 200 });
+    }
+    return new Response("not found", { status: 404 });
+  }) as typeof fetch;
+
+  try {
+    const exit = await claudeCodeAdapter.install({ target, version: "1.4.8" });
+    assert.equal(exit, 0, "install from a legacy-shape manifest should succeed");
+    assert.equal(fs.readFileSync(path.join(target, "SKILL.md"), "utf8"), SYNTHETIC_SKILL_MD);
+    assert.equal(fs.readFileSync(path.join(target, "examples", "01-context.puml"), "utf8"), SYNTHETIC_EXAMPLE);
   } finally {
     globalThis.fetch = realFetch;
     if (prevEnv === undefined) delete process.env.ARCH_SKILL_TARGET_ROOT;
@@ -292,7 +348,7 @@ test("update: already-at-version emits no-op, does not re-fetch examples", async
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) {
       return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
     }
     return new Response("not found", { status: 404 });
@@ -308,7 +364,7 @@ test("update: already-at-version emits no-op, does not re-fetch examples", async
     assert.equal(exit, 0);
     assert.match(captured, /already at version 0\.5\.0 \(no-op\)/);
     // No SKILL.md GET should have happened during update (only manifest + HEAD).
-    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/dist/skill/SKILL.md"));
+    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/skills/architecture-diagram/SKILL.md"));
     assert.equal(skillMdGets.length, 0, `expected zero SKILL.md GETs during no-op update, got: ${JSON.stringify(skillMdGets)}`);
   } finally {
     process.stdout.write = origStdout as any;
@@ -418,7 +474,7 @@ test("cursor: update already-at-version emits no-op, does not overwrite", async 
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(SYNTHETIC_MANIFEST), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) {
       return new Response(SYNTHETIC_SKILL_MD, { status: 200 });
     }
     return new Response("not found", { status: 404 });
@@ -435,7 +491,7 @@ test("cursor: update already-at-version emits no-op, does not overwrite", async 
     assert.match(captured, /already at version 0\.5\.0 \(no-op\)/);
     // No SKILL.md GET during update — only manifest.json (and no HEADs because
     // verifyIconsAvailability is only called in install, not update no-op).
-    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/dist/skill/SKILL.md"));
+    const skillMdGets = fetchedUrls.filter(u => u.startsWith("GET ") && u.endsWith("/skills/architecture-diagram/SKILL.md"));
     assert.equal(skillMdGets.length, 0, `expected zero SKILL.md GETs during Cursor no-op update, got: ${JSON.stringify(skillMdGets)}`);
   } finally {
     process.stdout.write = origStdout as any;
@@ -450,6 +506,3 @@ test("cursor: update already-at-version emits no-op, does not overwrite", async 
     rmTmpdir(tmpdir);
   }
 });
-
-// Use fs imports so node:test doesn't complain about unused imports.
-void fs;

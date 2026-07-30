@@ -34,8 +34,8 @@ function tamperedSkillFetchMock(): { restore: () => void } {
     requires_icons: SYNTHETIC_REQUIRES_ICONS,
     icons_version: SYNTHETIC_ICONS_VERSION,
     files: [
-      { src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill", sha256: honestSha },
-      { src: "dist/skill/examples/01-context.puml", dest: "examples/01-context.puml", role: "example", sha256: exampleSha },
+      { src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill", sha256: honestSha },
+      { src: "skills/architecture-diagram/examples/01-context.puml", dest: "examples/01-context.puml", role: "example", sha256: exampleSha },
     ],
   };
   globalThis.fetch = (async (url: any, init?: any) => {
@@ -45,12 +45,12 @@ function tamperedSkillFetchMock(): { restore: () => void } {
     if (u.endsWith("/dist/skill/manifest.json")) {
       return new Response(JSON.stringify(manifest), { status: 200, headers: { "Content-Type": "application/json" } });
     }
-    if (u.endsWith("/dist/skill/SKILL.md")) {
+    if (u.endsWith("/skills/architecture-diagram/SKILL.md")) {
       // Body tampered: real frontmatter (so name/requires_icons checks pass)
       // but appended bytes so the sha256 no longer matches the manifest.
       return new Response(SYNTHETIC_SKILL_MD + "\n<!-- tampered -->\n", { status: 200 });
     }
-    if (u.endsWith("/dist/skill/examples/01-context.puml")) {
+    if (u.endsWith("/skills/architecture-diagram/examples/01-context.puml")) {
       return new Response(SYNTHETIC_EXAMPLE, { status: 200 });
     }
     return new Response("not found", { status: 404 });

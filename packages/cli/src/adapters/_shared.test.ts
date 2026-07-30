@@ -11,7 +11,39 @@ import {
   stripFrontmatter,
   joinWithinTarget,
   verifyFileHash,
+  MANIFEST_PATH,
+  SKILL_SRC_DIR,
+  LEGACY_SKILL_SRC_DIR,
 } from "./_shared";
+
+// ---------------------------------------------------------------------------
+// MANIFEST_PATH — frozen published contract.
+// ---------------------------------------------------------------------------
+
+test("MANIFEST_PATH is frozen at dist/skill/manifest.json", () => {
+  // Every CLI version already published to npm has this path compiled in and
+  // fetches it from the repo at install time. Moving the manifest breaks
+  // installs and updates for releases already in users' hands — a change here
+  // is a breaking release, never a tidy-up. The skill content moved to
+  // skills/architecture-diagram/; the manifest deliberately did not follow.
+  assert.equal(MANIFEST_PATH, "dist/skill/manifest.json");
+});
+
+// ---------------------------------------------------------------------------
+// SKILL_SRC_DIR — the second frozen published contract.
+// ---------------------------------------------------------------------------
+
+test("the accepted files[].src prefixes are frozen", () => {
+  // fetchManifest rejects any files[].src outside these two prefixes, and that
+  // rejection is compiled into every CLI published from 1.4.9 onward. Moving
+  // the skill content elsewhere makes those released CLIs refuse the install
+  // outright — the same breakage MANIFEST_PATH carries, one level down.
+  // Widening the prefix set has to ship and reach users BEFORE the content
+  // moves; dropping the legacy prefix breaks `--version=X.Y.Z` installs
+  // pinned to tags published before the move.
+  assert.equal(SKILL_SRC_DIR, "skills/architecture-diagram");
+  assert.equal(LEGACY_SKILL_SRC_DIR, "dist/skill");
+});
 
 // ---------------------------------------------------------------------------
 // safeResolveTarget — the symlink/escape security guard.
@@ -149,7 +181,7 @@ test("fetchManifest: missing required field throws", async () => {
 test("fetchManifest: files[0] not SKILL.md is rejected", async () => {
   const m = mockFetchBody(JSON.stringify({
     name: "x", version: "1.0.0", requires_icons: ">=1.0.0",
-    files: [{ src: "dist/skill/examples/01.puml", dest: "examples/01.puml", role: "example" }],
+    files: [{ src: "skills/architecture-diagram/examples/01.puml", dest: "examples/01.puml", role: "example" }],
   }));
   try {
     await assert.rejects(() => fetchManifest(BASE), /files\[0\] must be SKILL\.md/);
@@ -160,7 +192,7 @@ test("fetchManifest: valid manifest parses", async () => {
   const m = mockFetchBody(JSON.stringify({
     name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.4.0",
     icons_version: "1.4.0",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill" }],
   }));
   try {
     const parsed = await fetchManifest(BASE);
@@ -174,7 +206,7 @@ test("fetchManifest: valid manifest with a per-file sha256 parses", async () => 
   const m = mockFetchBody(JSON.stringify({
     name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.4.0",
     icons_version: "1.4.0",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill", sha256: sha }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill", sha256: sha }],
   }));
   try {
     const parsed = await fetchManifest(BASE);
@@ -182,10 +214,35 @@ test("fetchManifest: valid manifest with a per-file sha256 parses", async () => 
   } finally { m.restore(); }
 });
 
+test("fetchManifest: a src outside both accepted prefixes is rejected", async () => {
+  // The behavioural half of the SKILL_SRC_DIR freeze above: proof the constant
+  // is load-bearing at install time rather than a label. Every published 1.4.9+
+  // CLI runs this rejection, which is why moving the content is a coordinated
+  // breaking release and not a refactor.
+  const m = mockFetchBody(JSON.stringify({
+    name: "architecture-diagram", version: "1.4.9", requires_icons: ">=1.2.0",
+    files: [{ src: "skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+  }));
+  try {
+    await assert.rejects(() => fetchManifest(BASE), /must live under/);
+  } finally { m.restore(); }
+});
+
+test("fetchManifest: the legacy prefix is still accepted (pinned old-tag installs)", async () => {
+  const m = mockFetchBody(JSON.stringify({
+    name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.2.0",
+    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" }],
+  }));
+  try {
+    const parsed = await fetchManifest(BASE);
+    assert.equal(parsed.files[0].src, "dist/skill/SKILL.md");
+  } finally { m.restore(); }
+});
+
 test("fetchManifest: malformed sha256 (not 64 hex) is rejected", async () => {
   const m = mockFetchBody(JSON.stringify({
     name: "architecture-diagram", version: "1.4.2", requires_icons: ">=1.4.0",
-    files: [{ src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill", sha256: "deadbeef" }],
+    files: [{ src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill", sha256: "deadbeef" }],
   }));
   try {
     await assert.rejects(() => fetchManifest(BASE), /sha256 must be a 64-char hex string/);
@@ -244,7 +301,7 @@ test("verifyFileHash: Buffer body is hashed the same as its string form", () => 
 // must not be able to escape the install target.
 // ---------------------------------------------------------------------------
 
-const VALID_SKILL = { src: "dist/skill/SKILL.md", dest: "SKILL.md", role: "skill" };
+const VALID_SKILL = { src: "skills/architecture-diagram/SKILL.md", dest: "SKILL.md", role: "skill" };
 function manifestWith(extra: object) {
   return JSON.stringify({
     name: "architecture-diagram", version: "1.6.3", requires_icons: ">=1.4.0",
@@ -253,13 +310,13 @@ function manifestWith(extra: object) {
 }
 
 test("fetchManifest: rejects a `..` traversal in dest", async () => {
-  const m = mockFetchBody(manifestWith({ src: "dist/skill/x.puml", dest: "../../../../.bashrc", role: "example" }));
+  const m = mockFetchBody(manifestWith({ src: "skills/architecture-diagram/x.puml", dest: "../../../../.bashrc", role: "example" }));
   try { await assert.rejects(() => fetchManifest(BASE), /relative path with no '\.\.'/); }
   finally { m.restore(); }
 });
 
 test("fetchManifest: rejects an absolute dest", async () => {
-  const m = mockFetchBody(manifestWith({ src: "dist/skill/x.puml", dest: "/etc/cron.d/evil", role: "example" }));
+  const m = mockFetchBody(manifestWith({ src: "skills/architecture-diagram/x.puml", dest: "/etc/cron.d/evil", role: "example" }));
   try { await assert.rejects(() => fetchManifest(BASE), /relative path with no/); }
   finally { m.restore(); }
 });

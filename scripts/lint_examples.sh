@@ -19,7 +19,7 @@ export LC_ALL=C
 
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${REPO_ROOT}"
-EX="dist/skill/examples"
+EX="skills/architecture-diagram/examples"
 [ -d "${EX}" ] || { echo "ERROR: ${EX} missing" >&2; exit 2; }
 
 FAILED=0

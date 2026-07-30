@@ -3,9 +3,9 @@
 #
 # Produces dist/chat-ui-bundle.zip containing:
 #   - README.md             (top-level "what's in this bundle + how to use")
-#   - SKILL.md              (copy of dist/skill/SKILL.md)
+#   - SKILL.md              (copy of skills/architecture-diagram/SKILL.md)
 #   - NOTICE                (copy of repo-root NOTICE)
-#   - examples/<NN-name>.{puml,mmd,md} (all dist/skill/examples/*.{puml,mmd,md} flat; .md = worked agent-dialogue transcript such as 20-init-clarify.md)
+#   - examples/<NN-name>.{puml,mmd,md} (all skills/architecture-diagram/examples/*.{puml,mmd,md} flat; .md = worked agent-dialogue transcript such as 20-init-clarify.md)
 #   - indexes/<Vendor>-INDEX.md       (per-vendor catalog, 5 files)
 #   - usage-rules/<Vendor>-USAGE-RULES.txt (per-vendor licence/trademark, 5 files)
 #
@@ -24,7 +24,7 @@
 #
 # Exit codes:
 #   0 — bundle built successfully.
-#   1 — missing input file (script-detectable; e.g. dist/skill/SKILL.md absent).
+#   1 — missing input file (script-detectable; e.g. skills/architecture-diagram/SKILL.md absent).
 #   2 — environment problem (zip CLI missing).
 set -euo pipefail
 export LC_ALL=C
@@ -35,9 +35,9 @@ command -v zip >/dev/null 2>&1 || { echo "ERROR: zip CLI not installed" >&2; exi
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "${REPO_ROOT}"
 
-SKILL_SRC="dist/skill/SKILL.md"
+SKILL_SRC="skills/architecture-diagram/SKILL.md"
 NOTICE_SRC="NOTICE"
-EXAMPLES_SRC_DIR="dist/skill/examples"
+EXAMPLES_SRC_DIR="skills/architecture-diagram/examples"
 DIST_DIR="dist"
 OUT_ZIP="${DIST_DIR}/chat-ui-bundle.zip"
 
@@ -74,7 +74,7 @@ mkdir -p "${STAGE}/examples" "${STAGE}/indexes" "${STAGE}/usage-rules"
 cp "${SKILL_SRC}"  "${STAGE}/SKILL.md"
 cp "${NOTICE_SRC}" "${STAGE}/NOTICE"
 
-# Examples — flatten dist/skill/examples/*.{puml,mmd,md} into examples/
+# Examples — flatten skills/architecture-diagram/examples/*.{puml,mmd,md} into examples/
 # (.puml = PlantUML, .mmd = Mermaid, .md = worked agent-dialogue transcript
 # such as 20-init-clarify.md). Without .md, SKILL.md cross-references the
 # dialogue example but the bundle would ship without it — chat-UI users

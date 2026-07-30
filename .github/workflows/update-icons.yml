@@ -133,19 +133,23 @@ jobs:
           bash scripts/build_aws.sh
           bash scripts/build_gcp.sh
 
-      - name: Open PR if dist/ changed
+      - name: Open PR if dist/ or skills/ changed
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          if [[ -n "$(git status --porcelain dist/)" ]]; then
+          # Icons land in dist/; none of the build scripts above write under
+          # skills/ today. skills/ is staged defensively so that if a future
+          # generator does emit skill content (a regenerated icon index, say),
+          # its output reaches the PR instead of being silently dropped.
+          if [[ -n "$(git status --porcelain dist/ skills/)" ]]; then
             # Branch name carries date + run_id so cron + manual dispatch on the
             # same day don't collide, and a previous unmerged PR isn't blocked.
             BR="chore/update-icons-$(date -u +%Y%m%d)-${{ github.run_id }}"
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
             git checkout -b "${BR}"
-            git add dist/
+            git add dist/ skills/
             git commit -m "chore(icons): refresh from upstream $(date -u +%Y-%m-%d)"
             git push origin "${BR}"
             gh pr create \

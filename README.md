@@ -8,13 +8,30 @@ Confluence, GitHub, and `www.plantuml.com/plantuml/uml/` — no CDN, no auth, no
 
 ## Quick start (60 seconds)
 
-**1.** Install the skill into your AI agent:
+**1.** Install the skill into your AI agent — **pick one** of the two commands
+below. Both write to the same directory, so running both just has one overwrite
+the other.
+
+**Option A — this repo's CLI** (recommended: it verifies every file's `sha256`
+against the install manifest before writing it):
 
 ```bash
 npx @hanv89/arch-skill install --agent=claude-code   # or codex | cursor | all
 ```
 
-> **Choose install scope** *(optional, default = `user`)*: add `--scope=project` to install into `<cwd>/.claude/skills/` for team-shared diagrams checked in via git; default `--scope=user` writes to `~/.claude/skills/` for personal use across all repos. Cursor is project-only by architecture (User Rules in Cursor are settings-only, not file-writable).
+> **Choose install scope** *(optional, `@hanv89/arch-skill` only, default = `user`)*: add `--scope=project` to install into `<cwd>/.claude/skills/` for team-shared diagrams checked in via git; default `--scope=user` writes to `~/.claude/skills/` for personal use across all repos. Cursor is project-only by architecture (User Rules in Cursor are settings-only, not file-writable).
+
+**Option B — the ecosystem CLI** (use it if you already manage your skills with
+it; it reaches 70+ agents but copies or symlinks the whole skill directory
+without verifying checksums):
+
+```bash
+npx skills add hanv89/archicon
+```
+
+To switch channels later, uninstall with the tool you installed with
+(`npx @hanv89/arch-skill uninstall --agent=…` or
+`npx skills remove architecture-diagram`) before running the other one.
 
 **2.** Ask your agent (copy-paste this prompt):
 
@@ -26,7 +43,7 @@ your diagram renders with real Azure icons in a few seconds.
 
 ![Example: Azure Container diagram rendered with vendor icons](docs/screenshots/17-ladder-container.png)
 
-*From [`dist/skill/examples/17-ladder-container.puml`](dist/skill/examples/17-ladder-container.puml)
+*From [`skills/architecture-diagram/examples/17-ladder-container.puml`](skills/architecture-diagram/examples/17-ladder-container.puml)
 — the canonical Container-level view of an e-commerce stack. Same shape your
 agent will produce for the prompt above.*
 
@@ -36,7 +53,7 @@ agent will produce for the prompt above.*
   FluentUI 75 / Devicon 149 / AWS 868 / GCP 19. Tag-pinned
   `raw.githubusercontent.com` URLs; no CDN, no auth. Per-vendor licence terms
   in [`NOTICE`](./NOTICE) + `dist/<Vendor>/USAGE-RULES.txt`.
-- **Skill** (`dist/skill/SKILL.md`): C4 diagram taxonomy (Context / Container /
+- **Skill** (`skills/architecture-diagram/SKILL.md`): C4 diagram taxonomy (Context / Container /
   Component / System Landscape / Dynamic / Deployment), 7-field header
   convention, HLD / ADR / Detailed Technical Design document scaffolds,
   strict-vs-freestyle style modes, 5 layout-compaction rules, and a 6-question

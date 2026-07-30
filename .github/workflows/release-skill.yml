@@ -38,6 +38,20 @@ jobs:
       - name: Upgrade npm to latest (trusted publishing needs >= 11.5.1)
         run: npm install -g npm@latest
 
+      - name: Tag must match the packaged version
+        # A mistyped tag would publish this tree under the wrong version, after
+        # which `--version=<tag>` installs a bundle that self-reports something
+        # else and every later `update` silently no-ops. npm will not let the
+        # right version be republished afterwards, so this has to fail here.
+        run: |
+          TAG_VERSION="${GITHUB_REF_NAME#skill-v}"
+          PKG_VERSION="$(node -p 'require("./package.json").version')"
+          if [ "${TAG_VERSION}" != "${PKG_VERSION}" ]; then
+            echo "ERROR: tag ${GITHUB_REF_NAME} implies ${TAG_VERSION}, but package.json reads ${PKG_VERSION}" >&2
+            exit 1
+          fi
+          echo "OK: tag and package.json both read ${PKG_VERSION}"
+
       - name: Install + build + pack
         run: |
           npm ci
@@ -46,6 +60,19 @@ jobs:
 
       - name: Run tests before publish
         run: npm test
+
+      - name: Run release gates before publish
+        # ci.yml triggers on pull requests and pushes to main, never on tags,
+        # so without this a tag cut from an unchecked commit publishes a
+        # partially-bumped or hash-stale manifest — exactly what these gates
+        # exist to stop. test_fixture_drift is omitted: it needs the fixture
+        # branch fetched and is a merge-time concern, not a publish-time one.
+        working-directory: ${{ github.workspace }}
+        run: |
+          bash scripts/validate_manifest.sh
+          bash scripts/test_version_sync.sh
+          bash scripts/test_skills_cli_discovery.sh
+          bash scripts/test_skill_frontmatter_parse.sh
 
       - name: npm audit gate (block publish on high-severity advisories)
         run: npm audit --omit=dev --audit-level=high
@@ -60,16 +87,21 @@ jobs:
             echo "tag=latest" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: npm publish --provenance
-        run: npm publish --provenance --access public --tag "${{ steps.dist.outputs.tag }}"
-
       - name: Build chat-UI distribution bundle
         # Downloadable artifact for chat-UI channels (Claude.ai Project +
         # ChatGPT Custom GPT). Byte-reproducible (bundle-repro CI job).
+        #
+        # Built BEFORE publishing on purpose. npm refuses to republish a
+        # version, so anything that can fail must fail while the publish can
+        # still be retried; a bundle failure after the publish would strand
+        # the version on npm with no release and no downloadable artifact.
         working-directory: ${{ github.workspace }}
         run: |
           bash scripts/build_chat_ui_bundle.sh
           test -s dist/chat-ui-bundle.zip
+
+      - name: npm publish --provenance
+        run: npm publish --provenance --access public --tag "${{ steps.dist.outputs.tag }}"
 
       - name: Create GitHub Release
         env:
